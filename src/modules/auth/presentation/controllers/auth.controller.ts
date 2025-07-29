@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiBody, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { AuthService } from '../../application/services/auth.service';
 import { LoginDto } from '../../domain/dto/login.dto';
@@ -11,17 +11,10 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-  @ApiBody({ 
-    type: LoginDto,
-    description: 'Credenciais de login do usuário',
-  })
-  @ApiOkResponse({ 
-    type: AuthResponseDto,
-    description: 'Login realizado com sucesso',
-  })
-  @ApiUnauthorizedResponse({
-    description: 'Credenciais inválidas ou usuário inativo',
-  })
+  @HttpCode(HttpStatus.OK)
+  @ApiBody({ type: LoginDto, description: 'Credenciais de login do usuário'})
+  @ApiOkResponse({type: AuthResponseDto, description: 'Login realizado com sucesso'})
+  @ApiUnauthorizedResponse({description: 'Credenciais inválidas ou usuário inativo'})
   async login(@Body() loginDto: LoginDto): Promise<AuthResponseDto> {
     return this.authService.login(loginDto);
   }
