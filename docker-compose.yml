@@ -1,0 +1,44 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: intranetantonelly-api  # Atualizado para refletir o novo nome
+    volumes:
+      - .:/home/node/app
+      - /home/node/app/.docker/postgres-data
+    ports:
+      - '3005:3000'
+    networks:
+      - api-network
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    container_name: intranetantonelly-postgres  # Atualizado
+    image: postgres:16.5
+    restart: no
+    environment:
+      POSTGRES_DB: intranetantonelly  # Nome do banco alterado
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5434:5432'  # Porta 5434 mapeada para 5432 (evita conflitos com PostgreSQL local)
+    networks:
+      - api-network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']  # Usuário fixo (sem variável)
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+networks:
+  api-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
