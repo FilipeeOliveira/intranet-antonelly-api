@@ -26,7 +26,7 @@ Este **`NestJS REST API`** foi projetado para dar um impulso inicial ao seu proc
 
 ### 1. Clone o repositório
 ```bash
-git clone https://github.com/FilipeeOliveira/assign-mate-api
+git clone https://github.com/FilipeeOliveira/intranet-antonelly-api
 ```
 
 ### 2. Atualize o arquivo `.env`
