@@ -8,28 +8,28 @@ async function main() {
 
   // Criar roles
   const adminRole = await prisma.role.upsert({
-    where: { name: 'ADMIN' },
+    where: { key: 'ADMIN' },
     update: {},
     create: {
-      name: 'ADMIN',
+      key: 'ADMIN',
       description: 'Administrador do sistema - acesso total',
     },
   });
 
   const gerenteRole = await prisma.role.upsert({
-    where: { name: 'GERENTE' },
+    where: { key: 'GERENTE' },
     update: {},
     create: {
-      name: 'GERENTE',
+      key: 'GERENTE',
       description: 'Gerente - pode importar documentos e criar avisos',
     },
   });
 
   const padraoRole = await prisma.role.upsert({
-    where: { name: 'PADRAO' },
+    where: { key: 'PADRAO' },
     update: {},
     create: {
-      name: 'PADRAO',
+      key: 'PADRAO',
       description: 'Usuário padrão - apenas leitura',
     },
   });

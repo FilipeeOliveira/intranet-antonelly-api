@@ -10,7 +10,7 @@ datasource db {
 
 model Role {
   id          String   @id @default(uuid())
-  name        String   @unique // ADMIN, GERENTE, PADRAO
+  key         String   @unique // ADMIN, GERENTE, PADRAO
   description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

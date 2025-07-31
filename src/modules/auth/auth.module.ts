@@ -7,14 +7,13 @@ import { AuthService } from './application/services/auth.service';
 import { LoginUseCase } from './application/use-cases/login.use-case';
 import { ValidateUserUseCase } from './application/use-cases/validate-user.use-case';
 import { AuthController } from './presentation/controllers/auth.controller';
-import { JwtStrategy } from './presentation/strategies/jwt.strategy';
-import { RoleGuard } from './presentation/guards/role.guard';
+import { AuthGuard } from './presentation/guards/auth.guard';
 
 @Module({
   imports: [
     PassportModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'your-secret-key',
+      secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '24h' },
     }),
     PrismaModule,
@@ -24,14 +23,12 @@ import { RoleGuard } from './presentation/guards/role.guard';
     // Infrastructure
     AuthRepository,
     AuthService,
-    AuthService,
     LoginUseCase,
     ValidateUserUseCase,
     
     // Presentation
-    JwtStrategy,
-    RoleGuard,
+    AuthGuard,
   ],
-  exports: [AuthService, RoleGuard],
+  exports: [AuthService, AuthGuard],
 })
 export class AuthModule {}
