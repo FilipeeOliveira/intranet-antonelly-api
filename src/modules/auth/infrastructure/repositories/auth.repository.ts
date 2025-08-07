@@ -38,10 +38,40 @@ export class AuthRepository implements IAuthRepository {
     return this.mapToUserEntity(userData);
   }
 
+  async updateUserPassword(userId: string, hashedPassword: string): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword },
+    });
+  }
+
+  async blacklistToken(token: string, userId: string, expiresAt: Date): Promise<void> {
+    await this.prisma.blacklistedToken.create({
+      data: {
+        token,
+        userId,
+        expiresAt,
+      },
+    });
+  }
+
+  async isTokenBlacklisted(token: string): Promise<boolean> {
+    const blacklistedToken = await this.prisma.blacklistedToken.findFirst({
+      where: {
+        token,
+        expiresAt: {
+          gte: new Date(), // Token ainda não expirou
+        },
+      },
+    });
+
+    return !!blacklistedToken;
+  }
+
   private mapToUserEntity(userData: any): User {
     const role = new Role(
       userData.role.id,
-      userData.role.name as RoleType,
+      userData.role.key as RoleType,
       userData.role.description,
       userData.role.createdAt,
       userData.role.updatedAt,

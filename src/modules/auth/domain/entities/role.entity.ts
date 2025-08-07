@@ -1,13 +1,15 @@
 export enum RoleType {
   ADMIN = 'ADMIN',
+  DIRETOR = 'DIRETOR',
   GERENTE = 'GERENTE',
-  PADRAO = 'PADRAO',
+  PORTARIA = 'PORTARIA',
+  FUNCIONARIO = 'FUNCIONARIO',
 }
 
 export class Role {
   constructor(
     public readonly id: string,
-    public readonly name: RoleType,
+    public readonly key: RoleType,
     public readonly description: string | null,
     public readonly createdAt: Date,
     public readonly updatedAt: Date,

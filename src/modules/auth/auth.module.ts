@@ -6,6 +6,9 @@ import { AuthRepository } from './infrastructure/repositories/auth.repository';
 import { AuthService } from './application/services/auth.service';
 import { LoginUseCase } from './application/use-cases/login.use-case';
 import { ValidateUserUseCase } from './application/use-cases/validate-user.use-case';
+import { ForgotPasswordUseCase } from './application/use-cases/forgot-password.use-case';
+import { ResetPasswordUseCase } from './application/use-cases/reset-password.use-case';
+import { LogoutUseCase } from './application/use-cases/logout.use-case';
 import { AuthController } from './presentation/controllers/auth.controller';
 import { AuthGuard } from './presentation/guards/auth.guard';
 
@@ -14,7 +17,7 @@ import { AuthGuard } from './presentation/guards/auth.guard';
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '24h' },
+      signOptions: { expiresIn: '1h' },
     }),
     PrismaModule,
   ],
@@ -25,6 +28,9 @@ import { AuthGuard } from './presentation/guards/auth.guard';
     AuthService,
     LoginUseCase,
     ValidateUserUseCase,
+    ForgotPasswordUseCase,
+    ResetPasswordUseCase,
+    LogoutUseCase,
     
     // Presentation
     AuthGuard,

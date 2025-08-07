@@ -25,17 +25,35 @@ async function main() {
     },
   });
 
-  const padraoRole = await prisma.role.upsert({
-    where: { key: 'PADRAO' },
+  const diretorRole = await prisma.role.upsert({
+    where: { key: 'DIRETOR' },
     update: {},
     create: {
-      key: 'PADRAO',
-      description: 'Usuário padrão - apenas leitura',
+      key: 'DIRETOR',
+      description: 'Diretor - acesso total aos relatórios e gestão',
+    },
+  });
+
+  const portariaRole = await prisma.role.upsert({
+    where: { key: 'PORTARIA' },
+    update: {},
+    create: {
+      key: 'PORTARIA',
+      description: 'Portaria - controle de acesso e visitantes',
+    },
+  });
+
+  const funcionarioRole = await prisma.role.upsert({
+    where: { key: 'FUNCIONARIO' },
+    update: {},
+    create: {
+      key: 'FUNCIONARIO',
+      description: 'Funcionário - acesso básico ao sistema',
     },
   });
 
   // Hash das senhas
-  const hashedPassword = await bcrypt.hash('123456', 10);
+  const hashedPassword = await bcrypt.hash('AdminPass@123', 12);
 
   // Criar usuários de exemplo
   const adminUser = await prisma.user.upsert({
@@ -64,24 +82,52 @@ async function main() {
     },
   });
 
-  const usuarioUser = await prisma.user.upsert({
-    where: { email: 'usuario@empresa.com' },
+  const diretorUser = await prisma.user.upsert({
+    where: { email: 'diretor@empresa.com' },
     update: {},
     create: {
-      name: 'Maria Usuária',
-      email: 'usuario@empresa.com',
-      username: 'maria.usuario',
+      name: 'Carlos Diretor',
+      email: 'diretor@empresa.com',
+      username: 'carlos.diretor',
       password: hashedPassword,
-      setor: 'Vendas',
-      roleId: padraoRole.id,
+      setor: 'Diretoria',
+      roleId: diretorRole.id,
+    },
+  });
+
+  const portariaUser = await prisma.user.upsert({
+    where: { email: 'portaria@empresa.com' },
+    update: {},
+    create: {
+      name: 'Ana Portaria',
+      email: 'portaria@empresa.com',
+      username: 'ana.portaria',
+      password: hashedPassword,
+      setor: 'Segurança',
+      roleId: portariaRole.id,
+    },
+  });
+
+  const funcionarioUser = await prisma.user.upsert({
+    where: { email: 'funcionario@empresa.com' },
+    update: {},
+    create: {
+      name: 'José Funcionário',
+      email: 'funcionario@empresa.com',
+      username: 'jose.funcionario',
+      password: hashedPassword,
+      setor: 'Operações',
+      roleId: funcionarioRole.id,
     },
   });
 
   console.log('✅ Seed concluído!');
   console.log('👥 Usuários criados:');
-  console.log(`📧 Admin: admin@empresa.com (senha: 123456)`);
-  console.log(`📧 Gerente: gerente@empresa.com (senha: 123456)`);
-  console.log(`📧 Usuário: usuario@empresa.com (senha: 123456)`);
+  console.log(`📧 Admin: admin@empresa.com (senha: AdminPass@123)`);
+  console.log(`📧 Diretor: diretor@empresa.com (senha: AdminPass@123)`);
+  console.log(`📧 Gerente: gerente@empresa.com (senha: AdminPass@123)`);
+  console.log(`📧 Portaria: portaria@empresa.com (senha: AdminPass@123)`);
+  console.log(`📧 Funcionário: funcionario@empresa.com (senha: AdminPass@123)`);
 }
 
 main()

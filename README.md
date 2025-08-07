@@ -58,7 +58,7 @@ npx prisma migrate dev --name "Nome do Schema"
 ```
 
 ### 7. Preencha as tabelas do banco de dados
-O script de seed criará um user: como administrador (`admin@escola.com`).
+O script de seed criará usuários de teste com diferentes perfis. A senha padrão é `AdminPass@123`.
 ```bash
 npm run seed
 ```

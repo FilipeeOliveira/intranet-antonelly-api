@@ -33,6 +33,21 @@ model User {
   updatedAt DateTime @updatedAt
   
   role Role @relation(fields: [roleId], references: [id])
+  blacklistedTokens BlacklistedToken[]
   
   @@map("users")
+}
+
+model BlacklistedToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([token])
+  @@index([expiresAt])
+  @@map("blacklisted_tokens")
 }

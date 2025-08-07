@@ -32,7 +32,7 @@ export class LoginUseCase {
     const payload = {
       email: user.email,
       sub: user.id,
-      role: user.role.name,
+      role: user.role.key,
     };
 
     const token = this.jwtService.sign(payload);
@@ -43,7 +43,7 @@ export class LoginUseCase {
       email: user.email,
       username: user.username || undefined,
       setor: user.setor || undefined,
-      role: user.role.name,
+      role: user.role.key,
     };
 
     return {
