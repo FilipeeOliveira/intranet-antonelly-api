@@ -68,6 +68,13 @@ export class AuthRepository implements IAuthRepository {
     return !!blacklistedToken;
   }
 
+  async updateTemporaryPasswordFlag(userId: string, isTemporary: boolean): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { isTemporaryPassword: isTemporary },
+    });
+  }
+
   private mapToUserEntity(userData: any): User {
     const role = new Role(
       userData.role.id,
@@ -86,6 +93,7 @@ export class AuthRepository implements IAuthRepository {
       userData.setor,
       userData.roleId,
       userData.isActive,
+      userData.isTemporaryPassword,
       role,
       userData.createdAt,
       userData.updatedAt,

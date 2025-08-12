@@ -21,16 +21,17 @@ model Role {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  username  String?  @unique
-  password  String
-  setor     String?
-  roleId    String
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                  String   @id @default(uuid())
+  name                String
+  email               String   @unique
+  username            String?  @unique
+  password            String
+  setor               String?
+  roleId              String
+  isActive            Boolean  @default(true)
+  isTemporaryPassword Boolean  @default(false)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
   
   role Role @relation(fields: [roleId], references: [id])
   blacklistedTokens BlacklistedToken[]

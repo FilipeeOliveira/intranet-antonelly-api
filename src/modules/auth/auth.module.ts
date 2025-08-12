@@ -9,8 +9,11 @@ import { ValidateUserUseCase } from './application/use-cases/validate-user.use-c
 import { ForgotPasswordUseCase } from './application/use-cases/forgot-password.use-case';
 import { ResetPasswordUseCase } from './application/use-cases/reset-password.use-case';
 import { LogoutUseCase } from './application/use-cases/logout.use-case';
+import { ChangeTemporaryPasswordUseCase } from './application/use-cases/change-temporary-password.use-case';
 import { AuthController } from './presentation/controllers/auth.controller';
 import { AuthGuard } from './presentation/guards/auth.guard';
+import { TemporaryPasswordGuard } from './presentation/guards/temporary-password.guard';
+import { JwtStrategy } from './infrastructure/strategies/jwt.strategy';
 
 @Module({
   imports: [
@@ -31,10 +34,15 @@ import { AuthGuard } from './presentation/guards/auth.guard';
     ForgotPasswordUseCase,
     ResetPasswordUseCase,
     LogoutUseCase,
+    ChangeTemporaryPasswordUseCase,
+    
+    // Infrastructure
+    JwtStrategy,
     
     // Presentation
     AuthGuard,
+    TemporaryPasswordGuard,
   ],
-  exports: [AuthService, AuthGuard],
+  exports: [AuthService, AuthGuard, TemporaryPasswordGuard, AuthRepository],
 })
 export class AuthModule {}
