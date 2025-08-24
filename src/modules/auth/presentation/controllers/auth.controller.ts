@@ -35,7 +35,7 @@ export class AuthController {
   @ApiOkResponse({type: AuthResponseDto, description: 'Login realizado com sucesso'})
   @ApiUnauthorizedResponse({description: 'Credenciais inválidas ou usuário inativo'})
   async login(@Body() loginDto: LoginDto): Promise<AuthResponseDto> {
-    return this.authService.login(loginDto);
+    return await this.authService.login(loginDto);
   }
 
   @Post('forgot-password')

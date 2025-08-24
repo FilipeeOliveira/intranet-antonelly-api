@@ -11,7 +11,7 @@ export class LoginUseCase {
   constructor(
     private readonly authRepository: AuthRepository,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async execute(loginDto: LoginDto): Promise<AuthResponseDto> {
     const user = await this.authRepository.findUserByEmail(loginDto.email);
@@ -35,20 +35,27 @@ export class LoginUseCase {
       role: user.role.key,
     };
 
-    const token = this.jwtService.sign(payload);
+    try {
+      const token = this.jwtService.sign(payload, {
+        
+      });
 
-    const userProfile: UserProfileDto = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      username: user.username || undefined,
-      setor: user.setor || undefined,
-      role: user.role.key,
-    };
+      const userProfile: UserProfileDto = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        username: user.username || undefined,
+        setor: user.setor || undefined,
+        role: user.role.key,
+      };
 
-    return {
-      access_token: token,
-      user: userProfile,
-    };
+      return {
+        access_token: token,
+        user: userProfile,
+      };
+    }
+    catch (e) {
+      console.log(e)
+    }
   }
 }

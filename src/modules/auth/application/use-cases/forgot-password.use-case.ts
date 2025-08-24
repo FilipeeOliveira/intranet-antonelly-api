@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthRepository } from '../../infrastructure/repositories/auth.repository';
 import { ForgotPasswordDto } from '../../domain/dto/forgot-password.dto';
+import { envConfig } from 'src/config/config';
 
 @Injectable()
 export class ForgotPasswordUseCase {
@@ -30,7 +31,7 @@ export class ForgotPasswordUseCase {
 
     const resetToken = this.jwtService.sign(resetPayload, { 
       expiresIn: '15m',
-      secret: process.env.JWT_SECRET + '_RESET', // Secret diferente para maior segurança
+      secret: envConfig.JWT_SECRET + '_RESET', // Secret diferente para maior segurança
     });
 
     // Em produção, aqui enviaria o email
