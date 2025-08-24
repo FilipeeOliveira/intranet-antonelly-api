@@ -55,7 +55,7 @@ export class LoginUseCase {
       };
     }
     catch (e) {
-      console.log(e)
+      console.error(e)
     }
   }
 }
