@@ -1,21 +1,11 @@
 FROM node:22.11.0-alpine AS development
 
-USER root
-
-RUN npm install -g @nestjs/cli
-
-RUN apk --update add  \
-    bash \
-    ca-certificates \
-    coreutils \
-    curl \
-    git \
-    git-flow \
-    procps \
-    wget
-
-USER node
+RUN apk update && apk add --no-cache git bash curl
 
 WORKDIR /home/node/app
+
+RUN chown -R node:node /home/node/app
+
+USER node
 
 CMD ["tail", "-f", "/dev/null"]
