@@ -6,6 +6,7 @@ import { PrismaModule } from './modules/prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { LoggingInterceptor } from './shared/interceptors/logging.interceptor';
+import { DocumentsModule } from './modules/documents/documents.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { LoggingInterceptor } from './shared/interceptors/logging.interceptor';
     AuthModule,
     UsersModule,
     PrismaModule,
+    DocumentsModule,
   ],
   controllers: [],
   providers: [
