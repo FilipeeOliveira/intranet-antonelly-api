@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { AuthRepository } from '../../infrastructure/repositories/auth.repository';
 import { ResetPasswordDto } from '../../domain/dto/reset-password.dto';
+import { envConfig } from 'src/config/config';
 
 @Injectable()
 export class ResetPasswordUseCase {
@@ -23,7 +24,7 @@ export class ResetPasswordUseCase {
     let payload: any;
     try {
       payload = this.jwtService.verify(token, {
-        secret: process.env.JWT_SECRET + '_RESET',
+        secret: envConfig.JWT_SECRET + '_RESET',
       });
     } catch (error) {
       throw new UnauthorizedException('Token de recuperação inválido ou expirado');

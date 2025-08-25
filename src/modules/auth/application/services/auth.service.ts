@@ -14,7 +14,7 @@ export class AuthService implements IAuthService {
   ) {}
 
   async login(loginDto: LoginDto): Promise<AuthResponseDto> {
-    return this.loginUseCase.execute(loginDto);
+    return await this.loginUseCase.execute(loginDto);
   }
 
   async validateUser(payload: any): Promise<any> {

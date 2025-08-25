@@ -14,12 +14,13 @@ import { AuthController } from './presentation/controllers/auth.controller';
 import { AuthGuard } from './presentation/guards/auth.guard';
 import { TemporaryPasswordGuard } from './presentation/guards/temporary-password.guard';
 import { JwtStrategy } from './infrastructure/strategies/jwt.strategy';
+import { envConfig } from 'src/config/config';
 
 @Module({
   imports: [
     PassportModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET,
+      secret: envConfig.JWT_SECRET,
       signOptions: { expiresIn: '1h' },
     }),
     PrismaModule,
