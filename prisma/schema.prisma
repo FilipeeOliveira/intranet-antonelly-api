@@ -52,3 +52,18 @@ model BlacklistedToken {
   @@index([expiresAt])
   @@map("blacklisted_tokens")
 }
+
+model Document {
+  id          String         @id @default(uuid())
+  title       String
+  category    String
+  description String?
+  department  String
+  filePath    String
+  version     String
+  status      String
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@map("documents")
+}
