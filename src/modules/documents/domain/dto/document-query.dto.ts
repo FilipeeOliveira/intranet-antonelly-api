@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, IsEnum, IsBoolean, Min, Max } from 'class-validator';
-import { Transform, Type } from 'class-transformer';
+import { Type } from 'class-transformer';
+import { IsEnum, IsOptional, IsString, Max, Min } from 'class-validator';
 import { DocumentStatus } from './create-document.dto';
 
 export class DocumentQueryDto {

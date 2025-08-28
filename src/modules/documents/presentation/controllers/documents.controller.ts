@@ -9,49 +9,37 @@ import {
     Put,
     Query,
     UploadedFile,
+    UseGuards,
     UseInterceptors,
 } from "@nestjs/common";
-import { FileInterceptor } from "@nestjs/platform-express";
 import {
+    ApiBearerAuth,
     ApiBody,
     ApiConsumes,
     ApiOperation,
     ApiResponse,
     ApiTags,
 } from "@nestjs/swagger";
-import { existsSync, unlinkSync } from "fs";
-import { diskStorage } from "multer";
+import { RoleType } from "src/modules/auth/domain/entities/role.entity";
+import { Roles } from "src/modules/auth/presentation/decorators/roles.decorator";
+import { pdfFileInterceptor } from "src/shared/interceptors/pdf-file.interceptor";
 import { DocumentsService } from "../../application/services/documents.service";
 import { CreateDocumentDto } from "../../domain/dto/create-document.dto";
 import { DocumentQueryDto } from "../../domain/dto/document-query.dto";
-import { extname } from "path";
+import { AuthGuard } from "@nestjs/passport";
+import { AuthenticateGuard } from "src/modules/auth/presentation/guards/authenticate.guard";
+
 
 @ApiTags("Gestão de Documentos")
+@ApiBearerAuth()
+@UseGuards(AuthGuard('jwt'), AuthenticateGuard)
 @Controller("documents")
 export class DocumentsController {
     constructor(private readonly documentsService: DocumentsService) { }
 
-    // Criar documento com PDF
     @Post()
-    @UseInterceptors(
-        FileInterceptor("document", {
-            storage: diskStorage({
-                destination: "./uploads/documents",
-                filename: (req, file, callback) => {
-                    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-                    callback(null, `${uniqueSuffix}${extname(file.originalname)}`);
-                },
-            }),
-            fileFilter: (req, file, callback) => {
-                if (file.mimetype === "application/pdf") {
-                    callback(null, true);
-                } else {
-                    callback(new BadRequestException("Somente arquivos PDF são permitidos!"), false);
-                }
-            },
-            limits: { fileSize: 5 * 1024 * 1024 }, // até 5MB
-        })
-    )
+    @Roles(RoleType.ADMIN, RoleType.DIRETOR)
+    @UseInterceptors(pdfFileInterceptor())
     @ApiConsumes("multipart/form-data")
     @ApiBody({
         description: "Criação de documento com metadados e arquivo PDF",
@@ -82,6 +70,7 @@ export class DocumentsController {
 
     // Listar documentos
     @Get()
+    @Roles(RoleType.ADMIN, RoleType.DIRETOR)
     @ApiOperation({ summary: "Listar documentos com filtros e paginação" })
     @ApiResponse({ status: 200, description: "Lista de documentos retornada com sucesso." })
     async findAll(@Query() query: DocumentQueryDto) {
@@ -90,6 +79,7 @@ export class DocumentsController {
 
     // Buscar documento por ID
     @Get(":id")
+    @Roles(RoleType.ADMIN, RoleType.DIRETOR)
     @ApiOperation({ summary: "Buscar documento por ID" })
     @ApiResponse({ status: 200, description: "Documento encontrado." })
     @ApiResponse({ status: 404, description: "Documento não encontrado." })
@@ -98,22 +88,8 @@ export class DocumentsController {
     }
 
     @Put(":id")
-    @UseInterceptors(
-        FileInterceptor("document", {
-            storage: diskStorage({
-                destination: "./uploads/documents",
-                filename: (req, file, callback) => {
-                    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-                    callback(null, `${uniqueSuffix}${extname(file.originalname)}`);
-                },
-            }),
-            fileFilter: (req, file, callback) => {
-                if (file.mimetype === "application/pdf") callback(null, true);
-                else callback(new BadRequestException("Somente arquivos PDF são permitidos!"), false);
-            },
-            limits: { fileSize: 5 * 1024 * 1024 },
-        })
-    )
+    @Roles(RoleType.ADMIN, RoleType.DIRETOR)
+    @UseInterceptors(pdfFileInterceptor())
     @ApiConsumes("multipart/form-data")
     @ApiBody({
         description: "Atualização de documento com metadados e arquivo PDF opcional",
@@ -141,6 +117,7 @@ export class DocumentsController {
     }
 
     @Delete(":id")
+    @Roles(RoleType.ADMIN, RoleType.DIRETOR)
     @ApiOperation({ summary: "Deletar documento e arquivo físico" })
     @ApiResponse({ status: 200, description: "Documento removido com sucesso." })
     async deleteDocument(@Param("id") id: string) {
