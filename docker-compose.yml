@@ -9,7 +9,7 @@ services:
       - .:/home/node/app
       - /home/node/app/.docker/postgres-data
     ports:
-      - '3005:3000'
+      - '3005:3005'
     networks:
       - api-network
     depends_on:
