@@ -130,6 +130,59 @@ async function main() {
   console.log(`📧 Gerente: gerente@empresa.com (senha: AdminPass@123)`);
   console.log(`📧 Portaria: portaria@empresa.com (senha: AdminPass@123)`);
   console.log(`📧 Funcionário: funcionario@empresa.com (senha: AdminPass@123)`);
+
+  // Criar páginas
+  const usuariosPage = await prisma.page.upsert({
+    where: { name: 'USUARIOS' },
+    update: {},
+    create: {
+      name: 'USUARIOS',
+      features: {
+        create: [
+          { key: 'VIEW_USERS', description: 'Listar usuários' },
+          { key: 'CREATE_USER', description: 'Criar usuário' },
+          { key: 'UPDATE_USER', description: 'Editar usuário' },
+          { key: 'DELETE_USER', description: 'Excluir usuário' },
+        ],
+      },
+    },
+  });
+
+  const portariaPage = await prisma.page.upsert({
+    where: { name: 'PORTARIA' },
+    update: {},
+    create: {
+      name: 'PORTARIA',
+      features: {
+        create: [
+          { key: 'VIEW_VISITORS', description: 'Visualizar visitantes' },
+          { key: 'REGISTER_VISITOR', description: 'Registrar novo visitante' },
+          { key: 'EXIT_VISITOR', description: 'Registrar saída de visitante' },
+        ],
+      },
+    },
+  });
+
+  const procedimentosPage = await prisma.page.upsert({
+    where: { name: 'PROCEDIMENTOS' },
+    update: {},
+    create: {
+      name: 'PROCEDIMENTOS',
+      features: {
+        create: [
+          { key: 'VIEW_PROCEDURES', description: 'Visualizar procedimentos' },
+          { key: 'CREATE_PROCEDURE', description: 'Criar novo procedimento' },
+          { key: 'UPDATE_PROCEDURE', description: 'Editar procedimento' },
+          { key: 'DELETE_PROCEDURE', description: 'Excluir procedimento' },
+        ],
+      },
+    },
+  });
+
+  console.log('📄 Páginas e features criadas:');
+  console.log(`🧑‍💼 Usuários -> ${usuariosPage.id}`);
+  console.log(`🚪 Portaria -> ${portariaPage.id}`);
+  console.log(`📑 Procedimentos -> ${procedimentosPage.id}`);
 }
 
 main()

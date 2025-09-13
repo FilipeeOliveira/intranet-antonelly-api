@@ -34,9 +34,41 @@ model User {
   updatedAt           DateTime @updatedAt
 
   role              Role               @relation(fields: [roleId], references: [id])
+  permissions       UserPermission[]
   blacklistedTokens BlacklistedToken[]
 
   @@map("users")
+}
+
+model Page {
+  id       String    @id @default(uuid())
+  name     String    @unique
+  features Feature[]
+
+  @@map("pages")
+}
+
+model Feature {
+  id          String           @id @default(uuid())
+  key         String           @unique // ex: VIEW_PRODUCTS, CREATE_PRODUCT
+  description String?
+  pageId      String
+  page        Page             @relation(fields: [pageId], references: [id])
+  users       UserPermission[]
+
+  @@map("features")
+}
+
+model UserPermission {
+  id        String @id @default(uuid())
+  userId    String
+  featureId String
+
+  user    User    @relation(fields: [userId], references: [id])
+  feature Feature @relation(fields: [featureId], references: [id])
+
+  @@unique([userId, featureId])
+  @@map("user_permissions")
 }
 
 model BlacklistedToken {
@@ -54,7 +86,7 @@ model BlacklistedToken {
 }
 
 model Document {
-  id          String         @id @default(uuid())
+  id          String   @id @default(uuid())
   title       String
   category    String
   description String?
@@ -62,8 +94,8 @@ model Document {
   filePath    String
   version     String
   status      String
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@map("documents")
 }

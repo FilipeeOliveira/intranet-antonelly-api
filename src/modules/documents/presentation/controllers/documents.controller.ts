@@ -38,7 +38,7 @@ export class DocumentsController {
     constructor(private readonly documentsService: DocumentsService) { }
 
     @Post()
-    @Roles(RoleType.ADMIN, RoleType.DIRETOR)
+    @Roles(RoleType.ADMIN, RoleType.GERENTE)
     @UseInterceptors(pdfFileInterceptor())
     @ApiConsumes("multipart/form-data")
     @ApiBody({
@@ -70,7 +70,6 @@ export class DocumentsController {
 
     // Listar documentos
     @Get()
-    @Roles(RoleType.ADMIN, RoleType.DIRETOR)
     @ApiOperation({ summary: "Listar documentos com filtros e paginação" })
     @ApiResponse({ status: 200, description: "Lista de documentos retornada com sucesso." })
     async findAll(@Query() query: DocumentQueryDto) {
@@ -79,7 +78,6 @@ export class DocumentsController {
 
     // Buscar documento por ID
     @Get(":id")
-    @Roles(RoleType.ADMIN, RoleType.DIRETOR)
     @ApiOperation({ summary: "Buscar documento por ID" })
     @ApiResponse({ status: 200, description: "Documento encontrado." })
     @ApiResponse({ status: 404, description: "Documento não encontrado." })
@@ -88,7 +86,7 @@ export class DocumentsController {
     }
 
     @Put(":id")
-    @Roles(RoleType.ADMIN, RoleType.DIRETOR)
+    @Roles(RoleType.ADMIN, RoleType.GERENTE)
     @UseInterceptors(pdfFileInterceptor())
     @ApiConsumes("multipart/form-data")
     @ApiBody({
@@ -117,7 +115,7 @@ export class DocumentsController {
     }
 
     @Delete(":id")
-    @Roles(RoleType.ADMIN, RoleType.DIRETOR)
+    @Roles(RoleType.ADMIN, RoleType.GERENTE)
     @ApiOperation({ summary: "Deletar documento e arquivo físico" })
     @ApiResponse({ status: 200, description: "Documento removido com sucesso." })
     async deleteDocument(@Param("id") id: string) {
