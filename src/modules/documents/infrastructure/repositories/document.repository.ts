@@ -1,0 +1,106 @@
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../../../prisma/prisma.service';
+import { DocumentQueryDto } from '../../domain/dto/document-query.dto';
+import { DocumentStatus } from '../../domain/dto/create-document.dto';
+
+@Injectable()
+export class DocumentRepository {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async findAll(query: DocumentQueryDto) {
+    const { page, limit, search, status, department, version, sortBy, sortOrder } = query;
+
+    const skip = (page - 1) * limit;
+
+    // Construir filtros
+    const where: any = {};
+
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
+        { category: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    if (status) {
+      where.status = status;
+    }
+
+    if (department) {
+      where.department = { contains: department, mode: 'insensitive' };
+    }
+
+    if (version) {
+      where.version = { contains: version, mode: 'insensitive' };
+    }
+
+    // Construir ordenação
+    const orderBy: any = {};
+    orderBy[sortBy || 'title'] = sortOrder || 'asc';
+
+    const [documents, total] = await Promise.all([
+      this.prisma.document.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy,
+      }),
+      this.prisma.document.count({ where }),
+    ]);
+
+    return {
+      data: documents,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
+
+  async findById(id: string) {
+    return this.prisma.document.findUnique({
+      where: { id },
+    });
+  }
+
+  async create(data: {
+    title: string;
+    category: string;
+    description?: string;
+    department: string;
+    filePath: string;
+  }) {
+    return this.prisma.document.create({
+      data: {
+        ...data,
+        version: '1.0',
+        status: DocumentStatus.PENDING,
+      },
+    });
+  }
+
+  async update(id: string, data: Partial<{
+    title: string;
+    category: string;
+    description: string;
+    department: string;
+    status: DocumentStatus;
+    version: string;
+    filePath: string;
+  }>) {
+    return this.prisma.document.update({
+      where: { id },
+      data: {
+        ...data,
+        status: data.status,
+      },
+    });
+  }
+
+  async delete(id: string) {
+    return this.prisma.document.delete({
+      where: { id },
+    });
+  }
+}

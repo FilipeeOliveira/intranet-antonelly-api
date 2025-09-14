@@ -11,7 +11,7 @@ import { ResetPasswordUseCase } from './application/use-cases/reset-password.use
 import { LogoutUseCase } from './application/use-cases/logout.use-case';
 import { ChangeTemporaryPasswordUseCase } from './application/use-cases/change-temporary-password.use-case';
 import { AuthController } from './presentation/controllers/auth.controller';
-import { AuthGuard } from './presentation/guards/auth.guard';
+import { AuthenticateGuard } from './presentation/guards/authenticate.guard';
 import { TemporaryPasswordGuard } from './presentation/guards/temporary-password.guard';
 import { JwtStrategy } from './infrastructure/strategies/jwt.strategy';
 import { envConfig } from 'src/config/config';
@@ -41,9 +41,9 @@ import { envConfig } from 'src/config/config';
     JwtStrategy,
     
     // Presentation
-    AuthGuard,
+    AuthenticateGuard,
     TemporaryPasswordGuard,
   ],
-  exports: [AuthService, AuthGuard, TemporaryPasswordGuard, AuthRepository],
+  exports: [AuthService, AuthenticateGuard, TemporaryPasswordGuard, AuthRepository],
 })
 export class AuthModule {}
