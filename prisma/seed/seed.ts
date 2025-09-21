@@ -183,6 +183,16 @@ async function main() {
   console.log(`🧑‍💼 Usuários -> ${usuariosPage.id}`);
   console.log(`🚪 Portaria -> ${portariaPage.id}`);
   console.log(`📑 Procedimentos -> ${procedimentosPage.id}`);
+
+  // Setores
+  const setores = ['RH', 'TI', 'Financeiro', 'Operações', 'Marketing'];
+  for (const setorName of setores) {
+    await prisma.sector.upsert({
+      where: { name: setorName },
+      update: {},
+      create: { name: setorName },
+    });
+  }
 }
 
 main()

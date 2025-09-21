@@ -1,6 +1,6 @@
-// create-document.dto.ts
+// update-document.dto.ts
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsOptional, IsEnum } from 'class-validator';
+import { IsEnum, IsOptional, IsString, Matches } from 'class-validator';
 
 export enum DocumentStatus {
     PENDING = 'PENDING',
@@ -8,14 +8,14 @@ export enum DocumentStatus {
     APPROVED = 'APPROVED',
 }
 
-export class CreateDocumentDto {
+export class UpdateDocumentDto {
     @ApiProperty({
         description: 'Título do procedimento do documento',
         example: 'Manual de Segurança do Trabalho',
     })
     @IsString({ message: 'Título deve ser uma string' })
-    @IsNotEmpty({ message: 'Título é obrigatório' })
-    title: string;
+    @IsOptional()
+    title?: string;
 
     @ApiProperty({
         description: 'Descrição detalhada do documento',
@@ -29,9 +29,18 @@ export class CreateDocumentDto {
     @ApiProperty({
         description: 'ID do Setor do documento',
     })
+    @IsOptional()
     @IsString({ message: 'Setor deve ser uma string' })
-    @IsNotEmpty({ message: 'Setor é obrigatório' })
-    sectorId: string;
+    sectorId?: string;
+
+    @ApiProperty({
+        description: 'Versão do documento',
+        example: '1.0',
+    })
+    @IsOptional()
+    @Matches(/^\d+(\.\d+){0,2}$/, { message: 'Versão deve estar no formato X.Y ou X.Y.Z' })
+    @IsString({ message: 'Versão deve ser uma string' })
+    version?: string;
 
     @ApiProperty({
         description: 'Status do documento (definido automaticamente na criação)',
@@ -48,6 +57,7 @@ export class CreateDocumentDto {
         type: 'string',
         format: 'binary',
     })
-    document: Express.Multer.File;
+    @IsOptional()
+    document?: Express.Multer.File;
 
 }
