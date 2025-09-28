@@ -130,9 +130,7 @@ model Visitor {
   name       String
   email      String    @unique
   companieId String?
-  status     String    @default("PRESENT") // PRESENT, LEFT
-  arrivedAt  DateTime  @default(now())
-  leftAt     DateTime?
+  status     String?
 
   companie Companie? @relation(fields: [companieId], references: [id], onDelete: SetNull)
 

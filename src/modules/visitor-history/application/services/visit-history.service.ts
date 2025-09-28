@@ -4,6 +4,8 @@ import { CreateVisitHistoryDto } from '../../domain/dto/create-visit-history.dto
 import { UpdateVisitHistoryDto } from '../../domain/dto/update-visit-history.dto';
 import { VisitHistoryQueryDto } from '../../domain/dto/visit-history-query.dto';
 import { VisitHistoryRepository } from '../../infrastructure/respositories/visit-history.repository';
+import { VisitorRepository } from 'src/modules/visitors/infrastructure/repositories/visitors.repository';
+import { VisitorStatus } from 'src/modules/visitors/domain/dto/create-visitors.dto';
 
 export interface VisitHistory {
   id: string;
@@ -14,7 +16,10 @@ export interface VisitHistory {
 
 @Injectable()
 export class VisitHistoryService {
-  constructor(private readonly visitHistoryRepository: VisitHistoryRepository) { }
+  constructor(
+    private readonly visitHistoryRepository: VisitHistoryRepository,
+    private readonly visitorRepository: VisitorRepository
+  ) { }
 
   async create(dto: CreateVisitHistoryDto): Promise<VisitHistory> {
     return this.visitHistoryRepository.create({
@@ -31,6 +36,9 @@ export class VisitHistoryService {
       throw new BadRequestException('Este visitante já possui uma visita em andamento.');
     }
 
+    // Atualizar status do visitante para PRESENTE
+    await this.visitorRepository.update(visitorId, { status: VisitorStatus.PRESENT });
+
     return this.visitHistoryRepository.create({
       visitorId,
       arrivedAt: new Date(),
@@ -46,6 +54,8 @@ export class VisitHistoryService {
     if (lastVisit.leftAt) {
       throw new BadRequestException('A última visita já foi finalizada.');
     }
+
+    await this.visitorRepository.update(visitorId, { status: VisitorStatus.LEFT });
 
     return this.visitHistoryRepository.update(lastVisit.id, {
       leftAt: new Date(),

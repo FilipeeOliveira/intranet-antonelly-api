@@ -193,6 +193,52 @@ async function main() {
       create: { name: setorName },
     });
   }
+
+  // Empresas
+  const companies = [
+    { name: 'ACME Corp', description: 'Fornecedor de equipamentos' },
+    { name: 'Tech Solutions', description: 'Consultoria em TI' },
+    { name: 'Global Finance', description: 'Serviços financeiros' },
+    { name: 'Logística Rápida', description: 'Transporte e logística' },
+    { name: 'Marketing Plus', description: 'Agência de marketing digital' },
+  ];
+
+  for (const company of companies) {
+    await prisma.companie.upsert({
+      where: { name: company.name },
+      update: {},
+      create: company,
+    });
+  }
+
+  console.log('🏢 Empresas criadas.');
+
+  // Visitantes
+  const visitors = [
+    { name: 'João da Silva', email: 'joao.silva@acme.com', companie: 'ACME Corp' },
+    { name: 'Maria Oliveira', email: 'maria.oliveira@techsolutions.com', companie: 'Tech Solutions' },
+    { name: 'Carlos Souza', email: 'carlos.souza@globalfinance.com', companie: 'Global Finance' },
+    { name: 'Ana Lima', email: 'ana.lima@logisticarapida.com', companie: 'Logística Rápida' },
+    { name: 'Pedro Santos', email: 'pedro.santos@marketingplus.com', companie: 'Marketing Plus' },
+  ];
+
+  for (const v of visitors) {
+    const company = await prisma.companie.findUnique({ where: { name: v.companie } });
+
+    if (company) {
+      await prisma.visitor.upsert({
+        where: { email: v.email },
+        update: {},
+        create: {
+          name: v.name,
+          email: v.email,
+          companieId: company.id,
+        },
+      });
+    }
+  }
+  
+  console.log('👥 Visitantes criados.');
 }
 
 main()
