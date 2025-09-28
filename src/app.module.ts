@@ -9,6 +9,10 @@ import { LoggingInterceptor } from './shared/interceptors/logging.interceptor';
 import { DocumentsModule } from './modules/documents/documents.module';
 import { PermissionsModule } from './modules/permissions/permissions.module';
 import { PermissionsGuard } from './modules/permissions/presentation/guards/permissions.guard';
+import { SectorsModule } from './modules/sectors/sectors.module';
+import { VisitorsModule } from './modules/visitors/visitors.module';
+import { VisitHistoryModule } from './modules/visitor-history/visit-history.module';
+import { CompaniesModule } from './modules/companies/companies.module';
 
 @Module({
   imports: [
@@ -22,6 +26,10 @@ import { PermissionsGuard } from './modules/permissions/presentation/guards/perm
     PrismaModule,
     DocumentsModule,
     PermissionsModule,
+    SectorsModule,
+    VisitorsModule,
+    VisitHistoryModule,
+    CompaniesModule,
   ],
   controllers: [],
   providers: [
