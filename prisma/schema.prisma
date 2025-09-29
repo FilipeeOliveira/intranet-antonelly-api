@@ -133,6 +133,7 @@ model Visitor {
   status     String?
 
   companie Companie? @relation(fields: [companieId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
 
   histories VisitHistory[]
 

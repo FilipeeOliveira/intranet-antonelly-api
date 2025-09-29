@@ -22,7 +22,7 @@ export class VisitorRepository {
     if (companieId) where.companieId = companieId;
 
     const orderBy: any = {};
-    orderBy[sortBy || 'arrivedAt'] = sortOrder || 'asc';
+    orderBy[sortBy || 'createdAt'] = sortOrder || 'asc';
 
     const [visitors, total] = await Promise.all([
       this.prisma.visitor.findMany({
@@ -65,7 +65,7 @@ export class VisitorRepository {
     if (status) where.status = status;
 
     const orderBy: any = {};
-    orderBy[sortBy || 'arrivedAt'] = sortOrder || 'asc';
+    orderBy[sortBy || 'createdAt'] = sortOrder || 'asc';
 
     const [visitors, total] = await Promise.all([
       this.prisma.visitor.findMany({

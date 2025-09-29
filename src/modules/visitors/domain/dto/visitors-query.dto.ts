@@ -56,12 +56,12 @@ export class VisitorsQueryDto {
 
   @ApiProperty({
     description: 'Campo para ordenação',
-    enum: ['name', 'email', 'status', 'arrivedAt', 'leftAt', 'createdAt'],
-    default: 'arrivedAt',
+    enum: ['name', 'email', 'status', 'createdAt'],
+    default: 'createdAt',
     required: false,
   })
   @IsOptional()
-  sortBy?: string = 'arrivedAt';
+  sortBy?: string = 'createdAt';
 
   @ApiProperty({
     description: 'Direção da ordenação',

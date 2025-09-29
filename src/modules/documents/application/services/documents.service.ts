@@ -78,6 +78,9 @@ export class DocumentsService {
         };
     }
     async update(id: string, dto: Partial<CreateDocumentDto>, filePath?: string): Promise<Document> {
+        
+        // Adicionar a lógica para atualizar a versão do documento se um novo arquivo for enviado.
+        
         const document = await this.documentRepository.findById(id);
         if (!document) throw new NotFoundException('Documento não encontrado.');
 
