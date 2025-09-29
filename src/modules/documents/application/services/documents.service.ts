@@ -8,9 +8,8 @@ import { unlink } from 'fs/promises';
 export interface Document {
     id: string;
     title: string;
-    category: string;
     description?: string;
-    department: string;
+    sectorId: string;
     filePath: string;
     version: string;
     status: DocumentStatus;
@@ -18,7 +17,9 @@ export interface Document {
 
 @Injectable()
 export class DocumentsService {
-    constructor(private readonly documentRepository: DocumentRepository) { }
+    constructor(
+        private readonly documentRepository: DocumentRepository
+    ) { }
 
     async create(dto: CreateDocumentDto, filePath: string): Promise<Document> {
         if (!filePath.endsWith('.pdf')) {
@@ -27,9 +28,8 @@ export class DocumentsService {
 
         const document = await this.documentRepository.create({
             title: dto.title,
-            category: dto.category,
             description: dto.description,
-            department: dto.department,
+            sectorId: dto.sectorId,
             filePath,
         });
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { DocumentQueryDto } from '../../domain/dto/document-query.dto';
 import { DocumentStatus } from '../../domain/dto/create-document.dto';
+import { DocumentQueryDto } from '../../domain/dto/document-query.dto';
 
 @Injectable()
 export class DocumentRepository {
@@ -66,9 +66,8 @@ export class DocumentRepository {
 
   async create(data: {
     title: string;
-    category: string;
     description?: string;
-    department: string;
+    sectorId: string;
     filePath: string;
   }) {
     return this.prisma.document.create({

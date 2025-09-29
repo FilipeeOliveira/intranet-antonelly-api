@@ -85,17 +85,67 @@ model BlacklistedToken {
   @@map("blacklisted_tokens")
 }
 
+model Sector {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  documents Document[]
+
+  @@map("sectors")
+}
+
 model Document {
   id          String   @id @default(uuid())
   title       String
-  category    String
+  sectorId    String
   description String?
-  department  String
   filePath    String
   version     String
   status      String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  sector Sector @relation(fields: [sectorId], references: [id])
+
   @@map("documents")
+}
+
+model Companie {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  visitors Visitor[]
+
+  @@map("companies")
+}
+
+model Visitor {
+  id         String    @id @default(uuid())
+  name       String
+  email      String    @unique
+  companieId String?
+  status     String?
+
+  companie Companie? @relation(fields: [companieId], references: [id], onDelete: SetNull)
+
+  histories VisitHistory[]
+
+  @@map("visitors")
+}
+
+model VisitHistory {
+  id        String    @id @default(uuid())
+  visitorId String
+  arrivedAt DateTime  @default(now())
+  leftAt    DateTime?
+
+  visitor Visitor @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+
+  @@map("visit_history")
 }
