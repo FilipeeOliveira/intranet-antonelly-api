@@ -126,9 +126,9 @@ model Companie {
 }
 
 model Visitor {
-  id         String    @id @default(uuid())
+  id         String  @id @default(uuid())
   name       String
-  email      String    @unique
+  email      String  @unique
   companieId String?
   status     String?
 
@@ -148,4 +148,55 @@ model VisitHistory {
   visitor Visitor @relation(fields: [visitorId], references: [id], onDelete: Cascade)
 
   @@map("visit_history")
+}
+
+model MeetingSchedule {
+  id           String          @id @default(uuid())
+  subject      String
+  date         DateTime // somente data
+  time         String // somente horário em HH:MM
+  endTime      String // HH:MM calculado
+  duration     MeetingDuration
+  participants String // nomes separados por vírgula
+  type         MeetingType
+  priority     MeetingPriority
+  location     String
+  description  String?
+  reminder     MeetingReminder
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("meeting_schedule")
+}
+
+enum MeetingDuration {
+  MIN_15
+  MIN_30
+  MIN_45
+  H_1
+  H_1_30
+  H_2
+  H_3
+}
+
+enum MeetingType {
+  INLOCAL
+  ONLINE
+}
+
+enum MeetingPriority {
+  LOW
+  MID
+  HIGH
+  URGENT
+}
+
+enum MeetingReminder {
+  NOT
+  MIN_5
+  MIN_15
+  MIN_30
+  H_1
+  D_1
 }

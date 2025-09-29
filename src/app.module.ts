@@ -12,6 +12,7 @@ import { UsersModule } from './modules/users/users.module';
 import { VisitHistoryModule } from './modules/visit-history/visit-history.module';
 import { VisitorsModule } from './modules/visitors/visitors.module';
 import { LoggingInterceptor } from './shared/interceptors/logging.interceptor';
+import { MeetingModule } from './modules/meeting/meeting.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { LoggingInterceptor } from './shared/interceptors/logging.interceptor';
     VisitorsModule,
     VisitHistoryModule,
     CompaniesModule,
+    MeetingModule,
   ],
   controllers: [],
   providers: [
