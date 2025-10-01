@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { RoleType } from '../../../auth/domain/entities/role.entity';
+import { Role, Sector } from '@prisma/client';
 
 export class UserResponseDto {
   @ApiProperty({ description: 'ID do usuário' })
@@ -15,10 +16,10 @@ export class UserResponseDto {
   username?: string;
 
   @ApiProperty({ description: 'Setor do usuário', required: false })
-  setor?: string;
+  sector?: Sector;
 
-  @ApiProperty({ description: 'Perfil do usuário', enum: RoleType })
-  role: RoleType;
+  @ApiProperty({ description: 'Perfil do usuário', required: false })
+  role: Role;
 
   @ApiProperty({ description: 'Status de ativação do usuário' })
   isActive: boolean;

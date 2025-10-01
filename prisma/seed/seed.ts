@@ -54,6 +54,24 @@ async function main() {
     },
   });
 
+  
+
+  // Setores
+  const setores = ['RH', 'TI', 'Financeiro', 'Diretoria', 'Operações', 'Marketing', 'Segurança'];
+
+  let sectorRecords = {};
+
+  for (const setorName of setores) {
+    const sector = await prisma.sector.upsert({
+      where: { name: setorName },
+      update: {},
+      create: { name: setorName },
+    });
+
+    sectorRecords[setorName] = sector;
+  }
+  console.log('🏢 Setores criados.');
+
   // Hash das senhas
   const hashedPassword = await bcrypt.hash('AdminPass@123', 12);
 
@@ -66,7 +84,7 @@ async function main() {
       email: 'admin@empresa.com',
       username: 'admin',
       password: hashedPassword,
-      setor: 'TI',
+      sectorId: sectorRecords['TI'].id,
       roleId: adminRole.id,
     },
   });
@@ -79,7 +97,7 @@ async function main() {
       email: 'gerente@empresa.com',
       username: 'joao.gerente',
       password: hashedPassword,
-      setor: 'Operações',
+      sectorId: sectorRecords['Operações'].id,
       roleId: gerenteRole.id,
     },
   });
@@ -92,7 +110,7 @@ async function main() {
       email: 'diretor@empresa.com',
       username: 'carlos.diretor',
       password: hashedPassword,
-      setor: 'Diretoria',
+      sectorId: sectorRecords['Diretoria'].id,
       roleId: diretorRole.id,
     },
   });
@@ -105,7 +123,7 @@ async function main() {
       email: 'portaria@empresa.com',
       username: 'ana.portaria',
       password: hashedPassword,
-      setor: 'Segurança',
+      sectorId: sectorRecords['Segurança'].id,
       roleId: portariaRole.id,
     },
   });
@@ -118,7 +136,7 @@ async function main() {
       email: 'funcionario@empresa.com',
       username: 'jose.funcionario',
       password: hashedPassword,
-      setor: 'Operações',
+      sectorId: sectorRecords['Operações'].id,
       roleId: funcionarioRole.id,
     },
   });
@@ -184,16 +202,6 @@ async function main() {
   console.log(`🚪 Portaria -> ${portariaPage.id}`);
   console.log(`📑 Procedimentos -> ${procedimentosPage.id}`);
 
-  // Setores
-  const setores = ['RH', 'TI', 'Financeiro', 'Operações', 'Marketing'];
-  for (const setorName of setores) {
-    await prisma.sector.upsert({
-      where: { name: setorName },
-      update: {},
-      create: { name: setorName },
-    });
-  }
-
   // Empresas
   const companies = [
     { name: 'ACME Corp', description: 'Fornecedor de equipamentos' },
@@ -237,7 +245,7 @@ async function main() {
       });
     }
   }
-  
+
   console.log('👥 Visitantes criados.');
 }
 

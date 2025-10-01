@@ -35,7 +35,7 @@ import { RoleType } from '../../../auth/domain/entities/role.entity';
 @UseGuards(AuthGuard('jwt'), TemporaryPasswordGuard)
 @ApiBearerAuth()
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Get()
   @Roles(RoleType.ADMIN)

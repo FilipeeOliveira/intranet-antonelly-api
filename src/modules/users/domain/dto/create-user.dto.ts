@@ -29,13 +29,13 @@ export class CreateUserDto {
   username?: string;
 
   @ApiProperty({
-    description: 'Setor do usuário (opcional)',
-    example: 'Vendas',
-    required: false,
+    description: 'Setor do usuário',
+    example: 'uuid-do-setor',
+    required: true,
   })
   @IsOptional()
-  @IsString({ message: 'Setor deve ser uma string' })
-  setor?: string;
+  @IsString({ message: 'Setor ID deve ser uma string' })
+  sectorId?: string;
 
   @ApiProperty({
     description: 'Perfil do usuário',

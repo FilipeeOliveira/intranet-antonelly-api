@@ -7,31 +7,31 @@ import { RoleType } from '../../../auth/domain/entities/role.entity';
 
 @Injectable()
 export class UsersRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async findAll(query: UserQueryDto) {
-    const { page, limit, search, role, setor, isActive, sortBy, sortOrder } = query;
-    
+    const { page, limit, search, role, sector, isActive, sortBy, sortOrder } = query;
+
     const skip = (page - 1) * limit;
-    
+
     // Construir filtros
     const where: any = {};
-    
+
     if (search) {
       where.OR = [
         { name: { contains: search, mode: 'insensitive' } },
         { email: { contains: search, mode: 'insensitive' } },
       ];
     }
-    
+
     if (role) {
       where.role = { key: role };
     }
-    
-    if (setor) {
-      where.setor = { contains: setor, mode: 'insensitive' };
+
+    if (sector) {
+      where.sector = { contains: sector, mode: 'insensitive' };
     }
-    
+
     if (isActive !== undefined) {
       where.isActive = isActive;
     }
@@ -52,6 +52,7 @@ export class UsersRepository {
         orderBy,
         include: {
           role: true,
+          sector: true,
         },
       }),
       this.prisma.user.count({ where }),
@@ -63,12 +64,12 @@ export class UsersRepository {
         name: user.name,
         email: user.email,
         username: user.username,
-        setor: user.setor,
+        sector: user.sector,
         isActive: user.isActive,
         isTemporaryPassword: user.isTemporaryPassword,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
-        role: user.role.key as RoleType,
+        role: user.role,
       })),
       total,
       page,
@@ -82,6 +83,7 @@ export class UsersRepository {
       where: { id },
       include: {
         role: true,
+        sector: true,
       },
     });
 
@@ -92,12 +94,12 @@ export class UsersRepository {
       name: user.name,
       email: user.email,
       username: user.username,
-      setor: user.setor,
       isActive: user.isActive,
       isTemporaryPassword: user.isTemporaryPassword,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
-      role: user.role.key as RoleType,
+      role: user.role,
+      sector: user.sector,
     };
   }
 
@@ -130,39 +132,28 @@ export class UsersRepository {
         name: createUserDto.name,
         email: createUserDto.email,
         username: createUserDto.username,
-        setor: createUserDto.setor,
         password: hashedPassword,
+        sectorId: createUserDto.sectorId,
         roleId: role.id,
         isTemporaryPassword: true,
       },
       include: {
         role: true,
+        sector: true,
       },
     });
   }
 
   async update(id: string, data: Partial<CreateUserDto>) {
     const updateData: any = { ...data };
-    
-    // Se role foi fornecido, buscar o roleId correspondente
-    if (data.role) {
-      const role = await this.prisma.role.findUnique({
-        where: { key: data.role },
-      });
-      
-      if (!role) {
-        throw new Error(`Role ${data.role} não encontrada`);
-      }
-      
-      updateData.roleId = role.id;
-      delete updateData.role;
-    }
+  
 
     return this.prisma.user.update({
       where: { id },
       data: updateData,
       include: {
         role: true,
+        sector: true,
       },
     });
   }
@@ -192,6 +183,7 @@ export class UsersRepository {
       data: { isActive: !user.isActive },
       include: {
         role: true,
+        sector: true,
       },
     });
   }

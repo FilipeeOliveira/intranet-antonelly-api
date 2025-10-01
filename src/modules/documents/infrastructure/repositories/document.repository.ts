@@ -5,10 +5,10 @@ import { DocumentQueryDto } from '../../domain/dto/document-query.dto';
 
 @Injectable()
 export class DocumentRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async findAll(query: DocumentQueryDto) {
-    const { page, limit, search, status, department, version, sortBy, sortOrder } = query;
+    const { page, limit, search, status, sector, version, sortBy, sortOrder } = query;
 
     const skip = (page - 1) * limit;
 
@@ -19,7 +19,6 @@ export class DocumentRepository {
       where.OR = [
         { title: { contains: search, mode: 'insensitive' } },
         { description: { contains: search, mode: 'insensitive' } },
-        { category: { contains: search, mode: 'insensitive' } },
       ];
     }
 
@@ -27,8 +26,12 @@ export class DocumentRepository {
       where.status = status;
     }
 
-    if (department) {
-      where.department = { contains: department, mode: 'insensitive' };
+    if (sector) {
+      where.sector = {
+        name: {
+          contains: sector, mode: 'insensitive',
+        }
+      };
     }
 
     if (version) {
@@ -45,6 +48,7 @@ export class DocumentRepository {
         skip,
         take: limit,
         orderBy,
+        include: { sector: true },
       }),
       this.prisma.document.count({ where }),
     ]);

@@ -29,7 +29,7 @@ export class UserQueryDto {
   })
   @IsOptional()
   @IsString()
-  setor?: string;
+  sector?: string;
 
   @ApiProperty({
     description: 'Filtro por status ativo',
