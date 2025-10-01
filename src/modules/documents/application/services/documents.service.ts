@@ -79,11 +79,13 @@ export class DocumentsService {
         if (!document) {
             throw new NotFoundException('Documento não encontrado.');
         }
+        
         return {
             ...document,
             status: document.status as DocumentStatus,
         };
     }
+
     async update(id: string, dto: Partial<CreateDocumentDto>, filePath?: string): Promise<Document> {
         
         // Adicionar a lógica para atualizar a versão do documento se um novo arquivo for enviado.

@@ -4,10 +4,12 @@ import {
     Controller,
     Delete,
     Get,
+    NotFoundException,
     Param,
     Post,
     Put,
     Query,
+    Res,
     UploadedFile,
     UseGuards,
     UseInterceptors,
@@ -28,6 +30,9 @@ import { CreateDocumentDto } from "../../domain/dto/create-document.dto";
 import { DocumentQueryDto } from "../../domain/dto/document-query.dto";
 import { AuthGuard } from "@nestjs/passport";
 import { AuthenticateGuard } from "src/modules/auth/presentation/guards/authenticate.guard";
+import { Response } from "express";
+import { createReadStream } from "fs";
+import { join } from "path";
 
 
 @ApiTags("Gestão de Documentos")
@@ -83,6 +88,26 @@ export class DocumentsController {
     @ApiResponse({ status: 404, description: "Documento não encontrado." })
     async findOne(@Param("id") id: string) {
         return this.documentsService.findById(id);
+    }
+
+    @Get(":id/download")
+    async downloadDocument(@Param("id") id: string, @Res() res: Response) {
+        const document = await this.documentsService.findById(id);
+        if (!document) {
+            throw new NotFoundException("Documento não encontrado");
+        }
+
+        const filePath = document.filePath;
+
+        // força o navegador a baixar o arquivo
+        res.setHeader(
+            "Content-Disposition",
+            `attachment; filename="${document.title}.pdf"`
+        );
+        res.setHeader("Content-Type", "application/pdf");
+
+        const fileStream = createReadStream(join(process.cwd(), filePath));
+        fileStream.pipe(res);
     }
 
     @Put(":id")

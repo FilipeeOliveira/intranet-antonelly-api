@@ -9,7 +9,7 @@ import { SectorQueryDto } from '../../domain/dto/sector-query.dto';
 import { Roles } from 'src/modules/auth/presentation/decorators/roles.decorator';
 import { RoleType } from 'src/modules/auth/domain/entities/role.entity';
 
-@ApiTags('Setores')
+@ApiTags('Gestão de Setores')
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'), AuthenticateGuard)
 @Controller('sectors')

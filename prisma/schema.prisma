@@ -20,19 +20,33 @@ model Role {
   @@map("roles")
 }
 
+model Sector {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  documents Document[]
+  users     User[]
+
+  @@map("sectors")
+}
+
 model User {
   id                  String   @id @default(uuid())
   name                String
   email               String   @unique
   username            String?  @unique
   password            String
-  setor               String?
+  sectorId            String
   roleId              String
   isActive            Boolean  @default(true)
   isTemporaryPassword Boolean  @default(false)
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
+  sector            Sector             @relation(fields: [sectorId], references: [id])
   role              Role               @relation(fields: [roleId], references: [id])
   permissions       UserPermission[]
   blacklistedTokens BlacklistedToken[]
@@ -85,18 +99,6 @@ model BlacklistedToken {
   @@map("blacklisted_tokens")
 }
 
-model Sector {
-  id          String   @id @default(uuid())
-  name        String   @unique
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  documents Document[]
-
-  @@map("sectors")
-}
-
 model Document {
   id          String   @id @default(uuid())
   title       String
@@ -132,8 +134,8 @@ model Visitor {
   companieId String?
   status     String?
 
-  companie Companie? @relation(fields: [companieId], references: [id], onDelete: SetNull)
-  createdAt DateTime @default(now())
+  companie  Companie? @relation(fields: [companieId], references: [id], onDelete: SetNull)
+  createdAt DateTime  @default(now())
 
   histories VisitHistory[]
 

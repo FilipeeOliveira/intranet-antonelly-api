@@ -23,13 +23,13 @@ export class DocumentQueryDto {
   status?: DocumentStatus;
 
   @ApiProperty({
-    description: 'Filtro por departamento',
+    description: 'Filtro por setor',
     required: false,
     example: 'RH',
   })
   @IsOptional()
   @IsString()
-  department?: string;
+  sector?: string;
 
   @ApiProperty({
     description: 'Filtro por versão',

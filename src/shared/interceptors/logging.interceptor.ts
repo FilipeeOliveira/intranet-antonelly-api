@@ -40,12 +40,21 @@ Started at: ${new Date().toISOString()}
           const duration = Date.now() - startTime;
           const statusCode = response.statusCode;
 
+          let responseSize = 0;
+          if (data !== undefined && data !== null) {
+            try {
+              responseSize = JSON.stringify(data).length;
+            } catch {
+              responseSize = 0;
+            }
+          }
+
           this.logger.log(`
 [SUCCESS] ${method} ${url} - ${statusCode}
 Duration: ${duration}ms
-Response size: ${JSON.stringify(data).length} bytes
+Response size: ${responseSize} bytes
 Completed at: ${new Date().toISOString()}
-          `);
+    `);
         },
         error: (error) => {
           const duration = Date.now() - startTime;
