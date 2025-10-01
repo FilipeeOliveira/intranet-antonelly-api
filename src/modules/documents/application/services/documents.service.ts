@@ -2,6 +2,7 @@ import { Injectable, BadRequestException, NotFoundException } from '@nestjs/comm
 import { CreateDocumentDto, DocumentStatus } from '../../domain/dto/create-document.dto';
 import { DocumentRepository } from '../../infrastructure/repositories/document.repository';
 import { DocumentQueryDto } from '../../domain/dto/document-query.dto';
+import { SectorRepository } from '../../../sectors/infrastructure/repositories/sector.repository';
 import { join } from 'path';
 import { unlink } from 'fs/promises';
 
@@ -18,12 +19,18 @@ export interface Document {
 @Injectable()
 export class DocumentsService {
     constructor(
-        private readonly documentRepository: DocumentRepository
+        private readonly documentRepository: DocumentRepository,
+        private readonly sectorRepository: SectorRepository
     ) { }
 
     async create(dto: CreateDocumentDto, filePath: string): Promise<Document> {
         if (!filePath.endsWith('.pdf')) {
             throw new BadRequestException('Apenas arquivos PDF são permitidos.');
+        }
+
+        const sector = await this.sectorRepository.findById(dto.sectorId);
+        if (!sector) {
+            throw new BadRequestException('Setor não encontrado. Verifique se o ID do setor está correto.');
         }
 
         const document = await this.documentRepository.create({
@@ -85,6 +92,13 @@ export class DocumentsService {
         
         const document = await this.documentRepository.findById(id);
         if (!document) throw new NotFoundException('Documento não encontrado.');
+
+        if (dto.sectorId) {
+            const sector = await this.sectorRepository.findById(dto.sectorId);
+            if (!sector) {
+                throw new BadRequestException('Setor não encontrado. Verifique se o ID do setor está correto.');
+            }
+        }
 
         const updateData: any = { ...dto };
 
