@@ -13,6 +13,7 @@ import { VisitHistoryModule } from './modules/visit-history/visit-history.module
 import { VisitorsModule } from './modules/visitors/visitors.module';
 import { LoggingInterceptor } from './shared/interceptors/logging.interceptor';
 import { MeetingModule } from './modules/meeting/meeting.module';
+import { RoomsModule } from './modules/rooms/rooms.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { MeetingModule } from './modules/meeting/meeting.module';
     VisitHistoryModule,
     CompaniesModule,
     MeetingModule,
+    RoomsModule,
   ],
   controllers: [],
   providers: [

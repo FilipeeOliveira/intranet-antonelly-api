@@ -27,8 +27,9 @@ model Sector {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  documents Document[]
-  users     User[]
+  documents       Document[]
+  users           User[]
+  MeetingSchedule MeetingSchedule[]
 
   @@map("sectors")
 }
@@ -64,6 +65,7 @@ model Page {
 
 model Feature {
   id          String           @id @default(uuid())
+  prettyName  String? // ex: View Products, Create Product
   key         String           @unique // ex: VIEW_PRODUCTS, CREATE_PRODUCT
   description String?
   pageId      String
@@ -118,6 +120,7 @@ model Document {
 model Companie {
   id          String   @id @default(uuid())
   name        String   @unique
+  cnpj        String   @unique
   description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -128,13 +131,13 @@ model Companie {
 }
 
 model Visitor {
-  id         String  @id @default(uuid())
-  name       String
-  email      String?
-  cpf        String? @unique
-  cnpj       String? @unique
-  companieId String?
-  status     Int     @default(1) // 1 = present, 2 = left
+  id          String  @id @default(uuid())
+  name        String
+  email       String?
+  cpf         String? @unique
+  companieId  String?
+  status      Int     @default(1) // 1 = present, 2 = left
+  description String? // Descrição adicional sobre o visitante
 
   companie  Companie? @relation(fields: [companieId], references: [id], onDelete: SetNull)
   createdAt DateTime  @default(now())
@@ -145,63 +148,45 @@ model Visitor {
 }
 
 model VisitHistory {
-  id        String    @id @default(uuid())
-  visitorId String
-  arrivedAt DateTime  @default(now())
-  leftAt    DateTime?
+  id          String    @id @default(uuid())
+  description String? // Motivo da visita
+  visitorId   String
+  arrivedAt   DateTime  @default(now())
+  leftAt      DateTime?
 
   visitor Visitor @relation(fields: [visitorId], references: [id], onDelete: Cascade)
 
   @@map("visit_history")
 }
 
-model MeetingSchedule {
-  id           String          @id @default(uuid())
-  subject      String
-  date         DateTime // somente data
-  time         String // somente horário em HH:MM
-  endTime      String // HH:MM calculado
-  duration     MeetingDuration
-  participants String // nomes separados por vírgula
-  type         MeetingType
-  priority     MeetingPriority
-  location     String
-  description  String?
-  reminder     MeetingReminder
-
+model Room {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  location  String?
+  capacity  Int?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  meetingSchedules MeetingSchedule[]
+
+  @@map("rooms")
+}
+
+model MeetingSchedule {
+  id          String   @id @default(uuid())
+  subject     String
+  description String?
+  date        DateTime // Somente data
+  startTime   String // Somente horário em HH:MM
+  endTime     String // HH:MM calculado
+  sectorId    String
+  roomId      String
+  status      Int      @default(1) // 1 = agendada, 2 = em andamento, 3 = concluida.
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Sector    Sector   @relation(fields: [sectorId], references: [id])
+  Room      Room     @relation(fields: [roomId], references: [id])
+
   @@map("meeting_schedule")
-}
-
-enum MeetingDuration {
-  MIN_15
-  MIN_30
-  MIN_45
-  H_1
-  H_1_30
-  H_2
-  H_3
-}
-
-enum MeetingType {
-  INLOCAL
-  ONLINE
-}
-
-enum MeetingPriority {
-  LOW
-  MID
-  HIGH
-  URGENT
-}
-
-enum MeetingReminder {
-  NOT
-  MIN_5
-  MIN_15
-  MIN_30
-  H_1
-  D_1
 }

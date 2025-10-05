@@ -7,6 +7,15 @@ export class StartVisitDto {
   @IsString()
   visitorId: string;
 
+  @ApiProperty({
+    description: 'Descrição do motivo da visita',
+    example: 'Reunião com o departamento de vendas',
+    required: true,
+  })
+  @IsNotEmpty()
+  @IsString()
+  description: string;
+
   @ApiProperty({ description: 'Data e hora de entrada (opcional)', example: '2025-09-28T10:00:00Z', required: false })
   @IsOptional()
   arrivedAt?: Date;

@@ -5,7 +5,7 @@ import { VisitorStatus } from './create-visitors.dto';
 
 export class VisitorsQueryDto {
   @ApiProperty({
-    description: 'Busca por nome ou email',
+    description: 'Busca por nome ou email ou CPF',
     required: false,
     example: 'João',
   })

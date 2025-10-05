@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { CompanieQueryDto } from '../../domain/dto/companie-query.dto';
+import { CreateCompanieDto } from '../../domain/dto/create-companie.dto';
+import { UpdateCompanieDto } from '../../domain/dto/update-companie.dto';
 
 @Injectable()
 export class CompanieRepository {
@@ -45,11 +47,11 @@ export class CompanieRepository {
     });
   }
 
-  async create(data: { name: string; description?: string }) {
+  async create(data: CreateCompanieDto) {
     return this.prisma.companie.create({ data });
   }
 
-  async update(id: string, data: Partial<{ name: string; description: string }>) {
+  async update(id: string, data: UpdateCompanieDto) {
     return this.prisma.companie.update({
       where: { id },
       data,

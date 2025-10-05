@@ -23,7 +23,7 @@ export class VisitorsService {
     const visitor = await this.visitorRepository.create(dto);
     return {
       ...visitor,
-      status: visitor.status as VisitorStatus,
+      status: visitor.status as unknown as VisitorStatus,
     };
   }
 
@@ -39,7 +39,7 @@ export class VisitorsService {
 
     return {
       ...updatedVisitor,
-      status: updatedVisitor.status as VisitorStatus,
+      status: updatedVisitor.status as unknown as VisitorStatus,
     };
   }
 
@@ -51,7 +51,7 @@ export class VisitorsService {
     return {
       data: data.map(visitor => ({
         ...visitor,
-        status: visitor.status as VisitorStatus,
+        status: visitor.status as unknown as VisitorStatus,
       })),
       total,
       page,
@@ -68,7 +68,7 @@ export class VisitorsService {
 
     return {
       ...visitor,
-      status: visitor.status as VisitorStatus,
+      status: visitor.status as unknown as VisitorStatus,
     };
   }
 
@@ -85,7 +85,7 @@ export class VisitorsService {
     const updatedVisitor = await this.visitorRepository.update(id, dto);
     return {
       ...updatedVisitor,
-      status: updatedVisitor.status as VisitorStatus,
+      status: updatedVisitor.status as unknown as VisitorStatus,
     };
   }
 
@@ -99,7 +99,7 @@ export class VisitorsService {
 
     return {
       ...deletedVisitor,
-      status: deletedVisitor.status as VisitorStatus,
+      status: deletedVisitor.status as unknown as VisitorStatus,
     };
   }
 }

@@ -2,6 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { MeetingQueryDto } from '../../domain/dto/meeting-query.dto';
 
+export enum MeetingStatus {
+    SCHEDULED = 1,   // agendada
+    IN_PROGRESS = 2, // em andamento
+    COMPLETED = 3,   // concluída
+}
+
 @Injectable()
 export class MeetingRepository {
     constructor(private readonly prisma: PrismaService) { }
@@ -13,13 +19,8 @@ export class MeetingRepository {
                 id: excludeId ? { not: excludeId } : undefined,
                 AND: [
                     {
-                        OR: [
-                            {
-                                // começa dentro de outra reunião
-                                time: { lt: endTime },
-                                endTime: { gt: startTime },
-                            }
-                        ],
+                        startTime: { lt: endTime },
+                        endTime: { gt: startTime },
                     },
                 ],
             },
@@ -27,18 +28,16 @@ export class MeetingRepository {
     }
 
     async findAll(query: MeetingQueryDto) {
-        const { page, limit, search, type, priority, sortBy, sortOrder } = query;
+        const { page = 1, limit = 10, search, sortBy, sortOrder } = query;
         const skip = (page - 1) * limit;
 
         const where: any = {};
         if (search) {
             where.OR = [
                 { subject: { contains: search, mode: 'insensitive' } },
-                { location: { contains: search, mode: 'insensitive' } },
+                { description: { contains: search, mode: 'insensitive' } },
             ];
         }
-        if (type) where.type = type;
-        if (priority) where.priority = priority;
 
         const orderBy: any = {};
         orderBy[sortBy || 'date'] = sortOrder || 'asc';
@@ -49,6 +48,10 @@ export class MeetingRepository {
                 skip,
                 take: limit,
                 orderBy,
+                include: {
+                    Sector: true,
+                    Room: true,
+                },
             }),
             this.prisma.meetingSchedule.count({ where }),
         ]);
@@ -65,11 +68,17 @@ export class MeetingRepository {
     async findById(id: string) {
         return this.prisma.meetingSchedule.findUnique({
             where: { id },
+            include: {
+                Sector: true,
+                Room: true,
+            },
         });
     }
 
     async create(data: any) {
-        return this.prisma.meetingSchedule.create({ data });
+        return this.prisma.meetingSchedule.create({
+            data,
+        });
     }
 
     async update(id: string, data: any) {
@@ -86,21 +95,18 @@ export class MeetingRepository {
     }
 
     async findToday() {
-        const startOfDay = new Date();
-        startOfDay.setHours(0, 0, 0, 0);
-
-        const endOfDay = new Date();
-        endOfDay.setHours(23, 59, 59, 999);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
 
         return this.prisma.meetingSchedule.findMany({
             where: {
-                date: {
-                    gte: startOfDay,
-                    lte: endOfDay,
-                },
+                date: today,
             },
-            orderBy: { time: 'asc' },
+            orderBy: { startTime: 'asc' },
+            include: {
+                Sector: true,
+                Room: true,
+            },
         });
     }
-
 }
