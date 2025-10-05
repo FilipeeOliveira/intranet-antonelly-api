@@ -7,6 +7,13 @@ export class CreateVisitHistoryDto {
   @IsString()
   visitorId: string;
 
+  @ApiProperty({
+    description: 'Descrição do motivo da visita',
+    example: 'Reunião com o departamento de vendas',
+    required: true,
+  })
+  description: string;
+
   @ApiProperty({ description: 'Data e hora de entrada', example: '2025-09-28T10:00:00Z', required: false })
   @IsOptional()
   arrivedAt?: Date;

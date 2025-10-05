@@ -26,13 +26,6 @@ export class CreateVisitorDto {
   @IsOptional()
   cpf?: string;
 
-  @ApiProperty({ description: 'CNPJ do visitante', example: '12345678000123', required: false })
-  @ValidateIf((o) => !o.email && !o.cpf)
-  @IsNotEmpty({ message: 'CNPJ é obrigatório quando e-mail ou CPF não são fornecidos' })
-  @IsString()
-  @IsOptional()
-  cnpj?: string;
-
   @ApiProperty({ description: 'ID da empresa do visitante', example: 'uuid-da-empresa', required: false })
   @IsOptional()
   @IsUUID()

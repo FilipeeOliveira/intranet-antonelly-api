@@ -17,7 +17,6 @@ export class VisitorRepository {
         { name: { contains: search, mode: 'insensitive' } },
         { email: { contains: search, mode: 'insensitive' } },
         { cpf: { contains: search, mode: 'insensitive' } },
-        { cnpj: { contains: search, mode: 'insensitive' } },
       ];
     }
     if (status) where.status = status;
@@ -92,7 +91,7 @@ export class VisitorRepository {
   }
 
 
-  async create(data: { name: string; email?: string; cpf?: string; cnpj?: string; companieId?: string; status?: VisitorStatus }) {
+  async create(data: { name: string; email?: string; cpf?: string; companieId?: string; status?: VisitorStatus }) {
     return this.prisma.visitor.create({
       data,
       include: { companie: true },

@@ -1,9 +1,10 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { IsEnum, IsOptional, IsString, Max, Min } from 'class-validator';
+import { ApiProperty } from "@nestjs/swagger";
+import { Type } from "class-transformer";
+import { IsOptional, IsString, Max, Min } from "class-validator";
 
-export class MeetingQueryDto {
-    @ApiProperty({ description: 'Busca por assunto ou local', required: false })
+export class RoomsQueryDto {
+
+    @ApiProperty({ description: 'Busca por nome ou local', required: false })
     @IsOptional()
     @IsString()
     search?: string;
@@ -21,11 +22,13 @@ export class MeetingQueryDto {
     @Max(100)
     limit: number = 10;
 
-    @ApiProperty({ description: 'Campo para ordenação', enum: ['subject', 'date', 'priority', 'createdAt'], default: 'date', required: false })
+    @ApiProperty({ description: 'Campo para ordenação', enum: ['id', 'name', 'location', 'createdAt'], default: 'id', required: false })
     @IsOptional()
-    sortBy: string = 'date';
+    sortBy: string = 'id';
 
     @ApiProperty({ description: 'Direção da ordenação', enum: ['asc', 'desc'], default: 'asc', required: false })
     @IsOptional()
     sortOrder: 'asc' | 'desc' = 'asc';
 }
+
+

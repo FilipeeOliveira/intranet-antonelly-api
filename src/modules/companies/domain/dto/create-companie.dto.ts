@@ -7,6 +7,11 @@ export class CreateCompanieDto {
   @IsString()
   name: string;
 
+  @ApiProperty({ description: 'CNPJ da empresa', example: '12345678000123', required: false })
+  @IsNotEmpty()
+  @IsString()
+  cnpj: string;
+
   @ApiProperty({ description: 'Descrição da empresa', example: 'Fornecedor de equipamentos', required: false })
   @IsOptional()
   @IsString()

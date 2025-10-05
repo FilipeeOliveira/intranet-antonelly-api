@@ -19,11 +19,6 @@ export class UpdateVisitorDto extends PartialType(CreateVisitorDto) {
   @IsString()
   cpf?: string;
 
-  @ApiProperty({ description: 'CNPJ do visitante', example: '12345678000123', required: false })
-  @IsOptional()
-  @IsString()
-  cnpj?: string;
-
   @ApiProperty({ description: 'ID da empresa', example: 'uuid-da-empresa', required: false })
   @IsOptional()
   @IsUUID()

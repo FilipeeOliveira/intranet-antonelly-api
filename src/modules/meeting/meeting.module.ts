@@ -4,11 +4,15 @@ import { AuthModule } from '../auth/auth.module';
 import { MeetingController } from './presentation/controllers/meeting.controller';
 import { MeetingService } from './application/service/meeting.service';
 import { MeetingRepository } from './infrastructure/repositories/meeting.repository';
+import { SectorsModule } from '../sectors/sectors.module';
+import { RoomsModule } from '../rooms/rooms.module';
 
 @Module({
     imports: [
         PrismaModule,
-        AuthModule
+        AuthModule,
+        SectorsModule,
+        RoomsModule
     ],
     controllers: [MeetingController],
     providers: [
