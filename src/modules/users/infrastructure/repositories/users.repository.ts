@@ -29,7 +29,7 @@ export class UsersRepository {
     }
 
     if (sector) {
-      where.sector = { contains: sector, mode: 'insensitive' };
+      where.sector = { name: { contains: sector, mode: 'insensitive' } };
     }
 
     if (isActive !== undefined) {

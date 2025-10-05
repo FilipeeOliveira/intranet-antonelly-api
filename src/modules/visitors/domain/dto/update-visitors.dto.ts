@@ -1,5 +1,5 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsEmail, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
 import { CreateVisitorDto, VisitorStatus } from './create-visitors.dto';
 
 
@@ -8,6 +8,21 @@ export class UpdateVisitorDto extends PartialType(CreateVisitorDto) {
   @IsOptional()
   @IsString()
   name?: string;
+
+  @ApiProperty({ description: 'E-mail do visitante', example: 'joao@email.com', required: false })
+  @IsOptional()
+  @IsEmail({}, { message: 'E-mail deve ter um formato válido' })
+  email?: string;
+
+  @ApiProperty({ description: 'CPF do visitante', example: '12345678901', required: false })
+  @IsOptional()
+  @IsString()
+  cpf?: string;
+
+  @ApiProperty({ description: 'CNPJ do visitante', example: '12345678000123', required: false })
+  @IsOptional()
+  @IsString()
+  cnpj?: string;
 
   @ApiProperty({ description: 'ID da empresa', example: 'uuid-da-empresa', required: false })
   @IsOptional()

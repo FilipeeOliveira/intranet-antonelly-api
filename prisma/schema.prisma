@@ -130,9 +130,11 @@ model Companie {
 model Visitor {
   id         String  @id @default(uuid())
   name       String
-  email      String  @unique
+  email      String?
+  cpf        String? @unique
+  cnpj       String? @unique
   companieId String?
-  status     String?
+  status     Int     @default(1) // 1 = present, 2 = left
 
   companie  Companie? @relation(fields: [companieId], references: [id], onDelete: SetNull)
   createdAt DateTime  @default(now())

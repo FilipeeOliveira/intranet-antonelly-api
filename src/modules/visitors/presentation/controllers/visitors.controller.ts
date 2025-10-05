@@ -36,17 +36,69 @@ export class VisitorsController {
   @Post()
   @Roles(RoleType.ADMIN, RoleType.GERENTE)
   @ApiBody({ type: CreateVisitorDto })
-  @ApiOperation({ summary: "Registrar novo visitante" })
-  @ApiResponse({ status: 201, description: "Visitante criado com sucesso." })
-  @ApiResponse({ status: 400, description: "Dados inválidos ou incompletos." })
+  @ApiOperation({ 
+    summary: "Registrar novo visitante",
+    description: "Registra um novo visitante. Deve fornecer pelo menos um dos seguintes: email, CPF ou CNPJ. Status: 1 = presente, 2 = saiu."
+  })
+  @ApiResponse({ 
+    status: 201, 
+    description: "Visitante criado com sucesso.",
+    schema: {
+      example: {
+        id: "uuid-do-visitante",
+        name: "João da Silva",
+        email: "joao@email.com",
+        cpf: null,
+        cnpj: null,
+        companieId: "uuid-da-empresa",
+        status: 1,
+        createdAt: "2024-01-01T00:00:00.000Z",
+        companie: {
+          id: "uuid-da-empresa",
+          name: "ACME Corp"
+        }
+      }
+    }
+  })
+  @ApiResponse({ status: 400, description: "Dados inválidos ou incompletos. Deve fornecer pelo menos email, CPF ou CNPJ." })
   async createVisitor(@Body() createVisitorDto: CreateVisitorDto) {
     return this.visitorsService.create(createVisitorDto);
   }
 
   // Listar visitantes
   @Get()
-  @ApiOperation({ summary: "Listar visitantes com filtros e paginação" })
-  @ApiResponse({ status: 200, description: "Lista de visitantes retornada com sucesso." })
+  @ApiOperation({ 
+    summary: "Listar visitantes com filtros e paginação",
+    description: "Lista visitantes com busca por nome, email, CPF ou CNPJ. Status: 1 = presente, 2 = saiu."
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: "Lista de visitantes retornada com sucesso.",
+    schema: {
+      example: {
+        data: [
+          {
+            id: "uuid-do-visitante",
+            name: "João da Silva",
+            email: "joao@email.com",
+            cpf: null,
+            cnpj: null,
+            companieId: "uuid-da-empresa",
+            status: 1,
+            createdAt: "2024-01-01T00:00:00.000Z",
+            companie: {
+              id: "uuid-da-empresa",
+              name: "ACME Corp"
+            }
+          }
+        ],
+        total: 1,
+        page: 1,
+        limit: 10,
+        totalPages: 1
+      }
+    }
+  })
   async findAll(@Query() query: VisitorsQueryDto) {
     return this.visitorsService.findAll(query);
   }
@@ -70,12 +122,66 @@ export class VisitorsController {
     return this.visitorsService.findByCompanie(companieId, query);
   }
 
+  // Marcar visitante como saiu
+  @Put(":id/exit")
+  @Roles(RoleType.ADMIN, RoleType.GERENTE, RoleType.PORTARIA)
+  @ApiOperation({ 
+    summary: "Marcar visitante como saiu",
+    description: "Marca um visitante como saiu (status = 2)."
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: "Visitante marcado como saiu com sucesso.",
+    schema: {
+      example: {
+        id: "uuid-do-visitante",
+        name: "João da Silva",
+        email: "joao@email.com",
+        cpf: null,
+        cnpj: null,
+        companieId: "uuid-da-empresa",
+        status: 2,
+        createdAt: "2024-01-01T00:00:00.000Z",
+        companie: {
+          id: "uuid-da-empresa",
+          name: "ACME Corp"
+        }
+      }
+    }
+  })
+  @ApiResponse({ status: 404, description: "Visitante não encontrado." })
+  async markAsLeft(@Param("id") id: string) {
+    return this.visitorsService.markAsLeft(id);
+  }
+
   // Atualizar visitante
   @Put(":id")
   @Roles(RoleType.ADMIN, RoleType.GERENTE)
   @ApiBody({ type: UpdateVisitorDto })
-  @ApiOperation({ summary: "Atualizar dados do visitante" })
-  @ApiResponse({ status: 200, description: "Visitante atualizado com sucesso." })
+  @ApiOperation({ 
+    summary: "Atualizar dados do visitante",
+    description: "Atualiza dados do visitante. Status: 1 = presente, 2 = saiu."
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: "Visitante atualizado com sucesso.",
+    schema: {
+      example: {
+        id: "uuid-do-visitante",
+        name: "João da Silva Atualizado",
+        email: "joao.novo@email.com",
+        cpf: "12345678901",
+        cnpj: null,
+        companieId: "uuid-da-empresa",
+        status: 2,
+        createdAt: "2024-01-01T00:00:00.000Z",
+        companie: {
+          id: "uuid-da-empresa",
+          name: "ACME Corp"
+        }
+      }
+    }
+  })
   async updateVisitor(
     @Param("id") id: string,
     @Body() updateDto: UpdateVisitorDto
