@@ -8,8 +8,10 @@ import { VisitorRepository } from '../../infrastructure/repositories/visitors.re
 export interface Visitor {
   id: string;
   name: string;
-  email: string;
-  companieId: string;
+  email?: string;
+  cpf?: string;
+  cnpj?: string;
+  companieId?: string;
   status: VisitorStatus;
 }
 
