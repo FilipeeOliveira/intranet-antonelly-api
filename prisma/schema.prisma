@@ -149,6 +149,7 @@ model Visitor {
 
 model VisitHistory {
   id          String    @id @default(uuid())
+  isScheduled Boolean   @default(false)
   description String? // Motivo da visita
   visitorId   String
   arrivedAt   DateTime  @default(now())

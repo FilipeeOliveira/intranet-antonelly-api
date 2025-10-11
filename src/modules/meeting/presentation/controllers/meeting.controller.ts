@@ -18,7 +18,6 @@ export class MeetingController {
     constructor(private readonly meetingService: MeetingService) { }
 
     @Post()
-    @Roles(RoleType.ADMIN, RoleType.GERENTE)
     @ApiOperation({ summary: 'Agendar nova reunião' })
     @ApiResponse({ status: 201, description: 'Reunião agendada com sucesso.' })
     async create(@Body() dto: CreateMeetingDto) {
@@ -49,7 +48,6 @@ export class MeetingController {
 
 
     @Put(':id')
-    @Roles(RoleType.ADMIN, RoleType.GERENTE)
     @ApiOperation({ summary: 'Atualizar reunião' })
     @ApiResponse({ status: 200, description: 'Reunião atualizada com sucesso.' })
     async update(@Param('id') id: string, @Body() dto: UpdateMeetingDto) {
@@ -57,7 +55,6 @@ export class MeetingController {
     }
 
     @Delete(':id')
-    @Roles(RoleType.ADMIN, RoleType.GERENTE)
     @ApiOperation({ summary: 'Cancelar reunião' })
     @ApiResponse({ status: 200, description: 'Reunião cancelada com sucesso.' })
     async delete(@Param('id') id: string) {

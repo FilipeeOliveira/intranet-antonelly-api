@@ -34,14 +34,13 @@ export class VisitorsController {
 
   // Criar visitante
   @Post()
-  @Roles(RoleType.ADMIN, RoleType.GERENTE)
   @ApiBody({ type: CreateVisitorDto })
-  @ApiOperation({ 
+  @ApiOperation({
     summary: "Registrar novo visitante",
     description: "Registra um novo visitante. Deve fornecer pelo menos um dos seguintes: email, CPF ou CNPJ. Status: 1 = presente, 2 = saiu."
   })
-  @ApiResponse({ 
-    status: 201, 
+  @ApiResponse({
+    status: 201,
     description: "Visitante criado com sucesso.",
     schema: {
       example: {
@@ -67,12 +66,12 @@ export class VisitorsController {
 
   // Listar visitantes
   @Get()
-  @ApiOperation({ 
+  @ApiOperation({
     summary: "Listar visitantes com filtros e paginação",
     description: "Lista visitantes com busca por nome, email, CPF ou CNPJ. Status: 1 = presente, 2 = saiu."
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: "Lista de visitantes retornada com sucesso.",
     schema: {
       example: {
@@ -124,13 +123,12 @@ export class VisitorsController {
 
   // Marcar visitante como saiu
   @Put(":id/exit")
-  @Roles(RoleType.ADMIN, RoleType.GERENTE, RoleType.PORTARIA)
-  @ApiOperation({ 
+  @ApiOperation({
     summary: "Marcar visitante como saiu",
     description: "Marca um visitante como saiu (status = 2)."
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: "Visitante marcado como saiu com sucesso.",
     schema: {
       example: {
@@ -156,14 +154,13 @@ export class VisitorsController {
 
   // Atualizar visitante
   @Put(":id")
-  @Roles(RoleType.ADMIN, RoleType.GERENTE)
   @ApiBody({ type: UpdateVisitorDto })
-  @ApiOperation({ 
+  @ApiOperation({
     summary: "Atualizar dados do visitante",
     description: "Atualiza dados do visitante. Status: 1 = presente, 2 = saiu."
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: "Visitante atualizado com sucesso.",
     schema: {
       example: {
@@ -191,7 +188,6 @@ export class VisitorsController {
 
   // Remover visitante
   @Delete(":id")
-  @Roles(RoleType.ADMIN, RoleType.GERENTE)
   @ApiOperation({ summary: "Remover visitante" })
   @ApiResponse({ status: 200, description: "Visitante removido com sucesso." })
   async deleteVisitor(@Param("id") id: string) {

@@ -52,6 +52,14 @@ export class VisitorRepository {
     });
   }
 
+  async findByCpf(cpf: string) {
+    return this.prisma.visitor.findUnique({
+      where: {
+        cpf
+      }
+    })
+  }
+
   async findByCompanie(companieId: string, query: VisitorsQueryDto) {
     const { page, limit, search, status, sortBy, sortOrder } = query;
     const skip = (page - 1) * limit;

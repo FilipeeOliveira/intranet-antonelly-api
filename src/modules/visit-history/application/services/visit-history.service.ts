@@ -6,6 +6,7 @@ import { VisitHistoryQueryDto } from '../../domain/dto/visit-history-query.dto';
 import { VisitHistoryRepository } from '../../infrastructure/respositories/visit-history.repository';
 import { VisitorRepository } from 'src/modules/visitors/infrastructure/repositories/visitors.repository';
 import { VisitorStatus } from 'src/modules/visitors/domain/dto/create-visitors.dto';
+import { CreateVisitScheduleDto } from '../../domain/dto/create-visit-schedule.dto';
 
 export interface VisitHistory {
   id: string;
@@ -22,11 +23,25 @@ export class VisitHistoryService {
   ) { }
 
   async create(dto: CreateVisitHistoryDto): Promise<VisitHistory> {
-    return this.visitHistoryRepository.create({
+    return await this.visitHistoryRepository.create({
       visitorId: dto.visitorId,
       arrivedAt: dto.arrivedAt || new Date(),
       leftAt: dto.leftAt,
     });
+  }
+
+
+  async createVisitSchedule(dto: CreateVisitScheduleDto): Promise<VisitHistory> {
+
+    const visitorExist = await this.visitorRepository.findByCpf(dto.cpf);
+    if (!visitorExist) throw new BadRequestException('Visitante com esse CPF não encontrado.')
+
+    const schedule = await this.visitHistoryRepository.create({
+      ...dto,
+      isScheduled: true,
+    });
+
+    return schedule;
   }
 
   async startVisit(visitorId: string): Promise<VisitHistory> {

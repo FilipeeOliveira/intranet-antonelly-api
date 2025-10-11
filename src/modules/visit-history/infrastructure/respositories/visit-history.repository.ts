@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { VisitHistoryQueryDto } from '../../domain/dto/visit-history-query.dto';
+import { VisitHistory } from '@prisma/client';
 
 @Injectable()
 export class VisitHistoryRepository {
@@ -57,9 +58,15 @@ export class VisitHistoryRepository {
     });
   }
 
-  async create(data: { visitorId: string; arrivedAt?: Date; leftAt?: Date }) {
-    return this.prisma.visitHistory.create({
-      data,
+  async create(data: Partial<VisitHistory>) {
+
+    return await this.prisma.visitHistory.create({
+      data: {
+        description: data.description,
+        visitorId: data.visitorId,
+        arrivedAt: data.arrivedAt,
+        leftAt: data.leftAt,
+      },
       include: { visitor: true },
     });
   }

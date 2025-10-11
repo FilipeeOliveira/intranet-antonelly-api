@@ -17,7 +17,6 @@ export class CompanieController {
   constructor(private readonly companieService: CompanieService) {}
 
   @Post()
-  @Roles(RoleType.ADMIN, RoleType.GERENTE)
   @ApiOperation({ summary: 'Criar nova empresa' })
   @ApiResponse({ status: 201, description: 'Empresa criada com sucesso.' })
   async create(@Body() dto: CreateCompanieDto) {
@@ -40,7 +39,6 @@ export class CompanieController {
   }
 
   @Put(':id')
-  @Roles(RoleType.ADMIN, RoleType.GERENTE)
   @ApiOperation({ summary: 'Atualizar empresa' })
   @ApiResponse({ status: 200, description: 'Empresa atualizada com sucesso.' })
   async update(@Param('id') id: string, @Body() dto: UpdateCompanieDto) {
@@ -48,7 +46,6 @@ export class CompanieController {
   }
 
   @Delete(':id')
-  @Roles(RoleType.ADMIN, RoleType.GERENTE)
   @ApiOperation({ summary: 'Deletar empresa' })
   @ApiResponse({ status: 200, description: 'Empresa removida com sucesso.' })
   async delete(@Param('id') id: string) {
