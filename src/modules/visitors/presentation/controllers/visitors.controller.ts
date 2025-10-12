@@ -17,9 +17,9 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { RoleType } from "src/modules/auth/domain/entities/role.entity";
-import { Roles } from "src/modules/auth/presentation/decorators/roles.decorator";
 import { AuthenticateGuard } from "src/modules/auth/presentation/guards/authenticate.guard";
+import { Features } from "src/modules/permissions/presentation/guards/features.decorator";
+import { Permissions } from "src/shared/features";
 import { VisitorsService } from "../../application/services/visitors.service";
 import { CreateVisitorDto } from "../../domain/dto/create-visitors.dto";
 import { UpdateVisitorDto } from "../../domain/dto/update-visitors.dto";
@@ -60,6 +60,7 @@ export class VisitorsController {
     }
   })
   @ApiResponse({ status: 400, description: "Dados inválidos ou incompletos. Deve fornecer pelo menos email, CPF ou CNPJ." })
+  @Features(Permissions.VISITORS.CREATE)
   async createVisitor(@Body() createVisitorDto: CreateVisitorDto) {
     return this.visitorsService.create(createVisitorDto);
   }
@@ -98,6 +99,7 @@ export class VisitorsController {
       }
     }
   })
+  @Features(Permissions.VISITORS.READ_ALL)
   async findAll(@Query() query: VisitorsQueryDto) {
     return this.visitorsService.findAll(query);
   }
@@ -107,6 +109,7 @@ export class VisitorsController {
   @ApiOperation({ summary: "Buscar visitante por ID" })
   @ApiResponse({ status: 200, description: "Visitante encontrado." })
   @ApiResponse({ status: 404, description: "Visitante não encontrado." })
+  @Features(Permissions.VISITORS.READ_BY_ID)
   async findOne(@Param("id") id: string) {
     return this.visitorsService.findById(id);
   }
@@ -114,6 +117,7 @@ export class VisitorsController {
   @Get("by-companie/:companieId")
   @ApiOperation({ summary: "Listar visitantes de uma empresa específica" })
   @ApiResponse({ status: 200, description: "Lista de visitantes da empresa retornada com sucesso." })
+  @Features(Permissions.VISITORS.READ_BY_COMPANIE)
   async findByCompanie(
     @Param("companieId") companieId: string,
     @Query() query: VisitorsQueryDto
@@ -148,6 +152,7 @@ export class VisitorsController {
     }
   })
   @ApiResponse({ status: 404, description: "Visitante não encontrado." })
+  @Features(Permissions.VISITORS.MARK_AS_LEFT)
   async markAsLeft(@Param("id") id: string) {
     return this.visitorsService.markAsLeft(id);
   }
@@ -179,6 +184,7 @@ export class VisitorsController {
       }
     }
   })
+  @Features(Permissions.VISITORS.UPDATE)
   async updateVisitor(
     @Param("id") id: string,
     @Body() updateDto: UpdateVisitorDto
@@ -190,6 +196,7 @@ export class VisitorsController {
   @Delete(":id")
   @ApiOperation({ summary: "Remover visitante" })
   @ApiResponse({ status: 200, description: "Visitante removido com sucesso." })
+  @Features(Permissions.VISITORS.DELETE)
   async deleteVisitor(@Param("id") id: string) {
     return this.visitorsService.delete(id);
   }
