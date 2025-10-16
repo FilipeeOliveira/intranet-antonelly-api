@@ -12,7 +12,7 @@ export class ResetPasswordDto {
 
   @ApiProperty({
     description: 'Nova senha do usuário',
-    example: 'AdminPass@123',
+    example: 'admin@123',
     minLength: 8,
   })
   @IsString({ message: 'Senha deve ser uma string' })
@@ -25,7 +25,7 @@ export class ResetPasswordDto {
 
   @ApiProperty({
     description: 'Confirmação da nova senha',
-    example: 'AdminPass@123',
+    example: 'admin@123',
   })
   @IsString({ message: 'Confirmação deve ser uma string' })
   @IsNotEmpty({ message: 'Confirmação da senha é obrigatória' })

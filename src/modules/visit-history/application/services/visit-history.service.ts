@@ -1,30 +1,26 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 
+import { VisitHistory } from '@prisma/client';
 import { CreateVisitHistoryDto } from '../../domain/dto/create-visit-history.dto';
+import { CreateVisitScheduleDto } from '../../domain/dto/create-visit-schedule.dto';
 import { UpdateVisitHistoryDto } from '../../domain/dto/update-visit-history.dto';
 import { VisitHistoryQueryDto } from '../../domain/dto/visit-history-query.dto';
+import { VisitHistoryStatus } from '../../domain/enums/VisitHistoryStatus';
 import { VisitHistoryRepository } from '../../infrastructure/respositories/visit-history.repository';
-import { VisitorRepository } from 'src/modules/visitors/infrastructure/repositories/visitors.repository';
-import { VisitorStatus } from 'src/modules/visitors/domain/dto/create-visitors.dto';
-import { CreateVisitScheduleDto } from '../../domain/dto/create-visit-schedule.dto';
-
-export interface VisitHistory {
-  id: string;
-  visitorId: string;
-  arrivedAt: Date;
-  leftAt?: Date;
-}
 
 @Injectable()
 export class VisitHistoryService {
   constructor(
     private readonly visitHistoryRepository: VisitHistoryRepository,
-    private readonly visitorRepository: VisitorRepository
   ) { }
 
   async create(dto: CreateVisitHistoryDto): Promise<VisitHistory> {
     return await this.visitHistoryRepository.create({
-      visitorId: dto.visitorId,
+      visitorName: dto.visitorName,
+      visitorCpf: dto.visitorCpf,
+      visitorPhone: dto.visitorPhone,
+      description: dto.description,
+      companyId: dto.companyId,
       arrivedAt: dto.arrivedAt || new Date(),
       leftAt: dto.leftAt,
     });
@@ -33,46 +29,47 @@ export class VisitHistoryService {
 
   async createVisitSchedule(dto: CreateVisitScheduleDto): Promise<VisitHistory> {
 
-    const visitorExist = await this.visitorRepository.findByCpf(dto.cpf);
-    if (!visitorExist) throw new BadRequestException('Visitante com esse CPF não encontrado.')
-
     const schedule = await this.visitHistoryRepository.create({
-      ...dto,
+      visitorName: dto.visitorName,
+      visitorCpf: dto.visitorCpf,
+      visitorPhone: dto.visitorPhone,
+      description: dto.description,
+      arrivedAt: new Date(`${dto.date}T${dto.time}:00`),
+      companyId: dto.companyId,
       isScheduled: true,
     });
 
     return schedule;
   }
 
-  async startVisit(visitorId: string): Promise<VisitHistory> {
+  async startVisit(visitHistoryId: string): Promise<VisitHistory> {
     // Verificar se já existe uma visita em andamento (sem saída)
-    const lastVisit = await this.visitHistoryRepository.findLastVisitByVisitor(visitorId);
-    if (lastVisit && !lastVisit.leftAt) {
-      throw new BadRequestException('Este visitante já possui uma visita em andamento.');
+    const isVisitStarted = await this.visitHistoryRepository.findById(visitHistoryId);
+
+    if (isVisitStarted && !isVisitStarted.leftAt) {
+      throw new BadRequestException('Esta visita já está em andamento.');
     }
 
-    // Atualizar status do visitante para PRESENTE
-    await this.visitorRepository.update(visitorId, { status: VisitorStatus.PRESENT });
-
-    return this.visitHistoryRepository.create({
-      visitorId,
+    return this.visitHistoryRepository.update(visitHistoryId, {
+      ...isVisitStarted,
+      status: VisitHistoryStatus.PRESENT,
       arrivedAt: new Date(),
     });
   }
 
-  async endVisit(visitorId: string): Promise<VisitHistory> {
-    const lastVisit = await this.visitHistoryRepository.findLastVisitByVisitor(visitorId);
-    if (!lastVisit) {
-      throw new NotFoundException('Nenhuma visita encontrada para este visitante.');
+  async endVisit(visitHistoryId: string): Promise<VisitHistory> {
+    const isVisitStarted = await this.visitHistoryRepository.findById(visitHistoryId);
+    if (!isVisitStarted) {
+      throw new NotFoundException('A visita não foi encontrada.');
     }
 
-    if (lastVisit.leftAt) {
-      throw new BadRequestException('A última visita já foi finalizada.');
+    if (isVisitStarted.leftAt) {
+      throw new BadRequestException('Esta visita já foi finalizada.');
     }
 
-    await this.visitorRepository.update(visitorId, { status: VisitorStatus.LEFT });
+    await this.visitHistoryRepository.update(isVisitStarted.id, { status: VisitHistoryStatus.FINISHED });
 
-    return this.visitHistoryRepository.update(lastVisit.id, {
+    return this.visitHistoryRepository.update(isVisitStarted.id, {
       leftAt: new Date(),
     });
   }

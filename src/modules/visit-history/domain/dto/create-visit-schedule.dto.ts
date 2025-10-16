@@ -8,16 +8,23 @@ export class CreateVisitScheduleDto {
   })
   @IsNotEmpty()
   @IsString()
-  fullName: string;
+  visitorName: string;
 
   @ApiProperty({
     description: 'CPF of the visitor',
-    example: '123.456.789-00',
+    example: '12345678900',
   })
   @IsNotEmpty()
   @IsString()
-  @Matches(/^\d{3}\.\d{3}\.\d{3}\-\d{2}$/, { message: 'CPF must be in the format 000.000.000-00' })
-  cpf: string;
+  visitorCpf: string;
+
+  @ApiProperty({
+    description: 'Phone number of the visitor',
+    example: '11987654321',
+  })
+  @IsNotEmpty()
+  @IsString()
+  visitorPhone: string;
 
   @ApiProperty({
     description: 'ID of the company being visited',

@@ -28,7 +28,7 @@ export class VisitHistoryRepository {
         skip,
         take: limit,
         orderBy,
-        include: { visitor: true },
+
       }),
       this.prisma.visitHistory.count({ where }),
     ]);
@@ -42,11 +42,10 @@ export class VisitHistoryRepository {
     };
   }
 
-  async findLastVisitByVisitor(visitorId: string) {
+  async findLastVisitByCpf(visitorCpf: string) {
     return this.prisma.visitHistory.findFirst({
-      where: { visitorId },
+      where: { visitorCpf },
       orderBy: { arrivedAt: 'desc' },
-      include: { visitor: true },
     });
   }
 
@@ -54,28 +53,27 @@ export class VisitHistoryRepository {
   async findById(id: string) {
     return this.prisma.visitHistory.findUnique({
       where: { id },
-      include: { visitor: true },
     });
   }
 
-  async create(data: Partial<VisitHistory>) {
+  async create(data: Partial<sz>) {
 
     return await this.prisma.visitHistory.create({
       data: {
         description: data.description,
-        visitorId: data.visitorId,
+        visitorCpf: data.visitorCpf,
+        visitorName: data.visitorName,
+        visitorPhone: data.visitorPhone,
         arrivedAt: data.arrivedAt,
         leftAt: data.leftAt,
       },
-      include: { visitor: true },
     });
   }
 
-  async update(id: string, data: Partial<{ arrivedAt: Date; leftAt: Date }>) {
+  async update(id: string, data: Partial<VisitHistory>) {
     return this.prisma.visitHistory.update({
       where: { id },
       data,
-      include: { visitor: true },
     });
   }
 
@@ -90,7 +88,6 @@ export class VisitHistoryRepository {
       where: {
         leftAt: null,
       },
-      include: { visitor: true },
     });
   }
 
@@ -102,7 +99,6 @@ export class VisitHistoryRepository {
           lte: end,
         },
       },
-      include: { visitor: true },
     });
   }
 }

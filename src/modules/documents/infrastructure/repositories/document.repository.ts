@@ -80,6 +80,7 @@ export class DocumentRepository {
         version: '1.0',
         status: DocumentStatus.PENDING,
       },
+      include: { sector: true },
     });
   }
 

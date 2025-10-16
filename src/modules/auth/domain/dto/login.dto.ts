@@ -12,7 +12,7 @@ export class LoginDto {
 
   @ApiProperty({
     description: 'Senha do usuário',
-    example: 'AdminPass@123',
+    example: 'admin@123',
     minLength: 8,
   })
   @IsString({ message: 'Senha deve ser uma string' })

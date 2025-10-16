@@ -6,7 +6,6 @@ import { createSectorsSeed } from './create-sectors.seed';
 import { createUsersSeed } from './create-users.seed';
 import { createPagesSeed } from './create-pages.seed';
 import { createCompaniesSeed } from './create-companies.seed';
-import { createVisitorsSeed } from './create-visitors.seed';
 import { createRoomsSeed } from './create-rooms.seed';
 dotenv.config();
 
@@ -20,7 +19,6 @@ async function main() {
   const usersCreated = await createUsersSeed({ rolesCreated, sectorRecords });
   const pagesCreated = await createPagesSeed();
   const companiesCreated = await createCompaniesSeed();
-  const visitorsCreated = await createVisitorsSeed();
   const roomsCreated = await createRoomsSeed();
 
   console.log('🌱 Seed finalizada com sucesso!');

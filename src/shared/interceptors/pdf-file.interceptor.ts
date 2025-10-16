@@ -8,8 +8,10 @@ export const pdfFileInterceptor = (fieldName = "document") =>
     storage: diskStorage({
       destination: "./uploads/documents",
       filename: (req, file, callback) => {
-        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-        callback(null, `${uniqueSuffix}${extname(file.originalname)}`);
+        const nameWithoutExt = file.originalname.replace(extname(file.originalname), '');
+        const uniqueSuffix = Date.now() + Math.round(Math.random() * 1e9);
+        
+        callback(null, `${nameWithoutExt}${extname(file.originalname)}`);
       },
     }),
     fileFilter: (req, file, callback) => {
