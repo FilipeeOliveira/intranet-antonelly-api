@@ -6,13 +6,11 @@ import { RoomsFeatures } from './rooms.features';
 import { SectorsFeatures } from './sectors.features';
 import { UserFeatures } from './users.features';
 import { VisitHistoryFeatures, VisitScheduleFeatures } from './visit-history.features';
-import { VisitorFeatures } from './visitors.features';
 
 export const Permissions = {
-    VISITORS: VisitorFeatures,
     COMPANIES: CompanyFeatures,
     VISIT_SCHEDULES: VisitScheduleFeatures,
-    VisitHistoryFeatures: VisitHistoryFeatures,
+    VISIT_HISTORY: VisitHistoryFeatures,
     DOCUMENTS: DocumentsFeatures,
     MEETINGS: MeetingFeatures,
     SECTORS: SectorsFeatures,
@@ -22,7 +20,6 @@ export const Permissions = {
 } as const;
 
 export type PermissionKey =
-    | typeof VisitorFeatures[keyof typeof VisitorFeatures]
     | typeof CompanyFeatures[keyof typeof CompanyFeatures]
     | typeof VisitScheduleFeatures[keyof typeof VisitScheduleFeatures]
     | typeof DocumentsFeatures[keyof typeof DocumentsFeatures]

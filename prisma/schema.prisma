@@ -134,11 +134,11 @@ model VisitHistory {
   id           String  @id @default(uuid())
   isScheduled  Boolean @default(false)
   description  String? // Motivo da visita
-  visitorName  String
-  visitorCpf   String
-  visitorPhone String?
+  name  String
+  cpf   String?
+  phone String?
   companyId    String?
-  status       Int     @default(1) // 1 = Aguardando, 2 = Presente, 3 = Finalizada, 4 = Cancelada.
+  status       Int     @default(1) // 1 = Agendado, 2 = Presente, 3 = Saiu, 4 = Cancelada.
 
   arrivedAt DateTime  @default(now())
   leftAt    DateTime?

@@ -1,13 +1,13 @@
 export enum VisitHistoryStatus {
-    WAITING = 1,
+    SCHEDULED = 1,
     PRESENT = 2,
-    FINISHED = 3,
+    LEFT = 3,
     CANCELED = 4
 }
 
 export const VisitHistoryStatusList = {
-    [VisitHistoryStatus.WAITING]: 'Aguardando',
+    [VisitHistoryStatus.SCHEDULED]: 'Agendado',
     [VisitHistoryStatus.PRESENT]: 'Presente',
-    [VisitHistoryStatus.FINISHED]: 'Finalizada',
+    [VisitHistoryStatus.LEFT]: 'Saiu',
     [VisitHistoryStatus.CANCELED]: 'Cancelada'
 }

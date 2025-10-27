@@ -1,14 +1,15 @@
 import { Injectable } from '@nestjs/common';
+import { VisitHistory } from '@prisma/client';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { VisitHistoryQueryDto } from '../../domain/dto/visit-history-query.dto';
-import { VisitHistory } from '@prisma/client';
+import { VisitHistoryStatusList } from '../../domain/enums/VisitHistoryStatus';
 
 @Injectable()
 export class VisitHistoryRepository {
   constructor(private readonly prisma: PrismaService) { }
 
   async findAll(query: VisitHistoryQueryDto) {
-    const { page, limit, search, sortBy, sortOrder } = query;
+    const { page, limit, search, sortBy, sortOrder, status } = query;
     const skip = (page - 1) * limit;
 
     const where: any = {};
@@ -19,6 +20,10 @@ export class VisitHistoryRepository {
       ];
     }
 
+    if (status) {
+      where.status = status;
+    }
+
     const orderBy: any = {};
     orderBy[sortBy || 'arrivedAt'] = sortOrder || 'desc';
 
@@ -26,6 +31,9 @@ export class VisitHistoryRepository {
       this.prisma.visitHistory.findMany({
         where,
         skip,
+        include: {
+          companie: true,
+        },
         take: limit,
         orderBy,
 
@@ -34,7 +42,10 @@ export class VisitHistoryRepository {
     ]);
 
     return {
-      data: histories,
+      data: histories.map(h => ({
+        ...h,
+        statusLabel: VisitHistoryStatusList[h.status],
+      })),
       total,
       page,
       limit,
@@ -42,9 +53,9 @@ export class VisitHistoryRepository {
     };
   }
 
-  async findLastVisitByCpf(visitorCpf: string) {
+  async findLastVisitByCpf(cpf: string) {
     return this.prisma.visitHistory.findFirst({
-      where: { visitorCpf },
+      where: { cpf },
       orderBy: { arrivedAt: 'desc' },
     });
   }
@@ -56,16 +67,18 @@ export class VisitHistoryRepository {
     });
   }
 
-  async create(data: Partial<sz>) {
+  async create(data: Partial<VisitHistory>) {
 
     return await this.prisma.visitHistory.create({
       data: {
         description: data.description,
-        visitorCpf: data.visitorCpf,
-        visitorName: data.visitorName,
-        visitorPhone: data.visitorPhone,
-        arrivedAt: data.arrivedAt,
-        leftAt: data.leftAt,
+        cpf: data.cpf,
+        name: data.name,
+        phone: data.phone,
+        companyId: data.companyId,
+        status: data.status,
+        isScheduled: data.isScheduled || false,
+        arrivedAt: data.arrivedAt
       },
     });
   }

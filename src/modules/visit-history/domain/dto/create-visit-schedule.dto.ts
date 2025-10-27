@@ -11,28 +11,20 @@ export class CreateVisitScheduleDto {
   visitorName: string;
 
   @ApiProperty({
-    description: 'CPF of the visitor',
-    example: '12345678900',
-  })
-  @IsNotEmpty()
-  @IsString()
-  visitorCpf: string;
-
-  @ApiProperty({
-    description: 'Phone number of the visitor',
-    example: '11987654321',
-  })
-  @IsNotEmpty()
-  @IsString()
-  visitorPhone: string;
-
-  @ApiProperty({
     description: 'ID of the company being visited',
     example: 'e2e47e4f-cc59-44b8-9b7f-247b3e3e4af8',
   })
   @IsNotEmpty()
   @IsString()
   companyId: string;
+
+  @ApiProperty({
+    description: 'Reason or description of the visit',
+    example: 'Meeting with the logistics team',
+  })
+  @IsOptional()
+  @IsString()
+  description?: string;
 
   @ApiProperty({
     description: 'Date of the visit (ISO format)',
@@ -52,10 +44,18 @@ export class CreateVisitScheduleDto {
   time: string;
 
   @ApiProperty({
-    description: 'Reason or description of the visit',
-    example: 'Meeting with the logistics team',
+    description: 'CPF of the visitor',
+    example: '12345678900',
   })
   @IsOptional()
   @IsString()
-  description?: string;
+  visitorCpf?: string;
+
+  @ApiProperty({
+    description: 'Phone number of the visitor',
+    example: '11987654321',
+  })
+  @IsOptional()
+  @IsString()
+  visitorPhone?: string;
 }

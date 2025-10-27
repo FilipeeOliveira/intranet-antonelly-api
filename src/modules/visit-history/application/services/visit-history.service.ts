@@ -1,6 +1,9 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { VisitHistory } from '@prisma/client';
+import { CompanyRepository } from 'src/modules/companies/infrastructure/repositories/company.repository';
+import { getCurrentUtcDate } from 'src/shared/utils/getCurrentUtcDate';
+import { getLocalDateToUtcDate } from 'src/shared/utils/getLocalDateToUtcDate';
 import { CreateVisitHistoryDto } from '../../domain/dto/create-visit-history.dto';
 import { CreateVisitScheduleDto } from '../../domain/dto/create-visit-schedule.dto';
 import { UpdateVisitHistoryDto } from '../../domain/dto/update-visit-history.dto';
@@ -12,30 +15,42 @@ import { VisitHistoryRepository } from '../../infrastructure/respositories/visit
 export class VisitHistoryService {
   constructor(
     private readonly visitHistoryRepository: VisitHistoryRepository,
+    private readonly companyRepository: CompanyRepository
   ) { }
 
   async create(dto: CreateVisitHistoryDto): Promise<VisitHistory> {
+
+    const companyExists = await this.companyRepository.findById(dto.companyId);
+    if (!companyExists) {
+      throw new NotFoundException('Empresa não encontrada.');
+    }
+
     return await this.visitHistoryRepository.create({
-      visitorName: dto.visitorName,
-      visitorCpf: dto.visitorCpf,
-      visitorPhone: dto.visitorPhone,
+      name: dto.visitorName,
+      cpf: dto?.visitorCpf,
+      phone: dto?.visitorPhone,
       description: dto.description,
       companyId: dto.companyId,
-      arrivedAt: dto.arrivedAt || new Date(),
-      leftAt: dto.leftAt,
+      status: VisitHistoryStatus.PRESENT,
+      arrivedAt: dto.arrivedAt ? getLocalDateToUtcDate(dto.arrivedAt) : getCurrentUtcDate()
     });
   }
 
-
   async createVisitSchedule(dto: CreateVisitScheduleDto): Promise<VisitHistory> {
 
+    const companyExists = await this.companyRepository.findById(dto.companyId);
+    if (!companyExists) {
+      throw new NotFoundException('Empresa não encontrada.');
+    }
+
     const schedule = await this.visitHistoryRepository.create({
-      visitorName: dto.visitorName,
-      visitorCpf: dto.visitorCpf,
-      visitorPhone: dto.visitorPhone,
+      name: dto.visitorName,
+      cpf: dto?.visitorCpf,
+      phone: dto?.visitorPhone,
       description: dto.description,
-      arrivedAt: new Date(`${dto.date}T${dto.time}:00`),
+      arrivedAt: getLocalDateToUtcDate(new Date(`${dto.date}T${dto.time}:00`)),
       companyId: dto.companyId,
+      status: VisitHistoryStatus.SCHEDULED,
       isScheduled: true,
     });
 
@@ -46,7 +61,7 @@ export class VisitHistoryService {
     // Verificar se já existe uma visita em andamento (sem saída)
     const isVisitStarted = await this.visitHistoryRepository.findById(visitHistoryId);
 
-    if (isVisitStarted && !isVisitStarted.leftAt) {
+    if (isVisitStarted.status === VisitHistoryStatus.PRESENT) {
       throw new BadRequestException('Esta visita já está em andamento.');
     }
 
@@ -67,15 +82,15 @@ export class VisitHistoryService {
       throw new BadRequestException('Esta visita já foi finalizada.');
     }
 
-    await this.visitHistoryRepository.update(isVisitStarted.id, { status: VisitHistoryStatus.FINISHED });
+    await this.visitHistoryRepository.update(isVisitStarted.id, { status: VisitHistoryStatus.LEFT });
 
     return this.visitHistoryRepository.update(isVisitStarted.id, {
       leftAt: new Date(),
     });
   }
 
-  async findAll(query: VisitHistoryQueryDto) {
-    return this.visitHistoryRepository.findAll(query);
+  async findAll(query?: VisitHistoryQueryDto) {
+    return await this.visitHistoryRepository.findAll(query);
   }
 
   async findById(id: string): Promise<VisitHistory> {
@@ -89,6 +104,19 @@ export class VisitHistoryService {
     if (!history) throw new NotFoundException('Histórico não encontrado.');
 
     return this.visitHistoryRepository.update(id, dto);
+  }
+
+  async cancelScheduledVisit(id: string): Promise<VisitHistory> {
+    const history = await this.visitHistoryRepository.findById(id);
+    if (!history) throw new NotFoundException('Histórico não encontrado.');
+
+    if (history.status !== VisitHistoryStatus.SCHEDULED) {
+      throw new BadRequestException('Apenas visitas agendadas podem ser canceladas.');
+    }
+
+    return this.visitHistoryRepository.update(id, {
+      status: VisitHistoryStatus.CANCELED,
+    });
   }
 
   async delete(id: string): Promise<VisitHistory> {

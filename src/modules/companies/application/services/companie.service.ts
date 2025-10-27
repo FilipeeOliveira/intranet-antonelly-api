@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CompanieRepository } from '../../infrastructure/repositories/companie.repository';
-import { CreateCompanieDto } from '../../domain/dto/create-companie.dto';
-import { UpdateCompanieDto } from '../../domain/dto/update-companie.dto';
-import { CompanieQueryDto } from '../../domain/dto/companie-query.dto';
+import { CompanyRepository } from '../../infrastructure/repositories/company.repository';
+import { CreateCompanyDto } from '../../domain/dto/create-company.dto';
+import { UpdateCompanyDto } from '../../domain/dto/update-companie.dto';
+import { CompaniesQueryDto } from '../../domain/dto/companies-query.dto';
 
-export interface Companie {
+export interface Company {
     id: string;
     name: string;
     description?: string;
@@ -13,32 +13,32 @@ export interface Companie {
 }
 
 @Injectable()
-export class CompanieService {
-    constructor(private readonly companieRepository: CompanieRepository) { }
+export class CompanyService {
+    constructor(private readonly companyRepository: CompanyRepository) { }
 
-    async create(dto: CreateCompanieDto): Promise<Companie> {
-        return this.companieRepository.create(dto);
+    async create(dto: CreateCompanyDto): Promise<Company> {
+        return this.companyRepository.create(dto);
     }
 
-    async findAll(query: CompanieQueryDto) {
-        return this.companieRepository.findAll(query);
+    async findAll(query: CompaniesQueryDto) {
+        return this.companyRepository.findAll(query);
     }
 
-    async findById(id: string): Promise<Companie> {
-        const companie = await this.companieRepository.findById(id);
-        if (!companie) throw new NotFoundException('Empresa não encontrada.');
-        return companie;
+    async findById(id: string): Promise<Company> {
+        const company = await this.companyRepository.findById(id);
+        if (!company) throw new NotFoundException('Empresa não encontrada.');
+        return company;
     }
 
-    async update(id: string, dto: UpdateCompanieDto): Promise<Companie> {
-        const companie = await this.companieRepository.findById(id);
-        if (!companie) throw new NotFoundException('Empresa não encontrada.');
-        return this.companieRepository.update(id, dto);
+    async update(id: string, dto: UpdateCompanyDto): Promise<Company> {
+        const company = await this.companyRepository.findById(id);
+        if (!company) throw new NotFoundException('Empresa não encontrada.');
+        return this.companyRepository.update(id, dto);
     }
 
-    async delete(id: string): Promise<Companie> {
-        const companie = await this.companieRepository.findById(id);
-        if (!companie) throw new NotFoundException('Empresa não encontrada.');
-        return this.companieRepository.delete(id);
+    async delete(id: string): Promise<Company> {
+        const company = await this.companyRepository.findById(id);
+        if (!company) throw new NotFoundException('Empresa não encontrada.');
+        return this.companyRepository.delete(id);
     }
 }
