@@ -31,8 +31,9 @@ import { DocumentQueryDto } from "../../domain/dto/document-query.dto";
 import { AuthGuard } from "@nestjs/passport";
 import { AuthenticateGuard } from "src/modules/auth/presentation/guards/authenticate.guard";
 import { Response } from "express";
-import { createReadStream } from "fs";
+import { createReadStream, existsSync, statSync } from "fs";
 import { join } from "path";
+import { createHash } from "crypto";
 
 
 @ApiTags("Gestão de Documentos")
@@ -108,6 +109,55 @@ export class DocumentsController {
 
         const fileStream = createReadStream(join(process.cwd(), filePath));
         fileStream.pipe(res);
+    }
+
+    @Get(":id/view")
+    @ApiOperation({ summary: "Visualizar documento PDF inline no navegador" })
+    @ApiResponse({ status: 200, description: "PDF retornado para visualização inline.", schema: { type: "string", format: "binary" } })
+    @ApiResponse({ status: 404, description: "Documento ou arquivo não encontrado." })
+    @ApiResponse({ status: 500, description: "Erro ao processar arquivo." })
+    async viewDocument(@Param("id") id: string, @Res() res: Response) {
+        // Busca documento no banco de dados
+        const document = await this.documentsService.findById(id);
+        if (!document) {
+            throw new NotFoundException("Documento não encontrado no sistema");
+        }
+
+        const fullPath = join(process.cwd(), document.filePath);
+
+        // Valida se arquivo físico existe
+        if (!existsSync(fullPath)) {
+            throw new NotFoundException(`Arquivo físico não encontrado: ${document.filePath}`);
+        }
+
+        try {
+            // Obtém informações do arquivo para cache
+            const stats = statSync(fullPath);
+            const fileSize = stats.size;
+            const lastModified = stats.mtime.toUTCString();
+
+            // Gera ETag baseado no path e última modificação
+            const etag = createHash("md5")
+                .update(`${document.filePath}-${stats.mtime.getTime()}`)
+                .digest("hex");
+
+            // Headers para visualização inline no navegador
+            res.setHeader("Content-Type", "application/pdf");
+            res.setHeader("Content-Disposition", `inline; filename="${document.title}.pdf"`);
+            res.setHeader("Content-Length", fileSize);
+
+            // Headers de cache (1 hora)
+            res.setHeader("Cache-Control", "public, max-age=3600");
+            res.setHeader("ETag", etag);
+            res.setHeader("Last-Modified", lastModified);
+
+            // Streaming do arquivo
+            const fileStream = createReadStream(fullPath);
+            fileStream.pipe(res);
+
+        } catch (error) {
+            throw new NotFoundException(`Erro ao processar arquivo: ${error.message}`);
+        }
     }
 
     @Put(":id")
