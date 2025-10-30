@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { CompanieQueryDto } from '../../domain/dto/companie-query.dto';
-import { CreateCompanieDto } from '../../domain/dto/create-companie.dto';
-import { UpdateCompanieDto } from '../../domain/dto/update-companie.dto';
+import { CompaniesQueryDto } from '../../domain/dto/companies-query.dto';
+import { CreateCompanyDto } from '../../domain/dto/create-company.dto';
+import { UpdateCompanyDto } from '../../domain/dto/update-companie.dto';
 
 @Injectable()
-export class CompanieRepository {
+export class CompanyRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll(query: CompanieQueryDto) {
+  async findAll(query: CompaniesQueryDto) {
     const { page, limit, search, sortBy, sortOrder } = query;
     const skip = (page - 1) * limit;
 
@@ -26,7 +26,6 @@ export class CompanieRepository {
         skip,
         take: limit,
         orderBy,
-        include: { visitors: true },
       }),
       this.prisma.companie.count({ where }),
     ]);
@@ -43,15 +42,14 @@ export class CompanieRepository {
   async findById(id: string) {
     return this.prisma.companie.findUnique({
       where: { id },
-      include: { visitors: true },
     });
   }
 
-  async create(data: CreateCompanieDto) {
+  async create(data: CreateCompanyDto) {
     return this.prisma.companie.create({ data });
   }
 
-  async update(id: string, data: UpdateCompanieDto) {
+  async update(id: string, data: UpdateCompanyDto) {
     return this.prisma.companie.update({
       where: { id },
       data,

@@ -1,13 +1,15 @@
 import { Injectable } from '@nestjs/common';
+import { VisitHistory } from '@prisma/client';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { VisitHistoryQueryDto } from '../../domain/dto/visit-history-query.dto';
+import { VisitHistoryStatusList } from '../../domain/enums/VisitHistoryStatus';
 
 @Injectable()
 export class VisitHistoryRepository {
   constructor(private readonly prisma: PrismaService) { }
 
   async findAll(query: VisitHistoryQueryDto) {
-    const { page, limit, search, sortBy, sortOrder } = query;
+    const { page, limit, search, sortBy, sortOrder, status } = query;
     const skip = (page - 1) * limit;
 
     const where: any = {};
@@ -18,6 +20,10 @@ export class VisitHistoryRepository {
       ];
     }
 
+    if (status) {
+      where.status = status;
+    }
+
     const orderBy: any = {};
     orderBy[sortBy || 'arrivedAt'] = sortOrder || 'desc';
 
@@ -25,15 +31,21 @@ export class VisitHistoryRepository {
       this.prisma.visitHistory.findMany({
         where,
         skip,
+        include: {
+          companie: true,
+        },
         take: limit,
         orderBy,
-        include: { visitor: true },
+
       }),
       this.prisma.visitHistory.count({ where }),
     ]);
 
     return {
-      data: histories,
+      data: histories.map(h => ({
+        ...h,
+        statusLabel: VisitHistoryStatusList[h.status],
+      })),
       total,
       page,
       limit,
@@ -41,11 +53,10 @@ export class VisitHistoryRepository {
     };
   }
 
-  async findLastVisitByVisitor(visitorId: string) {
+  async findLastVisitByCpf(cpf: string) {
     return this.prisma.visitHistory.findFirst({
-      where: { visitorId },
+      where: { cpf },
       orderBy: { arrivedAt: 'desc' },
-      include: { visitor: true },
     });
   }
 
@@ -53,22 +64,29 @@ export class VisitHistoryRepository {
   async findById(id: string) {
     return this.prisma.visitHistory.findUnique({
       where: { id },
-      include: { visitor: true },
     });
   }
 
-  async create(data: { visitorId: string; arrivedAt?: Date; leftAt?: Date }) {
-    return this.prisma.visitHistory.create({
-      data,
-      include: { visitor: true },
+  async create(data: Partial<VisitHistory>) {
+
+    return await this.prisma.visitHistory.create({
+      data: {
+        description: data.description,
+        cpf: data.cpf,
+        name: data.name,
+        phone: data.phone,
+        companyId: data.companyId,
+        status: data.status,
+        isScheduled: data.isScheduled || false,
+        arrivedAt: data.arrivedAt
+      },
     });
   }
 
-  async update(id: string, data: Partial<{ arrivedAt: Date; leftAt: Date }>) {
+  async update(id: string, data: Partial<VisitHistory>) {
     return this.prisma.visitHistory.update({
       where: { id },
       data,
-      include: { visitor: true },
     });
   }
 
@@ -83,7 +101,6 @@ export class VisitHistoryRepository {
       where: {
         leftAt: null,
       },
-      include: { visitor: true },
     });
   }
 
@@ -95,7 +112,6 @@ export class VisitHistoryRepository {
           lte: end,
         },
       },
-      include: { visitor: true },
     });
   }
 }

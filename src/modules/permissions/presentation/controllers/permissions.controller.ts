@@ -1,12 +1,17 @@
-import { Controller, Get, Post, Delete, Param, ParseIntPipe, Body } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, ParseIntPipe, Body, UseGuards } from '@nestjs/common';
 import { PermissionsService } from '../../application/services/permissions.service';
 import { ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
+import { PermissionsGuard } from '../guards/permissions.guard';
+import { Features } from '../guards/features.decorator';
 
+@UseGuards(AuthGuard('jwt'), PermissionsGuard)
 @ApiTags('Permissões')
 @Controller('permissions')
 export class PermissionsController {
     constructor(private readonly permissionsService: PermissionsService) { }
 
+    @Features('PERMISSION_CREATE')
     @Post('user/:id')
     setUserPermissions(
         @Param('id', ParseIntPipe) userId: string,
@@ -20,6 +25,7 @@ export class PermissionsController {
         return this.permissionsService.getUserPermissions(userId);
     }
 
+    @Features('PERMISSION_ASSOCIATION')
     @Post('user/:id/feature/:featureId')
     assignFeature(
         @Param('id') userId: string,
@@ -28,6 +34,7 @@ export class PermissionsController {
         return this.permissionsService.assignFeature(userId, featureId);
     }
 
+    @Features('PERMISSION_VIEW')
     @Get('pages')
     getPages() {
         return this.permissionsService.getAllPagesWithFeatures();

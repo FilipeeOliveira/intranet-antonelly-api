@@ -125,36 +125,25 @@ model Companie {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  visitors Visitor[]
+  visitHistories VisitHistory[]
 
   @@map("companies")
 }
 
-model Visitor {
-  id          String  @id @default(uuid())
-  name        String
-  email       String?
-  cpf         String? @unique
-  companieId  String?
-  status      Int     @default(1) // 1 = present, 2 = left
-  description String? // Descrição adicional sobre o visitante
-
-  companie  Companie? @relation(fields: [companieId], references: [id], onDelete: SetNull)
-  createdAt DateTime  @default(now())
-
-  histories VisitHistory[]
-
-  @@map("visitors")
-}
-
 model VisitHistory {
-  id          String    @id @default(uuid())
-  description String? // Motivo da visita
-  visitorId   String
-  arrivedAt   DateTime  @default(now())
-  leftAt      DateTime?
+  id           String  @id @default(uuid())
+  isScheduled  Boolean @default(false)
+  description  String? // Motivo da visita
+  name  String
+  cpf   String?
+  phone String?
+  companyId    String?
+  status       Int     @default(1) // 1 = Agendado, 2 = Presente, 3 = Saiu, 4 = Cancelada.
 
-  visitor Visitor @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  arrivedAt DateTime  @default(now())
+  leftAt    DateTime?
+
+  companie Companie? @relation(fields: [companyId], references: [id])
 
   @@map("visit_history")
 }

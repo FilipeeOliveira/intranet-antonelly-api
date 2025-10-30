@@ -17,7 +17,6 @@ export class SectorController {
     constructor(private readonly sectorService: SectorService) { }
 
     @Post()
-    @Roles(RoleType.ADMIN, RoleType.GERENTE)
     @ApiOperation({ summary: 'Criar novo setor' })
     @ApiResponse({ status: 201, description: 'Setor criado com sucesso.' })
     async create(@Body() dto: CreateSectorDto) {
@@ -40,7 +39,6 @@ export class SectorController {
     }
 
     @Put(':id')
-    @Roles(RoleType.ADMIN, RoleType.GERENTE)
     @ApiOperation({ summary: 'Atualizar setor' })
     @ApiResponse({ status: 200, description: 'Setor atualizado com sucesso.' })
     async update(@Param('id') id: string, @Body() dto: UpdateSectorDto) {
@@ -48,7 +46,6 @@ export class SectorController {
     }
 
     @Delete(':id')
-    @Roles(RoleType.ADMIN, RoleType.GERENTE)
     @ApiOperation({ summary: 'Deletar setor' })
     @ApiResponse({ status: 200, description: 'Setor removido com sucesso.' })
     async delete(@Param('id') id: string) {

@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsOptional, IsString, Max, Min } from 'class-validator';
 
-export class CompanieQueryDto {
+export class CompaniesQueryDto {
   @ApiProperty({ description: 'Filtro por nome', required: false, example: 'ACME' })
   @IsOptional()
   @IsString()

@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsOptional, IsString, Max, Min } from 'class-validator';
+import { VisitHistoryStatus } from '../enums/VisitHistoryStatus';
 
 export class VisitHistoryQueryDto {
   @ApiProperty({
@@ -10,6 +11,15 @@ export class VisitHistoryQueryDto {
   @IsOptional()
   @IsString()
   search?: string;
+
+  @ApiProperty({
+    description: 'Status da visita. (1: Agendado, 2: Presente, 3: Saiu, 4: Cancelada)',
+    default: VisitHistoryStatus.PRESENT,
+    enum: VisitHistoryStatus,
+    required: false,
+  })
+  @IsOptional()
+  status?: VisitHistoryStatus = VisitHistoryStatus.PRESENT;
 
   @ApiProperty({
     description: 'Número da página',

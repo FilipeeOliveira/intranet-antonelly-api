@@ -8,7 +8,7 @@ export async function createUsersSeed({ rolesCreated, sectorRecords }: { rolesCr
     const { adminRole, gerenteRole, diretorRole, portariaRole, funcionarioRole } = rolesCreated;
 
     // Hash das senhas
-    const hashedPassword = await bcrypt.hash('AdminPass@123', 12);
+    const hashedPassword = await bcrypt.hash('admin@123', 12);
 
     // Criar usuários de exemplo
     const adminUser = await prisma.user.upsert({
@@ -78,11 +78,11 @@ export async function createUsersSeed({ rolesCreated, sectorRecords }: { rolesCr
 
     console.log('✅ Seed concluído!');
     console.log('👥 Usuários criados:');
-    console.log(`📧 Admin: admin@empresa.com (senha: AdminPass@123)`);
-    console.log(`📧 Diretor: diretor@empresa.com (senha: AdminPass@123)`);
-    console.log(`📧 Gerente: gerente@empresa.com (senha: AdminPass@123)`);
-    console.log(`📧 Portaria: portaria@empresa.com (senha: AdminPass@123)`);
-    console.log(`📧 Funcionário: funcionario@empresa.com (senha: AdminPass@123)`);
+    console.log(`📧 Admin: admin@empresa.com (senha: admin@123)`);
+    console.log(`📧 Diretor: diretor@empresa.com (senha: admin@123)`);
+    console.log(`📧 Gerente: gerente@empresa.com (senha: admin@123)`);
+    console.log(`📧 Portaria: portaria@empresa.com (senha: admin@123)`);
+    console.log(`📧 Funcionário: funcionario@empresa.com (senha: admin@123)`);
 
     return [
         adminUser,

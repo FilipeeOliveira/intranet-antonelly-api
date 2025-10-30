@@ -18,6 +18,13 @@ export class CreateDocumentDto {
     title: string;
 
     @ApiProperty({
+        description: 'ID do Setor do documento',
+    })
+    @IsString({ message: 'Setor deve ser uma string' })
+    @IsNotEmpty({ message: 'Setor é obrigatório' })
+    sectorId: string;
+
+    @ApiProperty({
         description: 'Descrição detalhada do documento',
         example: 'Este documento contém instruções sobre normas de segurança',
         required: false,
@@ -25,13 +32,6 @@ export class CreateDocumentDto {
     @IsOptional()
     @IsString({ message: 'Descrição deve ser uma string' })
     description?: string;
-
-    @ApiProperty({
-        description: 'ID do Setor do documento',
-    })
-    @IsString({ message: 'Setor deve ser uma string' })
-    @IsNotEmpty({ message: 'Setor é obrigatório' })
-    sectorId: string;
 
     @ApiProperty({
         description: 'Status do documento (definido automaticamente na criação)',

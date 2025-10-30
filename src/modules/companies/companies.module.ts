@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { CompanieController } from './presentation/controllers/companie.controller';
-import { CompanieService } from './application/services/companie.service';
-import { CompanieRepository } from './infrastructure/repositories/companie.repository';
+import { CompanyController } from './presentation/controllers/company.controller';
+import { CompanyService } from './application/services/companie.service';
+import { CompanyRepository } from './infrastructure/repositories/company.repository';
 import { PrismaModule } from '../prisma/prisma.module';
 import { AuthModule } from '../auth/auth.module';
 
@@ -9,14 +9,14 @@ import { AuthModule } from '../auth/auth.module';
     imports: [
         PrismaModule, AuthModule
     ],
-    controllers: [CompanieController],
+    controllers: [CompanyController],
     providers: [
-        CompanieService,
-        CompanieRepository
+        CompanyService,
+        CompanyRepository
     ],
     exports: [
-        CompanieService,
-        CompanieRepository
+        CompanyService,
+        CompanyRepository
     ],
 })
 export class CompaniesModule {}

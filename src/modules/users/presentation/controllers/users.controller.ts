@@ -38,7 +38,6 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
   @Get()
-  @Roles(RoleType.ADMIN)
   @ApiOperation({ summary: 'Listar usuários com filtros e paginação' })
   @ApiResponse({
     status: 200,
@@ -52,7 +51,6 @@ export class UsersController {
   }
 
   @Get(':id')
-  @Roles(RoleType.ADMIN)
   @ApiOperation({ summary: 'Buscar usuário por ID' })
   @ApiParam({ name: 'id', description: 'ID do usuário' })
   @ApiResponse({
@@ -68,7 +66,6 @@ export class UsersController {
   }
 
   @Post()
-  @Roles(RoleType.ADMIN)
   @SkipTemporaryPasswordCheck()
   @HttpCode(HttpStatus.CREATED)
   @Throttle({ default: { limit: 10, ttl: 60000 } }) // 10 criações por minuto
@@ -87,7 +84,6 @@ export class UsersController {
   }
 
   @Put(':id')
-  @Roles(RoleType.ADMIN)
   @ApiOperation({ summary: 'Atualizar dados do usuário' })
   @ApiParam({ name: 'id', description: 'ID do usuário' })
   @ApiResponse({
@@ -108,7 +104,6 @@ export class UsersController {
   }
 
   @Put(':id/reset-password')
-  @Roles(RoleType.ADMIN)
   @HttpCode(HttpStatus.OK)
   @Throttle({ default: { limit: 5, ttl: 300000 } }) // 5 resets por 5 minutos
   @ApiOperation({ summary: 'Resetar senha do usuário (apenas admin)' })
@@ -125,7 +120,6 @@ export class UsersController {
   }
 
   @Put(':id/toggle-status')
-  @Roles(RoleType.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Ativar/desativar usuário' })
   @ApiParam({ name: 'id', description: 'ID do usuário' })
@@ -142,7 +136,6 @@ export class UsersController {
   }
 
   @Delete(':id')
-  @Roles(RoleType.ADMIN)
   @HttpCode(HttpStatus.OK)
   @Throttle({ default: { limit: 3, ttl: 300000 } }) // 3 exclusões por 5 minutos
   @ApiOperation({ summary: 'Excluir usuário (hard delete)' })

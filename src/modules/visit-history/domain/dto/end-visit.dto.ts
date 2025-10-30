@@ -5,7 +5,7 @@ export class EndVisitDto {
   @ApiProperty({ description: 'ID do visitante', example: 'uuid-do-visitante' })
   @IsNotEmpty()
   @IsString()
-  visitorId: string;
+  visitHistoryId: string;
 
   @ApiProperty({ description: 'Data e hora de entrada (opcional)', example: '2025-09-28T10:00:00Z', required: false })
   @IsOptional()

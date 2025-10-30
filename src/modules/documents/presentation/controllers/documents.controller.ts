@@ -44,7 +44,6 @@ export class DocumentsController {
     constructor(private readonly documentsService: DocumentsService) { }
 
     @Post()
-    @Roles(RoleType.ADMIN, RoleType.GERENTE)
     @UseInterceptors(pdfFileInterceptor())
     @ApiConsumes("multipart/form-data")
     @ApiBody({
@@ -161,7 +160,6 @@ export class DocumentsController {
     }
 
     @Put(":id")
-    @Roles(RoleType.ADMIN, RoleType.GERENTE)
     @UseInterceptors(pdfFileInterceptor())
     @ApiConsumes("multipart/form-data")
     @ApiBody({
@@ -190,7 +188,6 @@ export class DocumentsController {
     }
 
     @Delete(":id")
-    @Roles(RoleType.ADMIN, RoleType.GERENTE)
     @ApiOperation({ summary: "Deletar documento e arquivo físico" })
     @ApiResponse({ status: 200, description: "Documento removido com sucesso." })
     async deleteDocument(@Param("id") id: string) {

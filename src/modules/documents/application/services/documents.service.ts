@@ -3,7 +3,7 @@ import { CreateDocumentDto, DocumentStatus } from '../../domain/dto/create-docum
 import { DocumentRepository } from '../../infrastructure/repositories/document.repository';
 import { DocumentQueryDto } from '../../domain/dto/document-query.dto';
 import { SectorRepository } from '../../../sectors/infrastructure/repositories/sector.repository';
-import { join } from 'path';
+import path, { join } from 'path';
 import { unlink } from 'fs/promises';
 
 export interface Document {
@@ -23,7 +23,7 @@ export class DocumentsService {
         private readonly sectorRepository: SectorRepository
     ) { }
 
-    async create(dto: CreateDocumentDto, filePath: string): Promise<Document> {
+    async create(dto: CreateDocumentDto, filePath: string): Promise<{ fileName: string } & Document> {
         if (!filePath.endsWith('.pdf')) {
             throw new BadRequestException('Apenas arquivos PDF são permitidos.');
         }
@@ -42,6 +42,7 @@ export class DocumentsService {
 
         return {
             ...document,
+            fileName: path.basename(filePath),
             status: document.status as DocumentStatus,
         };
     }
@@ -60,12 +61,13 @@ export class DocumentsService {
         };
     }
 
-    async findAll(query: DocumentQueryDto): Promise<{ data: Document[]; total: number; page: number; limit: number; totalPages: number }> {
+    async findAll(query: DocumentQueryDto): Promise<{ data: (Document & { fileName: string })[]; total: number; page: number; limit: number; totalPages: number }> {
         const { data, total, page, limit, totalPages } = await this.documentRepository.findAll(query);
         return {
             data: data.map(doc => ({
                 ...doc,
                 status: doc.status as DocumentStatus,
+                fileName: doc.filePath ? path.basename(doc.filePath) : null,
             })),
             total,
             page,
@@ -74,7 +76,7 @@ export class DocumentsService {
         };
     }
 
-    async findById(id: string): Promise<Document> {
+    async findById(id: string): Promise<(Document & { fileName: string })> {
         const document = await this.documentRepository.findById(id);
         if (!document) {
             throw new NotFoundException('Documento não encontrado.');
@@ -82,11 +84,12 @@ export class DocumentsService {
         
         return {
             ...document,
+            fileName: document.filePath ? path.basename(document.filePath) : null,
             status: document.status as DocumentStatus,
         };
     }
 
-    async update(id: string, dto: Partial<CreateDocumentDto>, filePath?: string): Promise<Document> {
+    async update(id: string, dto: Partial<CreateDocumentDto>, filePath?: string): Promise<(Document & { fileName: string })> {
         
         // Adicionar a lógica para atualizar a versão do documento se um novo arquivo for enviado.
         
@@ -118,7 +121,7 @@ export class DocumentsService {
         }
 
         const updatedDocument = await this.documentRepository.update(id, updateData);
-        return { ...updatedDocument, status: updatedDocument.status as DocumentStatus };
+        return { ...updatedDocument, fileName: updatedDocument.filePath ? path.basename(updatedDocument.filePath) : null, status: updatedDocument.status as DocumentStatus };
     }
 
     async delete(id: string): Promise<Document> {

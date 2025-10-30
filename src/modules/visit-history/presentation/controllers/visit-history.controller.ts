@@ -1,10 +1,13 @@
-import { Body, Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthenticateGuard } from 'src/modules/auth/presentation/guards/authenticate.guard';
 import { VisitHistoryService } from '../../application/services/visit-history.service';
 import { EndVisitDto } from '../../domain/dto/end-visit.dto';
 import { StartVisitDto } from '../../domain/dto/start-visit.dto';
+import { CreateVisitScheduleDto } from '../../domain/dto/create-visit-schedule.dto';
+import { CreateVisitHistoryDto } from '../../domain/dto/create-visit-history.dto';
+import { VisitHistoryQueryDto } from '../../domain/dto/visit-history-query.dto';
 
 @ApiTags('Histórico de Visitas')
 @ApiBearerAuth()
@@ -13,24 +16,52 @@ import { StartVisitDto } from '../../domain/dto/start-visit.dto';
 export class VisitHistoryController {
     constructor(private readonly visitHistoryService: VisitHistoryService) { }
 
+    @Post('schedule')
+    @ApiOperation({ summary: 'Agendar uma visita para um visitante' })
+    @ApiResponse({ status: 201, description: 'Visita agendada com sucesso.' })
+    async scheduleVisit(@Body() createVisitScheduleDto: CreateVisitScheduleDto) {
+        return this.visitHistoryService.createVisitSchedule(createVisitScheduleDto);
+    }
+
+    @Post('add')
+    @ApiOperation({ summary: 'Adicionar um novo registro de visita' })
+    @ApiResponse({ status: 201, description: 'Registro de visita adicionado com sucesso.' })
+    async addVisitRecord(@Body() createVisitHistoryDto: CreateVisitHistoryDto) {
+        return this.visitHistoryService.create(createVisitHistoryDto);
+    }
+
     @Post('start')
     @ApiOperation({ summary: 'Iniciar uma nova visita' })
     @ApiResponse({ status: 201, description: 'Visita iniciada com sucesso.' })
     async startVisit(@Body() startVisitDto: StartVisitDto) {
-        return this.visitHistoryService.startVisit(startVisitDto.visitorId);
+        return this.visitHistoryService.startVisit(startVisitDto.visitHistoryId);
     }
 
     @Patch('leave')
     @ApiOperation({ summary: 'Finalizar a visita de um visitante' })
     @ApiResponse({ status: 200, description: 'Visita finalizada com sucesso.' })
     async endVisit(@Body() endVisitDto: EndVisitDto) {
-        return this.visitHistoryService.endVisit(endVisitDto.visitorId);
+        return this.visitHistoryService.endVisit(endVisitDto.visitHistoryId);
     }
 
-    @Get('activity')
-    @ApiOperation({ summary: 'Obter atividade de visitantes (presentes e do dia)' })
-    @ApiResponse({ status: 200, description: 'Atividade de visitantes retornada com sucesso.' })
-    async getVisitorsActivity() {
-        return this.visitHistoryService.getVisitorsActivity();
+    @Patch('cancel/:id')
+    @ApiOperation({ summary: 'Cancelar uma visita agendada pelo ID' })
+    @ApiResponse({ status: 200, description: 'Visita agendada cancelada com sucesso.' })
+    async cancelScheduledVisit(@Param('id') id: string) {
+        return this.visitHistoryService.cancelScheduledVisit(id);
+    }
+
+    @Get()
+    @ApiOperation({ summary: 'Obter histórico de visitas com filtros' })
+    @ApiResponse({ status: 200, description: 'Histórico de visitas retornado com sucesso.' })
+    async getVisitHistory(@Query() query: VisitHistoryQueryDto) {
+        return this.visitHistoryService.findAll(query);
+    }
+
+    @Delete(':id')
+    @ApiOperation({ summary: 'Excluir um registro de visita pelo ID' })
+    @ApiResponse({ status: 200, description: 'Registro de visita excluído com sucesso.' })
+    async deleteVisitRecord(@Param('id') id: string) {
+        return await this.visitHistoryService.delete(id);
     }
 }
