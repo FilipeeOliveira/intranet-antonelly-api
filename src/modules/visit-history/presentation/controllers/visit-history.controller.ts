@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthenticateGuard } from 'src/modules/auth/presentation/guards/authenticate.guard';
@@ -30,7 +30,7 @@ export class VisitHistoryController {
         return this.visitHistoryService.create(createVisitHistoryDto);
     }
 
-    @Post('start')
+    @Patch('start')
     @ApiOperation({ summary: 'Iniciar uma nova visita' })
     @ApiResponse({ status: 201, description: 'Visita iniciada com sucesso.' })
     async startVisit(@Body() startVisitDto: StartVisitDto) {
@@ -51,11 +51,25 @@ export class VisitHistoryController {
         return this.visitHistoryService.cancelScheduledVisit(id);
     }
 
+    @Put(':id')
+    @ApiOperation({ summary: 'Atualizar um registro de visita pelo ID' })
+    @ApiResponse({ status: 200, description: 'Registro de visita atualizado com sucesso.' })
+    async updateVisitRecord(@Param('id') id: string, @Body() updateData: Partial<CreateVisitHistoryDto>) {
+        return await this.visitHistoryService.update(id, updateData);
+    }
+
     @Get()
     @ApiOperation({ summary: 'Obter histórico de visitas com filtros' })
     @ApiResponse({ status: 200, description: 'Histórico de visitas retornado com sucesso.' })
     async getVisitHistory(@Query() query: VisitHistoryQueryDto) {
         return this.visitHistoryService.findAll(query);
+    }
+
+    @Get(':id')
+    @ApiOperation({ summary: 'Obter um registro de visita pelo ID' })
+    @ApiResponse({ status: 200, description: 'Registro de visita retornado com sucesso.' })
+    async getVisitRecordById(@Param('id') id: string) {
+        return await this.visitHistoryService.findById(id);
     }
 
     @Delete(':id')

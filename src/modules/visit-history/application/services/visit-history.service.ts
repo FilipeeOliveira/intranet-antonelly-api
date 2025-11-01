@@ -10,6 +10,7 @@ import { UpdateVisitHistoryDto } from '../../domain/dto/update-visit-history.dto
 import { VisitHistoryQueryDto } from '../../domain/dto/visit-history-query.dto';
 import { VisitHistoryStatus } from '../../domain/enums/VisitHistoryStatus';
 import { VisitHistoryRepository } from '../../infrastructure/respositories/visit-history.repository';
+import moment from 'moment';
 
 @Injectable()
 export class VisitHistoryService {
@@ -68,7 +69,7 @@ export class VisitHistoryService {
     return this.visitHistoryRepository.update(visitHistoryId, {
       ...isVisitStarted,
       status: VisitHistoryStatus.PRESENT,
-      arrivedAt: new Date(),
+      arrivedAt: getCurrentUtcDate(),
     });
   }
 
@@ -85,7 +86,7 @@ export class VisitHistoryService {
     await this.visitHistoryRepository.update(isVisitStarted.id, { status: VisitHistoryStatus.LEFT });
 
     return this.visitHistoryRepository.update(isVisitStarted.id, {
-      leftAt: new Date(),
+      leftAt: getCurrentUtcDate(),
     });
   }
 
@@ -103,7 +104,17 @@ export class VisitHistoryService {
     const history = await this.visitHistoryRepository.findById(id);
     if (!history) throw new NotFoundException('Histórico não encontrado.');
 
-    return this.visitHistoryRepository.update(id, dto);
+    console.log({ dto });
+
+    return this.visitHistoryRepository.update(id, {
+      name: dto.visitorName,
+      cpf: dto.visitorCpf,
+      phone: dto.visitorPhone,
+      description: dto.description,
+      arrivedAt: dto.arrivedAt ? getLocalDateToUtcDate(dto.arrivedAt) : history.arrivedAt,
+      leftAt: dto.leftAt ? getLocalDateToUtcDate(dto.leftAt) : history.leftAt,
+      companyId: dto.companyId,
+    });
   }
 
   async cancelScheduledVisit(id: string): Promise<VisitHistory> {

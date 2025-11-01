@@ -64,6 +64,9 @@ export class VisitHistoryRepository {
   async findById(id: string) {
     return this.prisma.visitHistory.findUnique({
       where: { id },
+      include: {
+        companie: true,
+      }
     });
   }
 
@@ -84,6 +87,7 @@ export class VisitHistoryRepository {
   }
 
   async update(id: string, data: Partial<VisitHistory>) {
+
     return this.prisma.visitHistory.update({
       where: { id },
       data,
