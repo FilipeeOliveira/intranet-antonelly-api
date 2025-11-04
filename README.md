@@ -1,36 +1,47 @@
-<h1 align="center" > NestJS REST API </h1>
+<h1 align="center">SIAN API - Sistema Interno Antonelly</h1>
 
 <p align="center">
 <img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" />
 </p>
 
-## Descrição
+## 📋 Sobre o Projeto
 
-**`NestJS REST API`** com autenticação JWT.
+**SIAN (Sistema Interno Antonelly)** é uma API REST desenvolvida com NestJS que oferece a infraestrutura backend para o sistema interno corporativo da empresa Antonelly.
 
-Este **`NestJS REST API`** foi projetado para dar um impulso inicial ao seu processo de desenvolvimento com um sistema de autenticação de usuário robusto e rotas protegidas. Construído usando Nest.js, Prisma e Postgres, este modelo fornece recursos essenciais, como registro de usuário, login, autenticação JWT e uma API CRUD para gerenciar usuários. A API também é totalmente documentada usando Swagger para fácil integração e compreensão.
+### Funcionalidades
 
-## Tecnologias usadas
+- **Controle de Acesso (Portaria)**: Sistema completo de gestão de visitantes e funcionários
+- **Gerenciamento de Usuários**: CRUD completo com controle de permissões e setores
+- **Histórico de Visitas**: Registro e acompanhamento de todas as visitas realizadas
+- **Autenticação Segura**: Sistema robusto de autenticação JWT com diferentes níveis de acesso
+- **Documentação Swagger**: API totalmente documentada para fácil integração
+- **Arquitetura Modular**: Estrutura preparada para expansão de funcionalidades
 
-- Nest.js: uma estrutura progressiva do Node.js para criar aplicativos do lado do servidor eficientes, confiáveis ​​e escaláveis.
+## 🚀 Tecnologias Utilizadas
 
-- Prisma: kit de ferramentas de banco de dados moderno para Node.js e TypeScript, fornecendo acesso e migrações de banco de dados com segurança de tipo.
+- **NestJS**: Framework progressivo do Node.js para criar aplicações server-side eficientes e escaláveis
+- **Prisma**: ORM moderno com segurança de tipo para Node.js e TypeScript
+- **PostgreSQL**: Sistema de banco de dados relacional robusto e confiável
+- **JWT**: Autenticação e autorização seguras com JSON Web Tokens
+- **Docker**: Containerização para ambiente de desenvolvimento consistente
+- **Swagger**: Documentação interativa da API
+- **TypeScript**: Superset JavaScript com tipagem estática
 
-- Postgres: poderoso sistema de banco de dados relacional de código aberto para armazenar e gerenciar dados com segurança.
-
-- JWT: tokens da Web JSON para autenticação e autorização seguras.
 
 
-
-## Primeiros Passos
+## ⚙️ Primeiros Passos
 
 ### 1. Clone o repositório
 ```bash
 git clone https://github.com/FilipeeOliveira/intranet-antonelly-api
 ```
 
-### 2. Atualize o arquivo `.env`
-Veja o arquivo `.env.example` para mais informações sobre como configurar seu ambiente.
+### 2. Configure as variáveis de ambiente
+Crie um arquivo `.env` na raiz do projeto baseado no `.env.example`:
+```bash
+cp .env.example .env
+```
+Atualize as variáveis conforme necessário.
 
 ### 3. Inicie o contêiner do banco de dados
 Certifique-se de que o Docker Desktop esteja aberto e em execução. Em seguida, inicie o contêiner:
@@ -69,12 +80,33 @@ Agora, você pode rodar o servidor:
 npm run start:dev
 ```
 
-## Documentação
+## 📚 Documentação
 
 ### Swagger
 
-Você também pode acessar a documentação do Swagger com a REST API em execução localmente visitando <a href="http://localhost:3000/api" >http://localhost:3005/api</a>.
+Você também pode acessar a documentação do Swagger com a REST API em execução localmente visitando [http://localhost:3005/api](http://localhost:3005/api).
 
-## Licença
-Este projeto é licenciado sob a Licença MIT - veja o arquivo LICENSE para detalhes.
+## 📁 Estrutura do Projeto
+
+```
+src/
+├── auth/           # Autenticação e autorização
+├── users/          # Gerenciamento de usuários
+├── visitors/       # Gestão de visitantes
+├── visit-history/  # Histórico de visitas
+├── prisma/         # Schema e configurações do Prisma
+└── common/         # Utilitários e recursos compartilhados
+```
+
+## 🔐 Usuários Padrão
+
+Após executar o seed, os seguintes usuários estarão disponíveis:
+
+- **Admin**: Acesso total ao sistema
+- **Portaria**: Acesso ao controle de visitantes
+- **Usuário Comum**: Acesso limitado
+
+## 📝 Licença
+
+Este é um projeto interno da empresa Antonelly.
 
