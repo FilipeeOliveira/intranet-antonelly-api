@@ -103,8 +103,6 @@ export class VisitHistoryService {
     const history = await this.visitHistoryRepository.findById(id);
     if (!history) throw new NotFoundException('Histórico não encontrado.');
 
-    console.log({ dto });
-
     let updateDto: Partial<VisitHistory> = { 
       name: dto.visitorName ?? history.name,
       cpf: dto.visitorCpf ?? history.cpf,
@@ -115,12 +113,10 @@ export class VisitHistoryService {
     
     if (dto.arrivedAt) {
       updateDto.arrivedAt = getLocalDateToUtcDate(dto.arrivedAt);
-      console.log('arrivedAt', updateDto.arrivedAt);
     }
 
     if (dto.leftAt) {
       updateDto.leftAt = getLocalDateToUtcDate(dto.leftAt);
-      console.log('leftAt', updateDto.leftAt);
     }
 
     return this.visitHistoryRepository.update(id, updateDto);
