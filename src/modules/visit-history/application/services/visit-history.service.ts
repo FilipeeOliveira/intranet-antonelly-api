@@ -25,6 +25,20 @@ export class VisitHistoryService {
       throw new NotFoundException('Empresa não encontrada.');
     }
 
+    const visitorAlreadyPresent = await this.visitHistoryRepository.findVisitorPresentByCpf({
+      cpf: dto?.visitorCpf,
+    });
+    if (visitorAlreadyPresent) {
+      throw new BadRequestException('O visitante já está presente na empresa.');
+    }
+
+    const visitorAlreadyScheduled = await this.visitHistoryRepository.findVisitorScheduledByCpf({
+      cpf: dto?.visitorCpf,
+    });
+    if (visitorAlreadyScheduled) {
+      throw new BadRequestException('O visitante já possui um agendamento para essa data.');
+    }
+
     return await this.visitHistoryRepository.create({
       name: dto.visitorName,
       cpf: dto?.visitorCpf,
@@ -41,6 +55,30 @@ export class VisitHistoryService {
     const companyExists = await this.companyRepository.findById(dto.companyId);
     if (!companyExists) {
       throw new NotFoundException('Empresa não encontrada.');
+    }
+
+    const visitorAlreadyPresent = await this.visitHistoryRepository.findVisitorPresentByCpf({
+      cpf: dto?.visitorCpf,
+    });
+    if (visitorAlreadyPresent) {
+      throw new BadRequestException('O visitante já está presente na empresa.');
+    }
+
+    console.log({
+      startDate: getLocalDateToUtcDate(new Date(`${dto.date}T00:00:00`)),
+      endDate: getLocalDateToUtcDate(new Date(`${dto.date}T23:59:59`)),
+    })
+
+    const visitorAlreadyScheduled = await this.visitHistoryRepository.findVisitorScheduledByCpf({
+      cpf: dto?.visitorCpf,
+      startDate: getLocalDateToUtcDate(new Date(`${dto.date}T00:00:00`)),
+      endDate: getLocalDateToUtcDate(new Date(`${dto.date}T23:59:59`)),
+    });
+
+    console.log({ visitorAlreadyScheduled })
+
+    if (visitorAlreadyScheduled) {
+      throw new BadRequestException('O visitante já possui um agendamento para essa data.');
     }
 
     const schedule = await this.visitHistoryRepository.create({
@@ -103,14 +141,14 @@ export class VisitHistoryService {
     const history = await this.visitHistoryRepository.findById(id);
     if (!history) throw new NotFoundException('Histórico não encontrado.');
 
-    let updateDto: Partial<VisitHistory> = { 
+    let updateDto: Partial<VisitHistory> = {
       name: dto.visitorName ?? history.name,
       cpf: dto.visitorCpf ?? history.cpf,
       phone: dto.visitorPhone ?? history.phone,
       description: dto.description ?? history.description,
       companyId: dto.companyId ?? history.companyId,
-     };
-    
+    };
+
     if (dto.arrivedAt) {
       updateDto.arrivedAt = getLocalDateToUtcDate(dto.arrivedAt);
     }

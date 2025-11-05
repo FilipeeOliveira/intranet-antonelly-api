@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { VisitHistory } from '@prisma/client';
+import moment from 'moment';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { VisitHistoryQueryDto } from '../../domain/dto/visit-history-query.dto';
-import { VisitHistoryStatusList } from '../../domain/enums/VisitHistoryStatus';
+import { VisitHistoryStatus, VisitHistoryStatusList } from '../../domain/enums/VisitHistoryStatus';
 
 @Injectable()
 export class VisitHistoryRepository {
@@ -51,6 +52,51 @@ export class VisitHistoryRepository {
       limit,
       totalPages: Math.ceil(total / limit),
     };
+  }
+
+  async findVisitorPresentByCpf(args: {
+    cpf: string;
+    startDate?: Date;
+    endDate?: Date;
+  }) {
+
+    const { cpf } = args;
+    args.startDate = moment(args.startDate).startOf('day').toDate() || moment().startOf('day').toDate();
+    args.endDate = moment(args.endDate).endOf('day').toDate() || moment().endOf('day').toDate();
+
+    return this.prisma.visitHistory.findFirst({
+      where: {
+        cpf,
+        leftAt: null,
+        arrivedAt: {
+          gte: args.startDate,
+          lte: args.endDate,
+        },
+        status: VisitHistoryStatus.PRESENT,
+      },
+    });
+  }
+
+  async findVisitorScheduledByCpf(args: {
+    cpf: string;
+    startDate?: Date;
+    endDate?: Date;
+  }) {
+    const { cpf } = args;
+    args.startDate = args.startDate || moment().startOf('day').toDate();
+    args.endDate = args.endDate || moment().endOf('day').toDate();
+
+    return this.prisma.visitHistory.findFirst({
+      where: {
+        cpf,
+        leftAt: null,
+        arrivedAt: {
+          gte: args.startDate,
+          lte: args.endDate,
+        },
+        status: VisitHistoryStatus.SCHEDULED,
+      },
+    });
   }
 
   async findLastVisitByCpf(cpf: string) {
