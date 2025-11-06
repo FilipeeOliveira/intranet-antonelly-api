@@ -65,6 +65,13 @@ export class VisitHistoryController {
         return this.visitHistoryService.findAll(query);
     }
 
+    @Get('total-count')
+    @ApiOperation({ summary: 'Obter a contagem total de registros de visita' })
+    @ApiResponse({ status: 200, description: 'Contagem total de registros de visita retornada com sucesso.' })
+    async getTotalVisitCount() {
+        return this.visitHistoryService.getTotalCount();
+    }
+
     @Get(':id')
     @ApiOperation({ summary: 'Obter um registro de visita pelo ID' })
     @ApiResponse({ status: 200, description: 'Registro de visita retornado com sucesso.' })

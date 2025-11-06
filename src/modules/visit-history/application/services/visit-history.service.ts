@@ -64,18 +64,11 @@ export class VisitHistoryService {
       throw new BadRequestException('O visitante já está presente na empresa.');
     }
 
-    console.log({
-      startDate: getLocalDateToUtcDate(new Date(`${dto.date}T00:00:00`)),
-      endDate: getLocalDateToUtcDate(new Date(`${dto.date}T23:59:59`)),
-    })
-
     const visitorAlreadyScheduled = await this.visitHistoryRepository.findVisitorScheduledByCpf({
       cpf: dto?.visitorCpf,
       startDate: getLocalDateToUtcDate(new Date(`${dto.date}T00:00:00`)),
       endDate: getLocalDateToUtcDate(new Date(`${dto.date}T23:59:59`)),
     });
-
-    console.log({ visitorAlreadyScheduled })
 
     if (visitorAlreadyScheduled) {
       throw new BadRequestException('O visitante já possui um agendamento para essa data.');
@@ -93,6 +86,27 @@ export class VisitHistoryService {
     });
 
     return schedule;
+  }
+
+  async getTotalCount(): Promise<{
+    totalPresent: number;
+    totalScheduled: number;
+    totalLeft: number;
+    totalCanceled: number;
+  }> {
+    const [totalPresent, totalScheduled, totalLeft, totalCanceled] = await Promise.all([
+      this.visitHistoryRepository.count({ status: VisitHistoryStatus.PRESENT }),
+      this.visitHistoryRepository.count({ status: VisitHistoryStatus.SCHEDULED }),
+      this.visitHistoryRepository.count({ status: VisitHistoryStatus.LEFT }),
+      this.visitHistoryRepository.count({ status: VisitHistoryStatus.CANCELED }),
+    ]);
+
+    return {
+      totalPresent,
+      totalScheduled,
+      totalLeft,
+      totalCanceled,
+    };
   }
 
   async startVisit(visitHistoryId: string): Promise<VisitHistory> {

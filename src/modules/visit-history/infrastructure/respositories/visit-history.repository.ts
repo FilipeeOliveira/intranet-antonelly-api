@@ -10,19 +10,52 @@ export class VisitHistoryRepository {
   constructor(private readonly prisma: PrismaService) { }
 
   async findAll(query: VisitHistoryQueryDto) {
-    const { page, limit, search, sortBy, sortOrder, status } = query;
+    const { page, limit, search, sortBy, sortOrder, status, date, time } = query;
     const skip = (page - 1) * limit;
 
-    const where: any = {};
+    let where: any = {};
     if (search) {
-      where.OR = [
-        { visitor: { name: { contains: search, mode: 'insensitive' } } },
-        { visitor: { email: { contains: search, mode: 'insensitive' } } },
-      ];
+      where = {
+        name: { contains: search, mode: 'insensitive' },
+      }
     }
 
     if (status) {
       where.status = status;
+    }
+
+    // Filtro por data e/ou hora
+    if (date && time) {
+      // Caso Data + Hora
+      const start = moment(`${date} ${time}`, 'YYYY-MM-DD HH:mm').utc(true).startOf('hour');
+      const end = moment(start).utc(true).endOf('hour');
+
+      where.arrivedAt = {
+        gte: start.toDate(),
+        lte: end.toDate(),
+      };
+    }
+
+    else if (date && !time) {
+      // Caso apenas a Data
+      const start = moment(date, 'YYYY-MM-DD').utc(true).startOf('day');
+      const end = moment(date, 'YYYY-MM-DD').utc(true).endOf('day');
+
+      where.arrivedAt = {
+        gte: start.toDate(),
+        lte: end.toDate(),
+      };
+    }
+    else if (!date && time) {
+      // Caso apenas a Hora (usa o dia atual)
+      const today = moment().format('YYYY-MM-DD');
+      const start = moment(`${today} ${time}`, 'YYYY-MM-DD HH:mm').utc(true).startOf('hour');
+      const end = moment(start).utc(true).endOf('hour');
+
+      where.arrivedAt = {
+        gte: start.toDate(),
+        lte: end.toDate(),
+      };
     }
 
     const orderBy: any = {};
@@ -52,6 +85,13 @@ export class VisitHistoryRepository {
       limit,
       totalPages: Math.ceil(total / limit),
     };
+  }
+
+  async count(args: {
+    status?: VisitHistoryStatus;
+
+  }): Promise<number> {
+    return this.prisma.visitHistory.count({ where: args });
   }
 
   async findVisitorPresentByCpf(args: {

@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsOptional, IsString, Max, Min } from 'class-validator';
+import moment from 'moment';
 import { VisitHistoryStatus } from '../enums/VisitHistoryStatus';
 
 export class VisitHistoryQueryDto {
@@ -11,6 +12,24 @@ export class VisitHistoryQueryDto {
   @IsOptional()
   @IsString()
   search?: string;
+
+  @ApiProperty({
+    description: 'Data da visita no formato AAAA-MM-DD',
+    example: moment().format('YYYY-MM-DD'),
+    required: false,
+  })
+  @IsOptional()
+  @IsString({ message: 'Data deve ser uma string no formato AAAA-MM-DD' })
+  date?: string;
+
+  @ApiProperty({
+    description: 'Hora da visita no formato HH:mm',
+    example: moment().format('HH:mm'),
+    required: false,
+  })
+  @IsOptional()
+  @IsString({ message: 'Hora deve ser uma string no formato HH:mm' })
+  time?: string;
 
   @ApiProperty({
     description: 'Status da visita. (1: Agendado, 2: Presente, 3: Saiu, 4: Cancelada)',
