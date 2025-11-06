@@ -1,6 +1,30 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 
+export interface Feature {
+  id: string
+  prettyName: string
+  key: string
+  description: string
+  pageId: string
+}
+
+// Interface para Page (agrupamento de features)
+export interface Page {
+  id: string
+  name: string
+  features: Feature[]
+}
+
+// Response completo da listagem de páginas com features
+export interface PagesWithFeaturesResponse {
+  data: Page[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
 
 @Injectable()
 export class PermissionsService {
@@ -32,6 +56,15 @@ export class PermissionsService {
             where: { id: userId },
             include: { permissions: { include: { feature: { include: { page: true } } } } },
         });
+    }
+
+    async getUserFeatures(userId: string): Promise<Feature[]> {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            include: { permissions: { include: { feature: true } } },
+        });
+
+        return user?.permissions.map((p) => p.feature) || [];
     }
 
 
