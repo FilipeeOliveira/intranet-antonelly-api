@@ -5,7 +5,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { PermissionsGuard } from '../guards/permissions.guard';
 import { Features } from '../guards/features.decorator';
 
-@UseGuards(AuthGuard('jwt'), PermissionsGuard)
+// @UseGuards(AuthGuard('jwt'), PermissionsGuard)
 @ApiTags('Permissões')
 @Controller('permissions')
 export class PermissionsController {
@@ -25,6 +25,11 @@ export class PermissionsController {
         return this.permissionsService.getUserPermissions(userId);
     }
 
+    @Get('user/:id/features')
+    getUserFeatures(@Param('id') userId: string) {
+        return this.permissionsService.getUserFeatures(userId);
+    }
+
     @Features('PERMISSION_ASSOCIATION')
     @Post('user/:id/feature/:featureId')
     assignFeature(
@@ -34,7 +39,7 @@ export class PermissionsController {
         return this.permissionsService.assignFeature(userId, featureId);
     }
 
-    @Features('PERMISSION_VIEW')
+    // @Features('PERMISSION_VIEW')
     @Get('pages')
     getPages() {
         return this.permissionsService.getAllPagesWithFeatures();
