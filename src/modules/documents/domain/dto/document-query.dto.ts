@@ -23,13 +23,22 @@ export class DocumentQueryDto {
   status?: DocumentStatus;
 
   @ApiProperty({
-    description: 'Filtro por setor',
+    description: 'Filtro por nome do setor',
     required: false,
     example: 'RH',
   })
   @IsOptional()
   @IsString()
   sector?: string;
+
+  @ApiProperty({
+    description: 'Filtro por ID do setor (UUID)',
+    required: false,
+    example: '0801b5e5-6aa4-4ec3-9742-5a48419a4104',
+  })
+  @IsOptional()
+  @IsString()
+  sectorId?: string;
 
   @ApiProperty({
     description: 'Filtro por versão',

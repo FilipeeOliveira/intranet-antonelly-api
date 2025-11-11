@@ -8,7 +8,7 @@ export class DocumentRepository {
   constructor(private readonly prisma: PrismaService) { }
 
   async findAll(query: DocumentQueryDto) {
-    const { page, limit, search, status, sector, version, sortBy, sortOrder } = query;
+    const { page, limit, search, status, sector, sectorId, version, sortBy, sortOrder } = query;
 
     const skip = (page - 1) * limit;
 
@@ -26,7 +26,11 @@ export class DocumentRepository {
       where.status = status;
     }
 
-    if (sector) {
+    // Prioriza filtro por sectorId (UUID) se fornecido
+    if (sectorId) {
+      where.sectorId = sectorId;
+    } else if (sector) {
+      // Caso contrário, filtra por nome do setor
       where.sector = {
         name: {
           contains: sector, mode: 'insensitive',
