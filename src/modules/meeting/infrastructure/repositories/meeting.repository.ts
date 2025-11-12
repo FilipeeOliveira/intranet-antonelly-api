@@ -35,6 +35,7 @@ export class MeetingRepository {
         if (search) {
             where.OR = [
                 { subject: { contains: search, mode: 'insensitive' } },
+                { Sector: { name: { contains: search, mode: 'insensitive' } } },
                 { description: { contains: search, mode: 'insensitive' } },
             ];
         }
