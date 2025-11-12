@@ -51,6 +51,7 @@ export class MeetingRepository {
                 include: {
                     Sector: true,
                     Room: true,
+                    Responsible: true,
                 },
             }),
             this.prisma.meetingSchedule.count({ where }),
@@ -71,6 +72,7 @@ export class MeetingRepository {
             include: {
                 Sector: true,
                 Room: true,
+                Responsible: true,
             },
         });
     }
@@ -106,6 +108,7 @@ export class MeetingRepository {
             include: {
                 Sector: true,
                 Room: true,
+                Responsible: true,
             },
         });
     }
