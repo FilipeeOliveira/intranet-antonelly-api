@@ -1,8 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { randomUUID } from "crypto";
-import { addDays, format } from "date-fns";
-import { MeetingStatus } from "../../src/modules/meeting/infrastructure/repositories/meeting.repository";
+import { addDays } from "date-fns";
 import { CreateMeetingDto } from "../../src/modules/meeting/domain/dto/create-meeting.dto";
+import { MeetingStatus } from "../../src/modules/meeting/infrastructure/repositories/meeting.repository";
 
 const prisma = new PrismaClient();
 
