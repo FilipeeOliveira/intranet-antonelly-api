@@ -23,5 +23,5 @@ export const pdfFileInterceptor = (fieldName = "document") =>
         callback(new BadRequestException("Somente arquivos PDF são permitidos!"), false);
       }
     },
-    limits: { fileSize: 5 * 1024 * 1024 },
+    limits: { fileSize: 50 * 1024 * 1024 },
   });

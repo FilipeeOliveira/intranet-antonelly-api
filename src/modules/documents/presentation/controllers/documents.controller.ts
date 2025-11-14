@@ -14,6 +14,7 @@ import {
     UseGuards,
     UseInterceptors,
 } from "@nestjs/common";
+import { AuthGuard } from "@nestjs/passport";
 import {
     ApiBearerAuth,
     ApiBody,
@@ -22,18 +23,15 @@ import {
     ApiResponse,
     ApiTags,
 } from "@nestjs/swagger";
-import { RoleType } from "src/modules/auth/domain/entities/role.entity";
-import { Roles } from "src/modules/auth/presentation/decorators/roles.decorator";
+import { createHash } from "crypto";
+import { Response } from "express";
+import { createReadStream, existsSync, statSync } from "fs";
+import { join } from "path";
+import { AuthenticateGuard } from "src/modules/auth/presentation/guards/authenticate.guard";
 import { pdfFileInterceptor } from "src/shared/interceptors/pdf-file.interceptor";
 import { DocumentsService } from "../../application/services/documents.service";
 import { CreateDocumentDto } from "../../domain/dto/create-document.dto";
 import { DocumentQueryDto } from "../../domain/dto/document-query.dto";
-import { AuthGuard } from "@nestjs/passport";
-import { AuthenticateGuard } from "src/modules/auth/presentation/guards/authenticate.guard";
-import { Response } from "express";
-import { createReadStream, existsSync, statSync } from "fs";
-import { join } from "path";
-import { createHash } from "crypto";
 
 
 @ApiTags("Gestão de Documentos")
