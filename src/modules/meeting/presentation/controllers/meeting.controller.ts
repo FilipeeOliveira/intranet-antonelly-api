@@ -1,14 +1,12 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { CreateMeetingDto } from '../../domain/dto/create-meeting.dto';
-import { UpdateMeetingDto } from '../../domain/dto/update-meeting.dto';
-import { MeetingQueryDto } from '../../domain/dto/meeting-query.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthenticateGuard } from 'src/modules/auth/presentation/guards/authenticate.guard';
-import { Roles } from 'src/modules/auth/presentation/decorators/roles.decorator';
-import { RoleType } from 'src/modules/auth/domain/entities/role.entity';
 import { MeetingService } from '../../application/service/meeting.service';
+import { CreateMeetingDto } from '../../domain/dto/create-meeting.dto';
+import { MeetingQueryDto } from '../../domain/dto/meeting-query.dto';
+import { UpdateMeetingDto } from '../../domain/dto/update-meeting.dto';
 
 @ApiTags('Agendamento de Reuniões')
 @ApiBearerAuth()

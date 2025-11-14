@@ -38,6 +38,11 @@ export class CreateMeetingDto {
     @IsString()
     sectorId: string;
 
+    @ApiProperty({ description: 'ID do Usuário responsável pela reunião', example: 'uuid-do-usuario', required: false })
+    @IsOptional()
+    @IsString()
+    responsibleId?: string;
+
     @ApiProperty({ description: 'Status da reunião', example: MeetingStatus.SCHEDULED, enum: MeetingStatus, required: false })
     @IsEnum(MeetingStatus)
     @IsOptional()

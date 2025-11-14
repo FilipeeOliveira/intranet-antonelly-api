@@ -49,6 +49,7 @@ model User {
 
   sector            Sector             @relation(fields: [sectorId], references: [id])
   role              Role               @relation(fields: [roleId], references: [id])
+  meetings          MeetingSchedule[]
   permissions       UserPermission[]
   blacklistedTokens BlacklistedToken[]
 
@@ -131,14 +132,14 @@ model Companie {
 }
 
 model VisitHistory {
-  id           String  @id @default(uuid())
-  isScheduled  Boolean @default(false)
-  description  String? // Motivo da visita
-  name  String
-  cpf   String?
-  phone String?
-  companyId    String?
-  status       Int     @default(1) // 1 = Agendado, 2 = Presente, 3 = Saiu, 4 = Cancelada.
+  id          String  @id @default(uuid())
+  isScheduled Boolean @default(false)
+  description String? // Motivo da visita
+  name        String
+  cpf         String?
+  phone       String?
+  companyId   String?
+  status      Int     @default(1) // 1 = Agendado, 2 = Presente, 3 = Saiu, 4 = Cancelada.
 
   arrivedAt DateTime  @default(now())
   leftAt    DateTime?
@@ -162,20 +163,22 @@ model Room {
 }
 
 model MeetingSchedule {
-  id          String   @id @default(uuid())
-  subject     String
-  description String?
-  date        DateTime // Somente data
-  startTime   String // Somente horário em HH:MM
-  endTime     String // HH:MM calculado
-  sectorId    String
-  roomId      String
-  status      Int      @default(1) // 1 = agendada, 2 = em andamento, 3 = concluida.
+  id            String   @id @default(uuid())
+  subject       String
+  description   String?
+  date          DateTime // Somente data
+  startTime     String // Somente horário em HH:MM
+  endTime       String // HH:MM calculado
+  sectorId      String
+  roomId        String
+  responsibleId String?
+  status        Int      @default(1) // 1 = agendada, 2 = em andamento, 3 = concluida, 4 = cancelada
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Sector    Sector   @relation(fields: [sectorId], references: [id])
-  Room      Room     @relation(fields: [roomId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  Sector      Sector   @relation(fields: [sectorId], references: [id])
+  Room        Room     @relation(fields: [roomId], references: [id])
+  Responsible User?    @relation(fields: [responsibleId], references: [id])
 
   @@map("meeting_schedule")
 }
