@@ -54,8 +54,10 @@ export class MeetingRepository {
             where.date = { gte: moment(startDate).startOf('day').toDate(), lte: endDate };
         }
 
-        const orderBy: any = {};
-        orderBy[sortBy || 'date'] = sortOrder || 'asc';
+        const orderBy: any = [
+            { [sortBy || 'createdAt']: sortOrder || 'asc' },
+            { id: 'asc' } // torna a ordenação estável
+        ];
 
         const [meetings, total] = await Promise.all([
             this.prisma.meetingSchedule.findMany({

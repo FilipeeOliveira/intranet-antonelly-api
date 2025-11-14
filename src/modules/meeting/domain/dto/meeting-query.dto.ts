@@ -22,10 +22,10 @@ export class MeetingQueryDto {
     @Max(100)
     limit: number = 10;
 
-    @ApiProperty({ description: 'Campo para ordenação', enum: ['subject', 'date', 'sector', 'createdAt'], default: 'date', required: false })
+    @ApiProperty({ description: 'Campo para ordenação', enum: ['subject', 'date', 'sector', 'createdAt'], default: 'createdAt', required: false })
     @IsString()
     @IsOptional()
-    sortBy: string = 'date';
+    sortBy: string = 'createdAt';
 
     @ApiProperty({ description: 'Direção da ordenação', enum: ['asc', 'desc'], default: 'asc', required: false })
     @IsString()
