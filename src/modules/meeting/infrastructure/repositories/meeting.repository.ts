@@ -55,8 +55,8 @@ export class MeetingRepository {
         }
 
         const orderBy: any = [
-            { [sortBy || 'createdAt']: sortOrder || 'asc' },
-            { id: 'asc' } // torna a ordenação estável
+            { [sortBy || 'createdAt']: sortOrder || 'desc' },
+            { id: 'desc' } // torna a ordenação estável
         ];
 
         const [meetings, total] = await Promise.all([

@@ -22,13 +22,13 @@ export class RoomsQueryDto {
     @Max(100)
     limit: number = 10;
 
-    @ApiProperty({ description: 'Campo para ordenação', enum: ['id', 'name', 'location', 'createdAt'], default: 'id', required: false })
+    @ApiProperty({ description: 'Campo para ordenação', enum: ['id', 'name', 'location', 'createdAt'], default: 'createdAt', required: false })
     @IsOptional()
-    sortBy: string = 'id';
+    sortBy: string = 'createdAt';
 
-    @ApiProperty({ description: 'Direção da ordenação', enum: ['asc', 'desc'], default: 'asc', required: false })
+    @ApiProperty({ description: 'Direção da ordenação', enum: ['asc', 'desc'], default: 'desc', required: false })
     @IsOptional()
-    sortOrder: 'asc' | 'desc' = 'asc';
+    sortOrder: 'asc' | 'desc' = 'desc';
 }
 
 

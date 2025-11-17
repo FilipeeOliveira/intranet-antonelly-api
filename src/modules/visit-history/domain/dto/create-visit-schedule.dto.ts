@@ -45,7 +45,7 @@ export class CreateVisitScheduleDto {
 
   @ApiProperty({
     description: 'CPF of the visitor',
-    example: '12345678900',
+    example: '123.456.789-00',
   })
   @IsOptional()
   @IsString()
@@ -53,7 +53,7 @@ export class CreateVisitScheduleDto {
 
   @ApiProperty({
     description: 'Phone number of the visitor',
-    example: '11987654321',
+    example: '(99) 9 9999-9999',
   })
   @IsOptional()
   @IsString()
