@@ -27,10 +27,10 @@ export class MeetingQueryDto {
     @IsOptional()
     sortBy: string = 'createdAt';
 
-    @ApiProperty({ description: 'Direção da ordenação', enum: ['asc', 'desc'], default: 'asc', required: false })
+    @ApiProperty({ description: 'Direção da ordenação', enum: ['asc', 'desc'], default: 'desc', required: false })
     @IsString()
     @IsOptional()
-    sortOrder: 'asc' | 'desc' = 'asc';
+    sortOrder: 'asc' | 'desc' = 'desc';
 
     @ApiProperty({ description: 'Filtrar por ID da sala', required: false })
     @IsOptional()

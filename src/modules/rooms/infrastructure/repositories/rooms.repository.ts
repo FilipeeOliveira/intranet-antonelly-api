@@ -34,7 +34,7 @@ export class RoomsRepository {
         }
 
         const orderBy: any = {};
-        orderBy[sortBy || 'id'] = sortOrder || 'asc';
+        orderBy[sortBy || 'createdAt'] = sortOrder || 'desc';
 
         const [rooms, total] = await Promise.all([
             this.prisma.room.findMany({
