@@ -16,9 +16,9 @@ export class CreateVisitHistoryDto {
     description: 'ID da empresa que está sendo visitada',
     example: 'e2e47e4f-cc59-44b8-9b7f-247b3e3e4af8',
   })
-  @IsUUID()
-  @IsNotEmpty()
-  companyId: string;
+  @IsString()
+  @IsOptional()
+  companyId?: string;
 
   @ApiProperty({
     description: 'Descrição do motivo da visita',

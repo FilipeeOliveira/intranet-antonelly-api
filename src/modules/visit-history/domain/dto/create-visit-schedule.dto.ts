@@ -14,9 +14,9 @@ export class CreateVisitScheduleDto {
     description: 'ID of the company being visited',
     example: 'e2e47e4f-cc59-44b8-9b7f-247b3e3e4af8',
   })
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  companyId: string;
+  companyId?: string;
 
   @ApiProperty({
     description: 'Reason or description of the visit',

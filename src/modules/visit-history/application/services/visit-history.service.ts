@@ -21,7 +21,7 @@ export class VisitHistoryService {
   async create(dto: CreateVisitHistoryDto): Promise<VisitHistory> {
 
     const companyExists = await this.companyRepository.findById(dto.companyId);
-    if (!companyExists) {
+    if (dto.companyId && !companyExists) {
       throw new NotFoundException('Empresa não encontrada.');
     }
 
@@ -44,7 +44,7 @@ export class VisitHistoryService {
       cpf: dto?.visitorCpf,
       phone: dto?.visitorPhone,
       description: dto.description,
-      companyId: dto.companyId,
+      companyId: dto?.companyId && dto.companyId.length ? dto.companyId : null,
       status: VisitHistoryStatus.PRESENT,
       arrivedAt: dto.arrivedAt ? getLocalDateToUtcDate(dto.arrivedAt) : getCurrentUtcDate()
     });
@@ -53,7 +53,7 @@ export class VisitHistoryService {
   async createVisitSchedule(dto: CreateVisitScheduleDto): Promise<VisitHistory> {
 
     const companyExists = await this.companyRepository.findById(dto.companyId);
-    if (!companyExists) {
+    if (dto.companyId && !companyExists) {
       throw new NotFoundException('Empresa não encontrada.');
     }
 
@@ -80,7 +80,7 @@ export class VisitHistoryService {
       phone: dto?.visitorPhone,
       description: dto.description,
       arrivedAt: getLocalDateToUtcDate(new Date(`${dto.date}T${dto.time}:00`)),
-      companyId: dto.companyId,
+      companyId: dto?.companyId && dto.companyId.length ? dto.companyId : null,
       status: VisitHistoryStatus.SCHEDULED,
       isScheduled: true,
     });
