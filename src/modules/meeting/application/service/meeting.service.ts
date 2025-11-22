@@ -6,6 +6,7 @@ import { MeetingQueryDto } from '../../domain/dto/meeting-query.dto';
 import { SectorService } from 'src/modules/sectors/application/services/sector.service';
 import { RoomsService } from 'src/modules/rooms/application/services/rooms.service';
 import { UsersService } from 'src/modules/users/application/services/users.service';
+import moment from 'moment';
 
 @Injectable()
 export class MeetingService {
@@ -65,6 +66,26 @@ export class MeetingService {
 
             if (error instanceof HttpException) throw error;
 
+            throw new HttpException('Erro interno no servidor.', 500);
+        }
+    }
+
+    async finish(id: string) {
+        try {
+            const meeting = await this.meetingRepository.findById(id);
+            if (!meeting) throw new NotFoundException('Reunião não encontrada.');
+            if (meeting.status !== MeetingStatus.IN_PROGRESS) {
+                throw new BadRequestException('Reunião não pode ser finalizada, pois não está em andamento.');
+            }
+
+            return this.meetingRepository.update(id, { 
+                endTime: moment().utc(true).format('HH:mm'),
+                status: MeetingStatus.COMPLETED 
+            });
+        }
+        catch (error) {
+            console.error('Error finishing meeting:', error);
+            if (error instanceof HttpException) throw error;
             throw new HttpException('Erro interno no servidor.', 500);
         }
     }
