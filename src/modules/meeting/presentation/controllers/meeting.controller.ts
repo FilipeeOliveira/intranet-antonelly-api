@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { AuthGuard } from '@nestjs/passport';
@@ -44,7 +44,6 @@ export class MeetingController {
         return this.meetingService.findToday();
     }
 
-
     @Put(':id')
     @ApiOperation({ summary: 'Atualizar reunião' })
     @ApiResponse({ status: 200, description: 'Reunião atualizada com sucesso.' })
@@ -57,5 +56,15 @@ export class MeetingController {
     @ApiResponse({ status: 200, description: 'Reunião cancelada com sucesso.' })
     async delete(@Param('id') id: string) {
         return this.meetingService.delete(id);
+    }
+
+    @Patch('finish/:id')
+    @ApiOperation({
+        summary: 'Finalizar reunião',
+        description: 'Esta operação é utilizada para finalizar uma reunião que já foi agendada.'
+    })
+    @ApiResponse({ status: 200, description: 'Reunião finalizada com sucesso.' })
+    async finish(@Param('id') id: string) {
+        return this.meetingService.finish(id);
     }
 }
