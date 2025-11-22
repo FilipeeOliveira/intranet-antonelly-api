@@ -5,6 +5,7 @@ import { DocumentQueryDto } from '../../domain/dto/document-query.dto';
 import { SectorRepository } from '../../../sectors/infrastructure/repositories/sector.repository';
 import path, { join } from 'path';
 import { unlink } from 'fs/promises';
+import { existsSync, statSync } from 'fs';
 
 export interface Document {
     id: string;
@@ -22,6 +23,15 @@ export class DocumentsService {
         private readonly documentRepository: DocumentRepository,
         private readonly sectorRepository: SectorRepository
     ) { }
+
+    private getFileSize(filePath: string): number | null {
+        if (!filePath) return null;
+        const fullPath = join(process.cwd(), filePath);
+        if (existsSync(fullPath)) {
+            return statSync(fullPath).size;
+        }
+        return null;
+    }
 
     async create(dto: CreateDocumentDto, filePath: string): Promise<{ fileName: string } & Document> {
         if (!filePath.endsWith('.pdf')) {
@@ -61,13 +71,14 @@ export class DocumentsService {
         };
     }
 
-    async findAll(query: DocumentQueryDto): Promise<{ data: (Document & { fileName: string })[]; total: number; page: number; limit: number; totalPages: number }> {
+    async findAll(query: DocumentQueryDto): Promise<{ data: (Document & { fileName: string; fileSize: number | null })[]; total: number; page: number; limit: number; totalPages: number }> {
         const { data, total, page, limit, totalPages } = await this.documentRepository.findAll(query);
         return {
             data: data.map(doc => ({
                 ...doc,
                 status: doc.status as DocumentStatus,
                 fileName: doc.filePath ? path.basename(doc.filePath) : null,
+                fileSize: this.getFileSize(doc.filePath),
             })),
             total,
             page,
@@ -76,15 +87,16 @@ export class DocumentsService {
         };
     }
 
-    async findById(id: string): Promise<(Document & { fileName: string })> {
+    async findById(id: string): Promise<(Document & { fileName: string; fileSize: number | null })> {
         const document = await this.documentRepository.findById(id);
         if (!document) {
             throw new NotFoundException('Documento não encontrado.');
         }
-        
+
         return {
             ...document,
             fileName: document.filePath ? path.basename(document.filePath) : null,
+            fileSize: this.getFileSize(document.filePath),
             status: document.status as DocumentStatus,
         };
     }
