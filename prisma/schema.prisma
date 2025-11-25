@@ -115,7 +115,24 @@ model Document {
 
   sector Sector @relation(fields: [sectorId], references: [id])
 
+  documentHistories DocumentHistory[]
+
   @@map("documents")
+}
+
+model DocumentHistory {
+  id          String   @id @default(uuid())
+  documentId  String
+  title       String
+  description String?
+  filePath    String // caminho do arquivo antigo
+  version     String
+  status      String
+  createdAt   DateTime @default(now())
+
+  document Document @relation(fields: [documentId], references: [id])
+
+  @@map("documents_history")
 }
 
 model Companie {

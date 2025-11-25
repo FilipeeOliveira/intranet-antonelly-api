@@ -88,6 +88,17 @@ export class DocumentRepository {
     });
   }
 
+  async createHistory(data: {
+    documentId: string;
+    title: string;
+    description?: string;
+    filePath: string;
+    version: string;
+    status: string;
+  }) {
+    return this.prisma.documentHistory.create({ data });
+  }
+
   async update(id: string, data: Partial<{
     title: string;
     category: string;
