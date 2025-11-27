@@ -83,6 +83,40 @@ export class MeetingRepository {
         };
     }
 
+    async findMeetingsByStatus(args: {
+        date: Date, hour: string, status: MeetingStatus
+    }) {
+        const { date, hour, status } = args;
+        const initialDate = moment(date).utc(true).startOf('day').toDate();
+        const finalDate = moment(date).utc(true).endOf('day').toDate();
+
+        const where: any = {
+            date: {
+                gte: initialDate,
+                lte: finalDate,
+            },
+            status,
+        };
+
+        switch (status) {
+            case MeetingStatus.SCHEDULED:
+                Object.assign(where, {
+                    startTime: { gte: hour, lte: hour },
+                });
+                break;
+
+            case MeetingStatus.IN_PROGRESS:
+                Object.assign(where, {
+                    endTime: { gte: hour, lte: hour },
+                });
+                break;
+        }
+
+        return this.prisma.meetingSchedule.findMany({ where });
+    }
+
+
+
     async findById(id: string) {
         return this.prisma.meetingSchedule.findUnique({
             where: { id },

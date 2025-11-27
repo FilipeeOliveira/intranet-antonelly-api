@@ -7,6 +7,7 @@ import { MeetingService } from '../../application/service/meeting.service';
 import { CreateMeetingDto } from '../../domain/dto/create-meeting.dto';
 import { MeetingQueryDto } from '../../domain/dto/meeting-query.dto';
 import { UpdateMeetingDto } from '../../domain/dto/update-meeting.dto';
+import moment from 'moment';
 
 @ApiTags('Agendamento de Reuniões')
 @ApiBearerAuth()

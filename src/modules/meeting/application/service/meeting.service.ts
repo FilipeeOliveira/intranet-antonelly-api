@@ -78,9 +78,9 @@ export class MeetingService {
                 throw new BadRequestException('Reunião não pode ser finalizada, pois não está em andamento.');
             }
 
-            return this.meetingRepository.update(id, { 
+            return this.meetingRepository.update(id, {
                 endTime: moment().utc(true).format('HH:mm'),
-                status: MeetingStatus.COMPLETED 
+                status: MeetingStatus.COMPLETED
             });
         }
         catch (error) {
@@ -89,6 +89,45 @@ export class MeetingService {
             throw new HttpException('Erro interno no servidor.', 500);
         }
     }
+
+    async updateMeetingsStatus(currentDate: Date) {
+        try {
+            const currentTime = moment(currentDate).utc(true).format('HH:mm');
+
+            const [
+                scheduledMeetings,
+                inProgressMeetings
+            ] = await Promise.all([
+                this.meetingRepository.findMeetingsByStatus({
+                    date: currentDate,
+                    hour: currentTime,
+                    status: MeetingStatus.SCHEDULED
+                }),
+                this.meetingRepository.findMeetingsByStatus({
+                    date: currentDate,
+                    hour: currentTime,
+                    status: MeetingStatus.IN_PROGRESS
+                })
+            ]);
+
+            const meetings = [...scheduledMeetings, ...inProgressMeetings];
+
+            for (const meeting of meetings) {
+                if (meeting.status === MeetingStatus.SCHEDULED && meeting.startTime <= currentTime && meeting.endTime > currentTime) {
+                    await this.meetingRepository.update(meeting.id, { status: MeetingStatus.IN_PROGRESS });
+                }
+                else if (meeting.status === MeetingStatus.IN_PROGRESS && meeting.endTime <= currentTime) {
+                    await this.meetingRepository.update(meeting.id, { status: MeetingStatus.COMPLETED });
+                }
+            }
+        }
+        catch (error) {
+            console.error('Error updating meetings status:', error);
+            throw new HttpException('Erro interno no servidor.', 500);
+        }
+    }
+
+
 
     async update(id: string, dto: UpdateMeetingDto) {
         try {

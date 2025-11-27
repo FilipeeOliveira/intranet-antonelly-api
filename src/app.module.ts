@@ -13,6 +13,8 @@ import { VisitHistoryModule } from './modules/visit-history/visit-history.module
 import { LoggingInterceptor } from './shared/interceptors/logging.interceptor';
 import { MeetingModule } from './modules/meeting/meeting.module';
 import { RoomsModule } from './modules/rooms/rooms.module';
+import { CronjobsModule } from './modules/cronjobs/cronjobs.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -31,6 +33,8 @@ import { RoomsModule } from './modules/rooms/rooms.module';
     CompaniesModule,
     MeetingModule,
     RoomsModule,
+    CronjobsModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [],
   providers: [
