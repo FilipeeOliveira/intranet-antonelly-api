@@ -4,8 +4,7 @@ import { DocumentRepository } from '../../infrastructure/repositories/document.r
 import { DocumentQueryDto } from '../../domain/dto/document-query.dto';
 import { SectorRepository } from '../../../sectors/infrastructure/repositories/sector.repository';
 import path, { join } from 'path';
-import { unlink } from 'fs/promises';
-import { existsSync, statSync } from 'fs';
+import { existsSync, statSync, promises } from 'fs';
 
 export interface Document {
     id: string;
@@ -102,9 +101,74 @@ export class DocumentsService {
     }
 
     async update(id: string, dto: Partial<CreateDocumentDto>, filePath?: string): Promise<(Document & { fileName: string })> {
+
+        const document = await this.documentRepository.findById(id);
+        if (!document) throw new NotFoundException('Documento não encontrado.');
+
+        if (dto.sectorId) {
+            const sector = await this.sectorRepository.findById(dto.sectorId);
+            if (!sector) {
+                throw new BadRequestException('Setor não encontrado. Verifique se o ID do setor está correto.');
+            }
+        }
         
+        const updateData: any = { ...dto };
+
+        // SE EXISTIR UM NOVO ARQUIVO → CRIA HISTÓRICO
+        if (filePath) {
+            if (!filePath.endsWith('.pdf')) {
+                throw new BadRequestException('Apenas arquivos PDF são permitidos.');
+            }
+
+            // 1. Salvar o arquivo antigo na pasta history
+            if (document.filePath) {
+                const oldPath = join(process.cwd(), document.filePath);
+                const historyDir = join(process.cwd(), 'uploads/documents/history');
+
+                const oldFileName = path.basename(document.filePath);
+                const historyPath = join(historyDir, oldFileName);
+
+                // garantir diretório
+                await promises.mkdir(historyDir, { recursive: true });
+
+                try {
+                    await promises.rename(oldPath, historyPath);
+                } catch (err) {
+                    console.error('Erro ao mover arquivo antigo para histórico:', err);
+                }
+
+                // 2. Criar histórico no banco
+                await this.documentRepository.createHistory({
+                    documentId: document.id,
+                    title: document.title,
+                    description: document.description,
+                    filePath: `uploads/documents/history/${oldFileName}`,
+                    version: document.version,
+                    status: document.status,
+                });
+            }
+
+            // 3. Atualiza documento com o novo arquivo
+            updateData.filePath = filePath;
+
+            // 4. Incrementa versão
+            updateData.version = (parseInt(document.version) + 1).toString();
+        }
+
+        const updatedDocument = await this.documentRepository.update(id, updateData);
+
+        return {
+            ...updatedDocument,
+            fileName: updatedDocument.filePath ? path.basename(updatedDocument.filePath) : null,
+            status: updatedDocument.status as DocumentStatus,
+        };
+    }
+
+
+    async updateLegacy(id: string, dto: Partial<CreateDocumentDto>, filePath?: string): Promise<(Document & { fileName: string })> {
+
         // Adicionar a lógica para atualizar a versão do documento se um novo arquivo for enviado.
-        
+
         const document = await this.documentRepository.findById(id);
         if (!document) throw new NotFoundException('Documento não encontrado.');
 
@@ -123,7 +187,7 @@ export class DocumentsService {
             // Apaga o arquivo antigo se existir
             if (document.filePath) {
                 try {
-                    await unlink(join(process.cwd(), document.filePath));
+                    await promises.unlink(join(process.cwd(), document.filePath));
                 } catch (err) {
                     console.error(err, '[DocumentsService]');
                 }
@@ -143,7 +207,7 @@ export class DocumentsService {
         // Apaga o arquivo físico
         if (document.filePath) {
             try {
-                await unlink(join(process.cwd(), document.filePath));
+                await promises.unlink(join(process.cwd(), document.filePath));
             } catch (err) {
                 console.error(err, '[DocumentsService]');
             }
