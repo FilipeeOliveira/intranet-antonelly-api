@@ -10,6 +10,7 @@ import { imageFileInterceptor } from "src/shared/interceptors/image-file.interce
 import { Response } from "express";
 import { join } from "path";
 import * as fs from "fs";
+import { UpdateCommuniqueDto } from "../domain/dtos/update-communique.dto";
 
 @ApiTags("Gestão de Comunicados")
 @ApiBearerAuth()
@@ -42,7 +43,6 @@ export class CommuniqueController {
     async createCommunique(
         @Body() body: CreateCommuniqueDto,
         @UploadedFile() file: Express.Multer.File
-
     ) {
 
         if (!file) throw new BadRequestException("Imagem do comunicado é obrigatória.");
@@ -56,7 +56,7 @@ export class CommuniqueController {
     async getCommuniqueById(
         @Param('id') id: string
     ) {
-        return { message: "Detalhes do comunicado!" };
+        return this.communiqueService.findById(id);
     }
 
 
@@ -82,12 +82,38 @@ export class CommuniqueController {
     }
 
     @Put(':id')
-    async updateCommunique() {
-        return { message: "Comunicado atualizado com sucesso!" };
+    @UseInterceptors(imageFileInterceptor())
+    @ApiConsumes("multipart/form-data")
+    @ApiBody({
+        description: "Criação de comunicado com metadados e imagem",
+        type: UpdateCommuniqueDto,
+        schema: {
+            type: "object",
+            properties: {
+                title: { type: "string", example: "Novo Comunicado" },
+                description: { type: "string", example: "Descrição do comunicado." },
+                sectorId: { type: "string", format: "uuid", example: "a1b2c3d4-e5f6-7890-abcd-ef1234567890" },
+                authorId: { type: "string", format: "uuid", example: "z9y8x7w6-v5u4-3210-tsrq-po9876543210" },
+                severity: { type: "string", example: "alta" },
+                image: { type: "string", format: "binary" }
+            },
+        },
+    })
+    async updateCommunique(
+        @Param('id') id: string,
+        @Body() body: UpdateCommuniqueDto,
+        @UploadedFile() file: Express.Multer.File
+    ) {
+
+        const imagePath = file?.filename;
+
+        return this.communiqueService.update(id, body, imagePath);
     }
 
     @Delete(':id')
-    async deleteCommunique() {
-        return { message: "Comunicado deletado com sucesso!" };
+    async deleteCommunique(
+        @Param('id') id: string
+    ) {
+        return this.communiqueService.delete(id);
     }
 }

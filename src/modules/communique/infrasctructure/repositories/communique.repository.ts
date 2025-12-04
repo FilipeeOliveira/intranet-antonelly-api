@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/modules/prisma/prisma.service";
 import { CommuniqueQueryDto } from "../../domain/dtos/communique-query.dto";
+import { UpdateCommuniqueDto } from "../../domain/dtos/update-communique.dto";
 
 @Injectable()
 export class CommuniqueRepository {
@@ -74,7 +75,8 @@ export class CommuniqueRepository {
         };
     }
 
-    async update(id: string, data: any) {
+    async update(id: string, data: UpdateCommuniqueDto) {
+
         return this.prisma.communique.update({ where: { id }, data });
     }
 
