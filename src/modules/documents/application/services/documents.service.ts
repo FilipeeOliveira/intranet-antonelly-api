@@ -191,8 +191,17 @@ export class DocumentsService {
             // 3. Atualiza documento com o novo arquivo
             updateData.filePath = filePath;
 
-            // 4. Incrementa versão
-            updateData.version = (parseInt(document.version) + 1).toString();
+            // 4. Incrementa versão (formato: 1.0 -> 1.1 -> ... -> 1.9 -> 2.0)
+            const [major, minor = '0'] = document.version.split('.');
+            const currentMinor = parseInt(minor);
+
+            if (currentMinor >= 9) {
+                // Se chegou em .9, incrementa o major e reseta minor para 0
+                updateData.version = `${parseInt(major) + 1}.0`;
+            } else {
+                // Caso contrário, apenas incrementa o minor
+                updateData.version = `${major}.${currentMinor + 1}`;
+            }
         }
 
         const updatedDocument = await this.documentRepository.update(id, updateData);
