@@ -4,6 +4,7 @@ import { PrismaModule } from '../prisma/prisma.module';
 import { DocumentRepository } from './infrastructure/repositories/document.repository';
 import { DocumentsController } from './presentation/controllers/documents.controller';
 import { SectorRepository } from '../sectors/infrastructure/repositories/sector.repository';
+import { DocumentHistoryRepository } from './infrastructure/repositories/document-history.repository';
 
 @Module({
     imports: [PrismaModule],
@@ -12,6 +13,7 @@ import { SectorRepository } from '../sectors/infrastructure/repositories/sector.
         DocumentRepository,
         SectorRepository,
         DocumentsService,
+        DocumentHistoryRepository
     ],
 })
 export class DocumentsModule {}

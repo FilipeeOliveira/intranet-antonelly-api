@@ -157,6 +157,84 @@ export class DocumentsController {
         }
     }
 
+    @Get('history/:id')
+    @ApiOperation({ summary: "Obter histórico de versões de um documento" })
+    @ApiResponse({ status: 200, description: "Histórico de versões retornado com sucesso." })
+    @ApiResponse({ status: 404, description: "Documento não encontrado." })
+    async getDocumentHistory(@Param("id") id: string) {
+        return this.documentsService.getHistory(id);
+    }
+
+
+    @Get("history/:id/view")
+    @ApiOperation({ summary: "Visualizar documento PDF antigo inline no navegador" })
+    @ApiResponse({ status: 200, description: "PDF retornado para visualização inline.", schema: { type: "string", format: "binary" } })
+    @ApiResponse({ status: 404, description: "Documento ou arquivo não encontrado." })
+    @ApiResponse({ status: 500, description: "Erro ao processar arquivo." })
+    async viewDocumentHistory(@Param("id") id: string, @Res() res: Response) {
+        // Busca documento no banco de dados
+        const document = await this.documentsService.findHistoryById(id);
+        if (!document) {
+            throw new NotFoundException("Documento não encontrado no sistema");
+        }
+
+        const fullPath = join(process.cwd(), document.filePath);
+
+        // Valida se arquivo físico existe
+        if (!existsSync(fullPath)) {
+            throw new NotFoundException(`Arquivo físico não encontrado: ${document.filePath}`);
+        }
+
+        try {
+            // Obtém informações do arquivo para cache
+            const stats = statSync(fullPath);
+            const fileSize = stats.size;
+            const lastModified = stats.mtime.toUTCString();
+
+            // Gera ETag baseado no path e última modificação
+            const etag = createHash("md5")
+                .update(`${document.filePath}-${stats.mtime.getTime()}`)
+                .digest("hex");
+
+            // Headers para visualização inline no navegador
+            res.setHeader("Content-Type", "application/pdf");
+            res.setHeader("Content-Disposition", `inline; filename="${document.title}.pdf"`);
+            res.setHeader("Content-Length", fileSize);
+
+            // Headers de cache (1 hora)
+            res.setHeader("Cache-Control", "public, max-age=3600");
+            res.setHeader("ETag", etag);
+            res.setHeader("Last-Modified", lastModified);
+
+            // Streaming do arquivo
+            const fileStream = createReadStream(fullPath);
+            fileStream.pipe(res);
+
+        } catch (error) {
+            throw new NotFoundException(`Erro ao processar arquivo: ${error.message}`);
+        }
+    }
+
+    @Get("history/:id/download")
+    async downloadDocumentHistory(@Param("id") id: string, @Res() res: Response) {
+        const document = await this.documentsService.findHistoryById(id);
+        if (!document) {
+            throw new NotFoundException("Documento não encontrado");
+        }
+
+        const filePath = document.filePath;
+
+        // força o navegador a baixar o arquivo
+        res.setHeader(
+            "Content-Disposition",
+            `attachment; filename="${document.title}.pdf"`
+        );
+        res.setHeader("Content-Type", "application/pdf");
+
+        const fileStream = createReadStream(join(process.cwd(), filePath));
+        fileStream.pipe(res);
+    }
+
     @Put(":id")
     @UseInterceptors(pdfFileInterceptor())
     @ApiConsumes("multipart/form-data")

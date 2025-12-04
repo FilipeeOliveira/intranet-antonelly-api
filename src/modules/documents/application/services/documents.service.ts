@@ -5,6 +5,7 @@ import { DocumentQueryDto } from '../../domain/dto/document-query.dto';
 import { SectorRepository } from '../../../sectors/infrastructure/repositories/sector.repository';
 import path, { join } from 'path';
 import { existsSync, statSync, promises } from 'fs';
+import { DocumentHistoryRepository } from '../../infrastructure/repositories/document-history.repository';
 
 export interface Document {
     id: string;
@@ -20,6 +21,7 @@ export interface Document {
 export class DocumentsService {
     constructor(
         private readonly documentRepository: DocumentRepository,
+        private readonly documentHistoryRepository: DocumentHistoryRepository,
         private readonly sectorRepository: SectorRepository
     ) { }
 
@@ -83,6 +85,44 @@ export class DocumentsService {
             page,
             limit,
             totalPages,
+        };
+    }
+
+    async getHistory(id: string): Promise<(Document & { fileName: string; fileSize: number | null })[]> {
+        const document = await this.documentRepository.findById(id);
+        if (!document) {
+            throw new NotFoundException('Documento não encontrado.');
+        }
+
+        const historyRecords = await this.documentHistoryRepository.findHistoryByDocumentId(id);
+
+        return historyRecords.map(record => ({
+            ...record,
+            sectorId: document.sectorId,
+            fileName: record.filePath ? path.basename(record.filePath) : null,
+            fileSize: this.getFileSize(record.filePath),
+            status: record.status as DocumentStatus,
+        }));
+
+    }
+
+    async findHistoryById(id: string): Promise<(Document & { fileName: string; fileSize: number | null })> {
+        const historyRecord = await this.documentHistoryRepository.findById(id);
+        if (!historyRecord) {
+            throw new NotFoundException('Registro de histórico não encontrado.');
+        }
+        
+        const document = await this.documentRepository.findById(historyRecord.documentId);
+        if (!document) {
+            throw new NotFoundException('Documento pai não encontrado.');
+        }
+        
+        return {
+            ...historyRecord,
+            sectorId: document.sectorId,
+            fileName: historyRecord.filePath ? path.basename(historyRecord.filePath) : null,
+            fileSize: this.getFileSize(historyRecord.filePath),
+            status: historyRecord.status as DocumentStatus,
         };
     }
 
