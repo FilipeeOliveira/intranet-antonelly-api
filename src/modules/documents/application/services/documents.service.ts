@@ -14,6 +14,7 @@ export interface Document {
     sectorId: string;
     filePath: string;
     version: string;
+    versionNote?: string;
     status: DocumentStatus;
 }
 
@@ -101,6 +102,7 @@ export class DocumentsService {
             sectorId: document.sectorId,
             fileName: record.filePath ? path.basename(record.filePath) : null,
             fileSize: this.getFileSize(record.filePath),
+            versionNote: record.versionNote || null,
             status: record.status as DocumentStatus,
         }));
 
@@ -111,17 +113,18 @@ export class DocumentsService {
         if (!historyRecord) {
             throw new NotFoundException('Registro de histórico não encontrado.');
         }
-        
+
         const document = await this.documentRepository.findById(historyRecord.documentId);
         if (!document) {
             throw new NotFoundException('Documento pai não encontrado.');
         }
-        
+
         return {
             ...historyRecord,
             sectorId: document.sectorId,
             fileName: historyRecord.filePath ? path.basename(historyRecord.filePath) : null,
             fileSize: this.getFileSize(historyRecord.filePath),
+            versionNote: historyRecord.versionNote || null,
             status: historyRecord.status as DocumentStatus,
         };
     }
@@ -140,7 +143,7 @@ export class DocumentsService {
         };
     }
 
-    async update(id: string, dto: Partial<CreateDocumentDto>, filePath?: string): Promise<(Document & { fileName: string })> {
+    async update(id: string, dto: Partial<CreateDocumentDto & { versionNote?: string }>, filePath?: string): Promise<(Document & { fileName: string })> {
 
         const document = await this.documentRepository.findById(id);
         if (!document) throw new NotFoundException('Documento não encontrado.');
@@ -151,7 +154,7 @@ export class DocumentsService {
                 throw new BadRequestException('Setor não encontrado. Verifique se o ID do setor está correto.');
             }
         }
-        
+
         const updateData: any = { ...dto };
 
         // SE EXISTIR UM NOVO ARQUIVO → CRIA HISTÓRICO
@@ -178,12 +181,14 @@ export class DocumentsService {
                 }
 
                 // 2. Criar histórico no banco
+                // Copia a versionNote do documento atual para o histórico
                 await this.documentRepository.createHistory({
                     documentId: document.id,
                     title: document.title,
                     description: document.description,
                     filePath: `uploads/documents/history/${oldFileName}`,
                     version: document.version,
+                    versionNote: document.versionNote || null, // Mantém a nota da versão antiga
                     status: document.status,
                 });
             }
@@ -202,6 +207,12 @@ export class DocumentsService {
                 // Caso contrário, apenas incrementa o minor
                 updateData.version = `${major}.${currentMinor + 1}`;
             }
+
+            // 5. Salva a nova versionNote no documento atual
+            updateData.versionNote = dto.versionNote || null;
+        } else {
+            // Se não há novo arquivo, remove versionNote do updateData
+            delete updateData.versionNote;
         }
 
         const updatedDocument = await this.documentRepository.update(id, updateData);
@@ -253,7 +264,24 @@ export class DocumentsService {
         const document = await this.documentRepository.findById(id);
         if (!document) throw new NotFoundException('Documento não encontrado.');
 
-        // Apaga o arquivo físico
+        // 1. Buscar histórico do documento
+        const historyRecords = await this.documentHistoryRepository.findHistoryByDocumentId(id);
+
+        // 2. Apagar arquivos do histórico
+        for (const record of historyRecords) {
+            if (record.filePath) {
+                try {
+                    await promises.unlink(join(process.cwd(), record.filePath));
+                } catch (err) {
+                    console.error('Erro ao deletar arquivo do histórico:', err);
+                }
+            }
+        }
+
+        // 3. Deletar registros de histórico do banco
+        await this.documentHistoryRepository.deleteByDocumentId(id);
+
+        // 4. Apagar arquivo físico do documento atual
         if (document.filePath) {
             try {
                 await promises.unlink(join(process.cwd(), document.filePath));
@@ -262,6 +290,7 @@ export class DocumentsService {
             }
         }
 
+        // 5. Deletar o documento
         const deletedDocument = await this.documentRepository.delete(id);
         return { ...deletedDocument, status: deletedDocument.status as DocumentStatus };
     }

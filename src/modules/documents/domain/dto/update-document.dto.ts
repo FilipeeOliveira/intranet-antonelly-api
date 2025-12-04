@@ -60,4 +60,13 @@ export class UpdateDocumentDto {
     @IsOptional()
     document?: Express.Multer.File;
 
+    @ApiProperty({
+        description: 'Nota da versão (obrigatório quando um novo arquivo é enviado)',
+        example: 'Correções de formatação e atualização de política',
+        required: false,
+    })
+    @IsOptional()
+    @IsString({ message: 'Nota da versão deve ser uma string' })
+    versionNote?: string;
+
 }

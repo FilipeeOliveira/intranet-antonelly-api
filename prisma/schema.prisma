@@ -111,6 +111,7 @@ model Document {
   description String?
   filePath    String
   version     String
+  versionNote String?
   status      String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -129,6 +130,7 @@ model DocumentHistory {
   description String?
   filePath    String
   version     String
+  versionNote String?
   status      String
   createdAt   DateTime @default(now())
 

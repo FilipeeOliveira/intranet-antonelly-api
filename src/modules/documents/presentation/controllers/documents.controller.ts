@@ -249,6 +249,7 @@ export class DocumentsController {
                 description: { type: "string", nullable: true },
                 department: { type: "string" },
                 document: { type: "string", format: "binary" },
+                versionNote: { type: "string", description: "Nota da versão (obrigatório quando um novo arquivo é enviado)" },
             },
         },
     })
@@ -256,7 +257,7 @@ export class DocumentsController {
     @ApiResponse({ status: 200, description: "Documento atualizado com sucesso." })
     async updateDocument(
         @Param("id") id: string,
-        @Body() updateDto: Partial<CreateDocumentDto>,
+        @Body() updateDto: Partial<CreateDocumentDto & { versionNote?: string }>,
         @UploadedFile() file?: Express.Multer.File
     ) {
         const filePath = file?.path;
