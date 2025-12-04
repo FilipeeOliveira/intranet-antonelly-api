@@ -15,6 +15,7 @@ import { MeetingModule } from './modules/meeting/meeting.module';
 import { RoomsModule } from './modules/rooms/rooms.module';
 import { CronjobsModule } from './modules/cronjobs/cronjobs.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { CommuniqueModule } from './modules/communique/communique.module';
 
 @Module({
   imports: [
@@ -24,16 +25,17 @@ import { ScheduleModule } from '@nestjs/schedule';
       limit: 5, // 5 tentativas por minuto
     }]),
     AuthModule,
+    CronjobsModule,
+    CompaniesModule,
+    CommuniqueModule,
+    DocumentsModule,
     UsersModule,
     PrismaModule,
-    DocumentsModule,
     PermissionsModule,
     SectorsModule,
     VisitHistoryModule,
-    CompaniesModule,
     MeetingModule,
     RoomsModule,
-    CronjobsModule,
     ScheduleModule.forRoot(),
   ],
   controllers: [],
