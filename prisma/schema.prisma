@@ -30,6 +30,7 @@ model Sector {
   documents       Document[]
   users           User[]
   MeetingSchedule MeetingSchedule[]
+  communiques     Communique[]
 
   @@map("sectors")
 }
@@ -52,6 +53,7 @@ model User {
   meetings          MeetingSchedule[]
   permissions       UserPermission[]
   blacklistedTokens BlacklistedToken[]
+  communiques       Communique[]
 
   @@map("users")
 }
@@ -198,4 +200,21 @@ model MeetingSchedule {
   Responsible User?    @relation(fields: [responsibleId], references: [id])
 
   @@map("meeting_schedule")
+}
+
+model Communique {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  severity    String
+  imagePath   String
+  authorId    String
+  sectorId    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  sector Sector @relation(fields: [sectorId], references: [id])
+  author User   @relation(fields: [authorId], references: [id])
+
+  @@map("communiques")
 }
