@@ -14,18 +14,28 @@ export async function createPagesSeed() {
                 create: [
                     {
                         key: Permissions.USERS.READ,
-                        prettyName: 'Visualizar Usuário',
-                        description: 'Permite visualizar informações individuais de um usuário.'
+                        prettyName: 'Visualizar Usuários',
+                        description: 'Permite visualizar todas as informações desta página, incluindo listagem de usuários, detalhes individuais e seu status.'
                     },
                     {
                         key: Permissions.USERS.READ_ALL,
                         prettyName: 'Listar Usuários',
-                        description: 'Exibe a lista completa de usuários cadastrados.'
+                        description: 'Exibe todos os usuários cadastrados no sistema.'
                     },
                     {
                         key: Permissions.USERS.READ_BY_ID,
-                        prettyName: 'Ver Usuário por ID',
-                        description: 'Permite visualizar detalhes de um usuário específico.'
+                        prettyName: 'Visualizar Usuário por ID',
+                        description: 'Permite consultar informações detalhadas de um usuário específico.'
+                    },
+                    {
+                        key: Permissions.USERS.RESET_PASSWORD,
+                        prettyName: 'Resetar Senha',
+                        description: 'Permite redefinir a senha de usuários.'
+                    },
+                    {
+                        key: Permissions.USERS.TOGGLE_ACTIVE_STATUS,
+                        prettyName: 'Ativar / Desativar Usuário',
+                        description: 'Autoriza ativar ou desativar usuários no sistema.'
                     },
                     {
                         key: Permissions.USERS.CREATE,
@@ -34,18 +44,19 @@ export async function createPagesSeed() {
                     },
                     {
                         key: Permissions.USERS.UPDATE,
-                        prettyName: 'Editar Usuário',
-                        description: 'Permite atualizar informações de usuários existentes.'
+                        prettyName: 'Atualizar Usuário',
+                        description: 'Permite editar informações de usuários existentes.'
                     },
                     {
                         key: Permissions.USERS.DELETE,
                         prettyName: 'Excluir Usuário',
-                        description: 'Autoriza excluir permanentemente um usuário.'
-                    },
-                ],
-            },
-        },
+                        description: 'Remove permanentemente um usuário do sistema.'
+                    }
+                ]
+            }
+        }
     });
+
 
     const companiesPage = await prisma.page.upsert({
         where: { name: 'COMPANIES' },
@@ -56,18 +67,18 @@ export async function createPagesSeed() {
                 create: [
                     {
                         key: Permissions.COMPANIES.READ,
-                        prettyName: 'Visualizar Empresa',
-                        description: 'Permite visualizar informações individuais de uma empresa.'
+                        prettyName: 'Visualizar Empresas',
+                        description: 'Permite visualizar todas as informações desta página, incluindo listagem de empresas, detalhes individuais e dados relacionados.'
                     },
                     {
                         key: Permissions.COMPANIES.READ_ALL,
                         prettyName: 'Listar Empresas',
-                        description: 'Autoriza visualizar a lista completa de empresas cadastradas no sistema.'
+                        description: 'Exibe a lista completa de empresas cadastradas no sistema.'
                     },
                     {
                         key: Permissions.COMPANIES.READ_BY_ID,
-                        prettyName: 'Ver Empresa por ID',
-                        description: 'Permite visualizar detalhes específicos de uma empresa.'
+                        prettyName: 'Visualizar Empresa por ID',
+                        description: 'Permite visualizar informações detalhadas de uma empresa específica.'
                     },
                     {
                         key: Permissions.COMPANIES.CREATE,
@@ -76,17 +87,17 @@ export async function createPagesSeed() {
                     },
                     {
                         key: Permissions.COMPANIES.UPDATE,
-                        prettyName: 'Editar Empresa',
-                        description: 'Permite atualizar informações de empresas cadastradas.'
+                        prettyName: 'Atualizar Empresa',
+                        description: 'Permite editar informações de empresas existentes.'
                     },
                     {
                         key: Permissions.COMPANIES.DELETE,
                         prettyName: 'Excluir Empresa',
-                        description: 'Autoriza a remoção permanente de uma empresa.'
-                    },
-                ],
-            },
-        },
+                        description: 'Autoriza remover permanentemente uma empresa do sistema.'
+                    }
+                ]
+            }
+        }
     });
 
     const communiquesPage = await prisma.page.upsert({
@@ -98,8 +109,8 @@ export async function createPagesSeed() {
                 create: [
                     {
                         key: Permissions.COMMUNIQUES.READ,
-                        prettyName: 'Visualizar Comunicado',
-                        description: 'Permite visualizar um comunicado individual.'
+                        prettyName: 'Visualizar Comunicados',
+                        description: 'Permite visualizar todas as informações desta página, incluindo listagens, detalhes individuais e quaisquer dados relacionados a comunicados.'
                     },
                     {
                         key: Permissions.COMMUNIQUES.READ_ALL,
@@ -142,8 +153,8 @@ export async function createPagesSeed() {
                     // 🔹 VISIT SCHEDULE FEATURES
                     {
                         key: Permissions.VISIT_SCHEDULES.READ,
-                        prettyName: "Ver Agendamentos",
-                        description: "Permite visualizar agendamentos individuais de visitantes."
+                        prettyName: 'Visualizar Agendamentos',
+                        description: 'Permite visualizar todas as informações desta página, incluindo listagem de agendamentos, detalhes individuais e dados complementares.'
                     },
                     {
                         key: Permissions.VISIT_SCHEDULES.READ_ALL,
@@ -184,8 +195,8 @@ export async function createPagesSeed() {
                     // 🔹 VISIT PRESENTS FEATURES (Presença dos Visitantes)
                     {
                         key: Permissions.VISIT_PRESENTS.READ,
-                        prettyName: "Ver Presenças",
-                        description: "Permite visualizar registros individuais de presença."
+                        prettyName: 'Visualizar Presenças',
+                        description: 'Permite visualizar todas as informações desta página, incluindo listagem de presenças, detalhes individuais e registros associados.'
                     },
                     {
                         key: Permissions.VISIT_PRESENTS.READ_ALL,
@@ -219,6 +230,11 @@ export async function createPagesSeed() {
                     },
 
                     // 🔹 VISIT HISTORY FEATURES (Histórico final de visitas)
+                    {
+                        key: Permissions.VISIT_HISTORY.READ,
+                        prettyName: 'Visualizar Histórico de Visitas',
+                        description: 'Permite visualizar todas as informações desta página, incluindo listagens de histórico, detalhes individuais e registros associados.'
+                    },
                     {
                         key: Permissions.VISIT_HISTORY.READ_ALL,
                         prettyName: "Listar Histórico Completo",
@@ -264,8 +280,8 @@ export async function createPagesSeed() {
                 create: [
                     {
                         key: Permissions.DOCUMENTS.READ,
-                        prettyName: 'Visualizar Documento',
-                        description: 'Permite visualizar um documento individual.'
+                        prettyName: 'Visualizar Documentos',
+                        description: 'Permite visualizar todas as informações desta página, incluindo listagens, pré-visualizações e detalhes de documentos.'
                     },
                     {
                         key: Permissions.DOCUMENTS.READ_ALL,
@@ -306,37 +322,42 @@ export async function createPagesSeed() {
                 create: [
                     {
                         key: Permissions.MEETINGS.READ,
-                        prettyName: 'Visualizar Reunião',
-                        description: 'Permite visualizar uma reunião individual.'
+                        prettyName: 'Visualizar Reuniões',
+                        description: 'Permite visualizar todas as informações desta página, incluindo a listagem de reuniões, detalhes individuais e dados complementares.'
                     },
                     {
                         key: Permissions.MEETINGS.READ_ALL,
                         prettyName: 'Listar Reuniões',
-                        description: 'Exibe a lista completa de reuniões cadastradas.'
+                        description: 'Exibe todas as reuniões cadastradas no sistema.'
                     },
                     {
                         key: Permissions.MEETINGS.READ_BY_ID,
-                        prettyName: 'Ver Reunião por ID',
-                        description: 'Permite consultar os detalhes de uma reunião específica.'
+                        prettyName: 'Visualizar Reunião por ID',
+                        description: 'Permite consultar detalhes de uma reunião específica.'
                     },
                     {
                         key: Permissions.MEETINGS.CREATE,
                         prettyName: 'Criar Reunião',
-                        description: 'Autoriza o agendamento ou criação de reuniões.'
+                        description: 'Autoriza agendar novas reuniões.'
                     },
                     {
                         key: Permissions.MEETINGS.UPDATE,
-                        prettyName: 'Editar Reunião',
-                        description: 'Permite atualizar informações de reuniões existentes.'
+                        prettyName: 'Atualizar Reunião',
+                        description: 'Permite editar informações de reuniões existentes.'
                     },
                     {
                         key: Permissions.MEETINGS.DELETE,
                         prettyName: 'Excluir Reunião',
-                        description: 'Autoriza remover permanentemente uma reunião.'
+                        description: 'Remove permanentemente uma reunião.'
                     },
-                ],
-            },
-        },
+                    {
+                        key: Permissions.MEETINGS.FINISH,
+                        prettyName: 'Finalizar Reunião',
+                        description: 'Permite marcar uma reunião como finalizada.'
+                    }
+                ]
+            }
+        }
     });
 
     const sectorsPage = await prisma.page.upsert({
@@ -348,8 +369,8 @@ export async function createPagesSeed() {
                 create: [
                     {
                         key: Permissions.SECTORS.READ,
-                        prettyName: 'Visualizar Setor',
-                        description: 'Permite visualizar informações individuais de um setor.'
+                        prettyName: 'Visualizar Setores',
+                        description: 'Permite visualizar todas as informações desta página, incluindo listagens de setores, detalhes individuais e dados relacionados.'
                     },
                     {
                         key: Permissions.SECTORS.READ_ALL,
@@ -390,8 +411,8 @@ export async function createPagesSeed() {
                 create: [
                     {
                         key: Permissions.ROOMS.READ,
-                        prettyName: 'Visualizar Sala',
-                        description: 'Permite visualizar informações individuais de uma sala.'
+                        prettyName: 'Visualizar Salas',
+                        description: 'Permite visualizar todas as informações desta página, incluindo listagem de salas, detalhes individuais e características relacionadas.'
                     },
                     {
                         key: Permissions.ROOMS.READ_ALL,
@@ -432,38 +453,49 @@ export async function createPagesSeed() {
                 create: [
                     {
                         key: Permissions.PERMISSIONS.READ,
-                        prettyName: 'Visualizar Permissão',
-                        description: 'Permite visualizar dados de uma permissão específica.'
+                        prettyName: 'Visualizar Permissões',
+                        description: 'Permite visualizar todas as informações desta página, incluindo listagens e detalhes de permissões atribuídas.'
                     },
                     {
-                        key: Permissions.PERMISSIONS.READ_ALL,
-                        prettyName: 'Listar Permissões',
-                        description: 'Exibe todas as permissões existentes no sistema.'
+                        key: Permissions.PERMISSIONS.READ_ALL_USERS_FEATURES,
+                        prettyName: 'Listar Permissões por Usuário',
+                        description: 'Exibe todas as permissões associadas a cada usuário.'
                     },
                     {
-                        key: Permissions.PERMISSIONS.READ_BY_ID,
-                        prettyName: 'Ver Permissão por ID',
-                        description: 'Permite visualizar detalhes de uma permissão.'
+                        key: Permissions.PERMISSIONS.READ_FEATURES_BY_USER_ID,
+                        prettyName: 'Ver Permissões de Usuário por ID',
+                        description: 'Permite visualizar as permissões atribuídas a um usuário específico.'
                     },
                     {
-                        key: Permissions.PERMISSIONS.CREATE,
-                        prettyName: 'Criar Permissão',
-                        description: 'Autoriza cadastrar novas permissões.'
+                        key: Permissions.PERMISSIONS.READ_ALL_PAGES_WITH_FEATURES,
+                        prettyName: 'Listar Páginas com Features',
+                        description: 'Exibe todas as páginas e suas respectivas permissões cadastradas.'
+                    },
+                    {
+                        key: Permissions.PERMISSIONS.ASSIGN_USER,
+                        prettyName: 'Atribuir Permissão',
+                        description: 'Autoriza adicionar uma permissão a um usuário.'
+                    },
+                    {
+                        key: Permissions.PERMISSIONS.REVOKE_USER_FEATURE,
+                        prettyName: 'Revogar Permissão de Usuário',
+                        description: 'Permite remover permissões atribuídas a usuários.'
                     },
                     {
                         key: Permissions.PERMISSIONS.UPDATE,
-                        prettyName: 'Editar Permissão',
-                        description: 'Permite atualizar permissões existentes.'
+                        prettyName: 'Atualizar Permissão',
+                        description: 'Permite editar informações de permissões existentes.'
                     },
                     {
                         key: Permissions.PERMISSIONS.DELETE,
                         prettyName: 'Excluir Permissão',
-                        description: 'Autoriza remover permanentemente uma permissão.'
-                    },
-                ],
-            },
-        },
+                        description: 'Remove permanentemente uma permissão do sistema.'
+                    }
+                ]
+            }
+        }
     });
+
 
     console.log('📄 Páginas e features criadas:');
     console.log(`🧑‍💼 Usuários -> ${usersPage.id}`);

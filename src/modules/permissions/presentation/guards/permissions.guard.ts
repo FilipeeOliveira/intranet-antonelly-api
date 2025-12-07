@@ -7,6 +7,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { FEATURES_KEY } from './features.decorator';
+import { Permissions } from 'src/shared/features';
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
@@ -20,8 +21,8 @@ export class PermissionsGuard implements CanActivate {
             FEATURES_KEY,
             context.getHandler(),
         );
-        
-        
+
+        console.log("Permissions: ", Permissions);
 
         if (!requiredFeatures || requiredFeatures.length === 0) return true;
 

@@ -26,14 +26,18 @@ import { CreateUserDto } from '../../domain/dto/create-user.dto';
 import { UpdateUserDto } from '../../domain/dto/update-user.dto';
 import { UserQueryDto } from '../../domain/dto/user-query.dto';
 import { PaginatedUsersResponseDto, UserResponseDto } from '../../domain/dto/user-response.dto';
+import { PermissionsGuard } from 'src/modules/permissions/presentation/guards/permissions.guard';
+import { Features } from 'src/modules/permissions/presentation/guards/features.decorator';
+import { Permissions } from 'src/shared/features';
 
 @ApiTags('Gestão de Usuários')
 @Controller('users')
-@UseGuards(AuthGuard('jwt'), TemporaryPasswordGuard)
+@UseGuards(AuthGuard('jwt'), TemporaryPasswordGuard, PermissionsGuard)
 @ApiBearerAuth()
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
+  @Features(Permissions.USERS.READ_ALL, Permissions.USERS.READ)
   @Get()
   @ApiOperation({ summary: 'Listar usuários com filtros e paginação' })
   @ApiResponse({
@@ -47,6 +51,7 @@ export class UsersController {
     return this.usersService.findAll(query);
   }
 
+  @Features(Permissions.USERS.READ_BY_ID, Permissions.USERS.READ)
   @Get(':id')
   @ApiOperation({ summary: 'Buscar usuário por ID' })
   @ApiParam({ name: 'id', description: 'ID do usuário' })
@@ -62,6 +67,7 @@ export class UsersController {
     return this.usersService.findById(id);
   }
 
+  @Features(Permissions.USERS.CREATE)
   @Post()
   @SkipTemporaryPasswordCheck()
   @HttpCode(HttpStatus.CREATED)
@@ -80,6 +86,7 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
+  @Features(Permissions.USERS.UPDATE)
   @Put(':id')
   @ApiOperation({ summary: 'Atualizar dados do usuário' })
   @ApiParam({ name: 'id', description: 'ID do usuário' })
@@ -100,6 +107,7 @@ export class UsersController {
     return this.usersService.update(id, updateUserDto);
   }
 
+  @Features(Permissions.USERS.RESET_PASSWORD)
   @Put(':id/reset-password')
   @HttpCode(HttpStatus.OK)
   @Throttle({ default: { limit: 5, ttl: 300000 } }) // 5 resets por 5 minutos
@@ -116,6 +124,7 @@ export class UsersController {
     return this.usersService.resetPassword(id);
   }
 
+  @Features(Permissions.USERS.TOGGLE_ACTIVE_STATUS)
   @Put(':id/toggle-status')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Ativar/desativar usuário' })
@@ -132,6 +141,7 @@ export class UsersController {
     return this.usersService.toggleStatus(id);
   }
 
+  @Features(Permissions.USERS.DELETE)
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
   @Throttle({ default: { limit: 3, ttl: 300000 } }) // 3 exclusões por 5 minutos

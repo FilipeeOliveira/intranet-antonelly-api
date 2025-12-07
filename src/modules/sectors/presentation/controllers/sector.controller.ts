@@ -1,21 +1,23 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthenticateGuard } from 'src/modules/auth/presentation/guards/authenticate.guard';
+import { PermissionsGuard } from 'src/modules/permissions/presentation/guards/permissions.guard';
 import { SectorService } from '../../application/services/sector.service';
 import { CreateSectorDto } from '../../domain/dto/create-sector.dto';
-import { UpdateSectorDto } from '../../domain/dto/update-sector.dto';
 import { SectorQueryDto } from '../../domain/dto/sector-query.dto';
-import { Roles } from 'src/modules/auth/presentation/decorators/roles.decorator';
-import { RoleType } from 'src/modules/auth/domain/entities/role.entity';
+import { UpdateSectorDto } from '../../domain/dto/update-sector.dto';
+import { Permissions } from 'src/shared/features';
+import { Features } from 'src/modules/permissions/presentation/guards/features.decorator';
 
 @ApiTags('Gestão de Setores')
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'), AuthenticateGuard)
+@UseGuards(AuthGuard('jwt'), AuthenticateGuard, PermissionsGuard)
 @Controller('sectors')
 export class SectorController {
     constructor(private readonly sectorService: SectorService) { }
 
+    @Features(Permissions.SECTORS.CREATE)
     @Post()
     @ApiOperation({ summary: 'Criar novo setor' })
     @ApiResponse({ status: 201, description: 'Setor criado com sucesso.' })
@@ -23,6 +25,7 @@ export class SectorController {
         return this.sectorService.create(dto);
     }
 
+    @Features(Permissions.SECTORS.READ_ALL, Permissions.SECTORS.READ)
     @Get()
     @ApiOperation({ summary: 'Listar setores com filtros e paginação' })
     @ApiResponse({ status: 200, description: 'Lista de setores retornada com sucesso.' })
@@ -30,6 +33,7 @@ export class SectorController {
         return this.sectorService.findAll(query);
     }
 
+    @Features(Permissions.SECTORS.READ_BY_ID, Permissions.SECTORS.READ)
     @Get(':id')
     @ApiOperation({ summary: 'Buscar setor por ID' })
     @ApiResponse({ status: 200, description: 'Setor encontrado.' })
@@ -38,6 +42,7 @@ export class SectorController {
         return this.sectorService.findById(id);
     }
 
+    @Features(Permissions.SECTORS.UPDATE)
     @Put(':id')
     @ApiOperation({ summary: 'Atualizar setor' })
     @ApiResponse({ status: 200, description: 'Setor atualizado com sucesso.' })
@@ -45,6 +50,7 @@ export class SectorController {
         return this.sectorService.update(id, dto);
     }
 
+    @Features(Permissions.SECTORS.DELETE)
     @Delete(':id')
     @ApiOperation({ summary: 'Deletar setor' })
     @ApiResponse({ status: 200, description: 'Setor removido com sucesso.' })

@@ -7,15 +7,18 @@ import { MeetingService } from '../../application/service/meeting.service';
 import { CreateMeetingDto } from '../../domain/dto/create-meeting.dto';
 import { MeetingQueryDto } from '../../domain/dto/meeting-query.dto';
 import { UpdateMeetingDto } from '../../domain/dto/update-meeting.dto';
-import moment from 'moment';
+import { PermissionsGuard } from 'src/modules/permissions/presentation/guards/permissions.guard';
+import { Permissions } from 'src/shared/features';
+import { Features } from 'src/modules/permissions/presentation/guards/features.decorator';
 
 @ApiTags('Agendamento de Reuniões')
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'), AuthenticateGuard)
+@UseGuards(AuthGuard('jwt'), AuthenticateGuard, PermissionsGuard)
 @Controller('meetings')
 export class MeetingController {
     constructor(private readonly meetingService: MeetingService) { }
 
+    @Features(Permissions.MEETINGS.CREATE)
     @Post()
     @ApiOperation({ summary: 'Agendar nova reunião' })
     @ApiResponse({ status: 201, description: 'Reunião agendada com sucesso.' })
@@ -23,13 +26,15 @@ export class MeetingController {
         return this.meetingService.create(dto);
     }
 
+    @Features(Permissions.MEETINGS.READ_ALL, Permissions.MEETINGS.READ)
     @Get()
     @ApiOperation({ summary: 'Listar reuniões com filtros e paginação' })
     @ApiResponse({ status: 200, description: 'Lista de reuniões retornada com sucesso.' })
     async findAll(@Query() query: MeetingQueryDto) {
         return this.meetingService.findAll(query);
     }
-
+    
+    @Features(Permissions.MEETINGS.READ_BY_ID, Permissions.MEETINGS.READ)
     @Get(':id')
     @ApiOperation({ summary: 'Buscar reunião por ID' })
     @ApiResponse({ status: 200, description: 'Reunião encontrada.' })
@@ -38,6 +43,7 @@ export class MeetingController {
         return this.meetingService.findById(id);
     }
 
+    @Features(Permissions.MEETINGS.READ_ALL, Permissions.MEETINGS.READ)
     @Get('today')
     @ApiOperation({ summary: 'Listar reuniões agendadas para hoje' })
     @ApiResponse({ status: 200, description: 'Lista de reuniões de hoje retornada com sucesso.' })
@@ -45,6 +51,7 @@ export class MeetingController {
         return this.meetingService.findToday();
     }
 
+    @Features(Permissions.MEETINGS.UPDATE)
     @Put(':id')
     @ApiOperation({ summary: 'Atualizar reunião' })
     @ApiResponse({ status: 200, description: 'Reunião atualizada com sucesso.' })
@@ -52,6 +59,7 @@ export class MeetingController {
         return this.meetingService.update(id, dto);
     }
 
+    @Features(Permissions.MEETINGS.DELETE)
     @Delete(':id')
     @ApiOperation({ summary: 'Cancelar reunião' })
     @ApiResponse({ status: 200, description: 'Reunião cancelada com sucesso.' })
@@ -59,6 +67,7 @@ export class MeetingController {
         return this.meetingService.delete(id);
     }
 
+    @Features(Permissions.MEETINGS.FINISH, Permissions.MEETINGS.UPDATE)
     @Patch('finish/:id')
     @ApiOperation({
         summary: 'Finalizar reunião',

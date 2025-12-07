@@ -1,17 +1,16 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Roles } from 'src/modules/auth/presentation/decorators/roles.decorator';
 import { AuthenticateGuard } from 'src/modules/auth/presentation/guards/authenticate.guard';
+import { Features } from 'src/modules/permissions/presentation/guards/features.decorator';
 import { PermissionsGuard } from 'src/modules/permissions/presentation/guards/permissions.guard';
-import { VisitHistoryFeatures } from 'src/shared/features/visit-history.features';
+import { Permissions } from 'src/shared/features';
 import { VisitHistoryService } from '../../application/services/visit-history.service';
 import { CreateVisitHistoryDto } from '../../domain/dto/create-visit-history.dto';
 import { CreateVisitScheduleDto } from '../../domain/dto/create-visit-schedule.dto';
 import { EndVisitDto } from '../../domain/dto/end-visit.dto';
 import { StartVisitDto } from '../../domain/dto/start-visit.dto';
 import { VisitHistoryQueryDto } from '../../domain/dto/visit-history-query.dto';
-import { Features } from 'src/modules/permissions/presentation/guards/features.decorator';
 
 @ApiTags('Histórico de Visitas')
 @ApiBearerAuth()
@@ -20,6 +19,7 @@ import { Features } from 'src/modules/permissions/presentation/guards/features.d
 export class VisitHistoryController {
     constructor(private readonly visitHistoryService: VisitHistoryService) { }
 
+    @Features(Permissions.VISIT_SCHEDULES.CREATE)
     @Post('schedule')
     @ApiOperation({ summary: 'Agendar uma visita para um visitante' })
     @ApiResponse({ status: 201, description: 'Visita agendada com sucesso.' })
@@ -27,6 +27,7 @@ export class VisitHistoryController {
         return this.visitHistoryService.createVisitSchedule(createVisitScheduleDto);
     }
 
+    @Features(Permissions.VISIT_PRESENTS.CREATE)
     @Post('add')
     @ApiOperation({ summary: 'Adicionar um novo registro de visita' })
     @ApiResponse({ status: 201, description: 'Registro de visita adicionado com sucesso.' })
@@ -34,6 +35,7 @@ export class VisitHistoryController {
         return this.visitHistoryService.create(createVisitHistoryDto);
     }
 
+    @Features(Permissions.VISIT_PRESENTS.UPDATE)
     @Patch('start')
     @ApiOperation({ summary: 'Iniciar uma nova visita' })
     @ApiResponse({ status: 201, description: 'Visita iniciada com sucesso.' })
@@ -41,6 +43,7 @@ export class VisitHistoryController {
         return this.visitHistoryService.startVisit(startVisitDto.visitHistoryId);
     }
 
+    @Features(Permissions.VISIT_PRESENTS.UPDATE, Permissions.VISIT_PRESENTS.CONFIRM_EXIT)
     @Patch('leave')
     @ApiOperation({ summary: 'Finalizar a visita de um visitante' })
     @ApiResponse({ status: 200, description: 'Visita finalizada com sucesso.' })
@@ -48,12 +51,14 @@ export class VisitHistoryController {
         return this.visitHistoryService.endVisit(endVisitDto.visitHistoryId);
     }
 
+    @Features(Permissions.VISIT_SCHEDULES.CANCEL)
     @Patch('cancel/:id')
     @ApiOperation({ summary: 'Cancelar uma visita agendada pelo ID' })
     @ApiResponse({ status: 200, description: 'Visita agendada cancelada com sucesso.' })
     async cancelScheduledVisit(@Param('id') id: string) {
         return this.visitHistoryService.cancelScheduledVisit(id);
     }
+
 
     @Put(':id')
     @ApiOperation({ summary: 'Atualizar um registro de visita pelo ID' })
@@ -62,7 +67,7 @@ export class VisitHistoryController {
         return await this.visitHistoryService.update(id, updateData);
     }
 
-    @Features(VisitHistoryFeatures.READ_ALL)
+    @Features(Permissions.VISIT_PRESENTS.READ_ALL, Permissions.VISIT_SCHEDULES.READ_ALL, Permissions.VISIT_HISTORY.READ_ALL)
     @Get()
     @ApiOperation({ summary: 'Obter histórico de visitas com filtros' })
     @ApiResponse({ status: 200, description: 'Histórico de visitas retornado com sucesso.' })
@@ -70,6 +75,7 @@ export class VisitHistoryController {
         return this.visitHistoryService.findAll(query);
     }
 
+    @Features(Permissions.VISIT_PRESENTS.READ_ALL, Permissions.VISIT_SCHEDULES.READ_ALL, Permissions.VISIT_HISTORY.READ_ALL)
     @Get('total-count')
     @ApiOperation({ summary: 'Obter a contagem total de registros de visita' })
     @ApiResponse({ status: 200, description: 'Contagem total de registros de visita retornada com sucesso.' })
@@ -77,6 +83,7 @@ export class VisitHistoryController {
         return this.visitHistoryService.getTotalCount();
     }
 
+    @Features(Permissions.VISIT_PRESENTS.READ_BY_ID, Permissions.VISIT_SCHEDULES.READ_BY_ID, Permissions.VISIT_HISTORY.READ_BY_ID)
     @Get(':id')
     @ApiOperation({ summary: 'Obter um registro de visita pelo ID' })
     @ApiResponse({ status: 200, description: 'Registro de visita retornado com sucesso.' })
@@ -84,6 +91,7 @@ export class VisitHistoryController {
         return await this.visitHistoryService.findById(id);
     }
 
+    @Features(Permissions.VISIT_PRESENTS.DELETE, Permissions.VISIT_SCHEDULES.DELETE, Permissions.VISIT_HISTORY.DELETE)
     @Delete(':id')
     @ApiOperation({ summary: 'Excluir um registro de visita pelo ID' })
     @ApiResponse({ status: 200, description: 'Registro de visita excluído com sucesso.' })

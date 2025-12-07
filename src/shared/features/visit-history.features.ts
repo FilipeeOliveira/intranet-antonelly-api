@@ -20,6 +20,7 @@ export const VisitPresentsFeatures = {
 } as const;
 
 export const VisitHistoryFeatures = {
+    READ: 'VISIT_HISTORY_READ',
     READ_ALL: 'VISIT_HISTORY_READ_ALL',
     READ_BY_ID: 'VISIT_HISTORY_READ_BY_ID',
     CREATE: 'VISIT_HISTORY_CREATE',

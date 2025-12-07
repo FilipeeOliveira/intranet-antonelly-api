@@ -5,4 +5,5 @@ export const MeetingFeatures = {
     CREATE: 'MEETING_CREATE',
     UPDATE: 'MEETING_UPDATE',
     DELETE: 'MEETING_DELETE',
+    FINISH: 'MEETING_FINISH',
 } as const;
