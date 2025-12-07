@@ -1,34 +1,31 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
   Body,
-  Param,
-  Query,
+  Controller,
+  Delete,
+  Get,
   HttpCode,
   HttpStatus,
+  Param,
+  Post,
+  Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import {
-  ApiTags,
   ApiBearerAuth,
   ApiOperation,
-  ApiResponse,
-  ApiQuery,
   ApiParam,
+  ApiResponse,
+  ApiTags
 } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
+import { SkipTemporaryPasswordCheck, TemporaryPasswordGuard } from '../../../auth/presentation/guards/temporary-password.guard';
 import { UsersService } from '../../application/services/users.service';
 import { CreateUserDto } from '../../domain/dto/create-user.dto';
 import { UpdateUserDto } from '../../domain/dto/update-user.dto';
 import { UserQueryDto } from '../../domain/dto/user-query.dto';
-import { UserResponseDto, PaginatedUsersResponseDto } from '../../domain/dto/user-response.dto';
-import { AuthGuard } from '@nestjs/passport';
-import { TemporaryPasswordGuard, SkipTemporaryPasswordCheck } from '../../../auth/presentation/guards/temporary-password.guard';
-import { Roles } from '../../../auth/presentation/decorators/roles.decorator';
-import { RoleType } from '../../../auth/domain/entities/role.entity';
+import { PaginatedUsersResponseDto, UserResponseDto } from '../../domain/dto/user-response.dto';
 
 @ApiTags('Gestão de Usuários')
 @Controller('users')

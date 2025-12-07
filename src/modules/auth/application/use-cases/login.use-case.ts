@@ -1,4 +1,4 @@
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { AuthResponseDto, UserProfileDto } from '../../domain/dto/auth-reponse.dto';
@@ -33,12 +33,11 @@ export class LoginUseCase {
       email: user.email,
       sub: user.id,
       role: user.role.key,
+      permissions: user.permissions.map(p => p.feature.key),
     };
 
     try {
-      const token = this.jwtService.sign(payload, {
-        
-      });
+      const token = this.jwtService.sign(payload, {});
 
       const userProfile: UserProfileDto = {
         id: user.id,
@@ -47,6 +46,7 @@ export class LoginUseCase {
         username: user.username || undefined,
         setor: user.setor || undefined,
         role: user.role.key,
+        permissions: user.permissions.map(p => p.feature.key),
       };
 
       return {

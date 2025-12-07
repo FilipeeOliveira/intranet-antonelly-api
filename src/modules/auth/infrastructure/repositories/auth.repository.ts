@@ -28,6 +28,11 @@ export class AuthRepository implements IAuthRepository {
       where: { id },
       include: {
         role: true,
+        permissions: {
+          include: {
+            feature: true
+          }
+        },
       },
     });
 
@@ -95,6 +100,7 @@ export class AuthRepository implements IAuthRepository {
       userData.isActive,
       userData.isTemporaryPassword,
       role,
+      userData.permissions ? userData.permissions : [],
       userData.createdAt,
       userData.updatedAt,
     );

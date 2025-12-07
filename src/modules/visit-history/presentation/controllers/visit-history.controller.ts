@@ -1,17 +1,21 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Roles } from 'src/modules/auth/presentation/decorators/roles.decorator';
 import { AuthenticateGuard } from 'src/modules/auth/presentation/guards/authenticate.guard';
+import { PermissionsGuard } from 'src/modules/permissions/presentation/guards/permissions.guard';
+import { VisitHistoryFeatures } from 'src/shared/features/visit-history.features';
 import { VisitHistoryService } from '../../application/services/visit-history.service';
+import { CreateVisitHistoryDto } from '../../domain/dto/create-visit-history.dto';
+import { CreateVisitScheduleDto } from '../../domain/dto/create-visit-schedule.dto';
 import { EndVisitDto } from '../../domain/dto/end-visit.dto';
 import { StartVisitDto } from '../../domain/dto/start-visit.dto';
-import { CreateVisitScheduleDto } from '../../domain/dto/create-visit-schedule.dto';
-import { CreateVisitHistoryDto } from '../../domain/dto/create-visit-history.dto';
 import { VisitHistoryQueryDto } from '../../domain/dto/visit-history-query.dto';
+import { Features } from 'src/modules/permissions/presentation/guards/features.decorator';
 
 @ApiTags('Histórico de Visitas')
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'), AuthenticateGuard)
+@UseGuards(AuthGuard('jwt'), AuthenticateGuard, PermissionsGuard)
 @Controller('visit-history')
 export class VisitHistoryController {
     constructor(private readonly visitHistoryService: VisitHistoryService) { }
@@ -58,6 +62,7 @@ export class VisitHistoryController {
         return await this.visitHistoryService.update(id, updateData);
     }
 
+    @Features(VisitHistoryFeatures.READ_ALL)
     @Get()
     @ApiOperation({ summary: 'Obter histórico de visitas com filtros' })
     @ApiResponse({ status: 200, description: 'Histórico de visitas retornado com sucesso.' })

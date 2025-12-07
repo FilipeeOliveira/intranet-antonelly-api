@@ -1,3 +1,4 @@
+import { Feature } from "@prisma/client";
 import { Role } from "./role.entity";
 
 export class User {
@@ -12,7 +13,13 @@ export class User {
     public readonly isActive: boolean,
     public readonly isTemporaryPassword: boolean,
     public readonly role: Role,
+    public readonly permissions: {
+      id: string;
+      userId: string;
+      featureId: string;
+      feature: Feature;
+    }[],
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
-  ) {}
+  ) { }
 }
