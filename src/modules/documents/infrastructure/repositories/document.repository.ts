@@ -94,6 +94,7 @@ export class DocumentRepository {
     description?: string;
     filePath: string;
     version: string;
+    versionNote?: string;
     status: string;
   }) {
     return this.prisma.documentHistory.create({ data });
@@ -106,6 +107,7 @@ export class DocumentRepository {
     department: string;
     status: DocumentStatus;
     version: string;
+    versionNote: string;
     filePath: string;
   }>) {
     return this.prisma.document.update({

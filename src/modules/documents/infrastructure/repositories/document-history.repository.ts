@@ -95,4 +95,10 @@ export class DocumentHistoryRepository {
             where: { id },
         });
     }
+
+    async deleteByDocumentId(documentId: string) {
+        return this.prisma.documentHistory.deleteMany({
+            where: { documentId },
+        });
+    }
 }
