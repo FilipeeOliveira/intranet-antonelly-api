@@ -10,7 +10,7 @@ export class MeetingCron {
 
     @Cron(CronExpression.EVERY_MINUTE)
     async handleStatusUpdate() {
-        this.logger.log('⌚ CronJob - Running reservation status update cron...⌚');
+        this.logger.log('CronJob - Running reservation status update cron...');
 
         const now = new Date();
 
