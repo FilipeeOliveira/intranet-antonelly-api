@@ -6,6 +6,8 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
+import { FEATURES_KEY } from './features.decorator';
+import { Permissions } from 'src/shared/features';
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
@@ -16,9 +18,12 @@ export class PermissionsGuard implements CanActivate {
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const requiredFeatures = this.reflector.get<string[]>(
-            'features',
+            FEATURES_KEY,
             context.getHandler(),
         );
+
+        console.log("Permissions: ", Permissions);
+
         if (!requiredFeatures || requiredFeatures.length === 0) return true;
 
         const request = context.switchToHttp().getRequest();

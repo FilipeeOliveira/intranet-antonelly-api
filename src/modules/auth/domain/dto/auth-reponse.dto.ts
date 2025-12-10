@@ -19,6 +19,13 @@ export class UserProfileDto {
 
   @ApiProperty({ description: 'Cargo do usuário', enum: RoleType })
   role: RoleType;
+
+  @ApiProperty({
+    description: 'Permissões do usuário',
+    isArray: true,
+    required: false,
+  })
+  permissions?: string[];
 }
 
 export class AuthResponseDto {

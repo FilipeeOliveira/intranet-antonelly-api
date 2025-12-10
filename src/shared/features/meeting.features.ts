@@ -1,6 +1,9 @@
 export const MeetingFeatures = {
     READ: 'MEETING_READ',
+    READ_ALL: 'MEETING_READ_ALL',
+    READ_BY_ID: 'MEETING_READ_BY_ID',   
     CREATE: 'MEETING_CREATE',
     UPDATE: 'MEETING_UPDATE',
     DELETE: 'MEETING_DELETE',
+    FINISH: 'MEETING_FINISH',
 } as const;

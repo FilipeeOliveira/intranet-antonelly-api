@@ -11,10 +11,13 @@ import { Response } from "express";
 import { join } from "path";
 import * as fs from "fs";
 import { UpdateCommuniqueDto } from "../domain/dtos/update-communique.dto";
+import { PermissionsGuard } from "src/modules/permissions/presentation/guards/permissions.guard";
+import { Features } from "src/modules/permissions/presentation/guards/features.decorator";
+import { Permissions } from "src/shared/features";
 
 @ApiTags("Gestão de Comunicados")
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'), AuthenticateGuard)
+@UseGuards(AuthGuard('jwt'), AuthenticateGuard, PermissionsGuard)
 @Controller('communique')
 export class CommuniqueController {
 
@@ -22,6 +25,7 @@ export class CommuniqueController {
         private readonly communiqueService: CommuniqueService
     ) { }
 
+    @Features(Permissions.COMMUNIQUES.CREATE)
     @Post()
     @UseInterceptors(imageFileInterceptor())
     @ApiConsumes("multipart/form-data")
@@ -52,6 +56,7 @@ export class CommuniqueController {
         return this.communiqueService.create(body, imagePath);
     }
 
+    @Features(Permissions.COMMUNIQUES.READ_BY_ID, Permissions.COMMUNIQUES.READ)
     @Get(':id')
     async getCommuniqueById(
         @Param('id') id: string
@@ -59,7 +64,7 @@ export class CommuniqueController {
         return this.communiqueService.findById(id);
     }
 
-
+    @Features(Permissions.COMMUNIQUES.READ_ALL, Permissions.COMMUNIQUES.READ)
     @Get()
     async getAllCommuniques(
         @Query() query: CommuniqueQueryDto
@@ -67,6 +72,7 @@ export class CommuniqueController {
         return this.communiqueService.findAll(query);
     }
 
+    @Features(...Object.values(Permissions.COMMUNIQUES))
     @Get("image/:filename")
     async viewImage(
         @Param("filename") filename: string,
@@ -81,6 +87,7 @@ export class CommuniqueController {
         return res.sendFile(imagePath);
     }
 
+    @Features(Permissions.COMMUNIQUES.UPDATE)
     @Put(':id')
     @UseInterceptors(imageFileInterceptor())
     @ApiConsumes("multipart/form-data")
@@ -110,6 +117,7 @@ export class CommuniqueController {
         return this.communiqueService.update(id, body, imagePath);
     }
 
+    @Features(Permissions.COMMUNIQUES.DELETE)
     @Delete(':id')
     async deleteCommunique(
         @Param('id') id: string

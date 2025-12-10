@@ -6,14 +6,18 @@ import { CompanyService } from '../../application/services/companie.service';
 import { CreateCompanyDto } from '../../domain/dto/create-company.dto';
 import { CompaniesQueryDto } from '../../domain/dto/companies-query.dto';
 import { UpdateCompanyDto } from '../../domain/dto/update-companie.dto';
+import { PermissionsGuard } from 'src/modules/permissions/presentation/guards/permissions.guard';
+import { Features } from 'src/modules/permissions/presentation/guards/features.decorator';
+import { Permissions } from 'src/shared/features';
 
 @ApiTags('Empresas')
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'), AuthenticateGuard)
+@UseGuards(AuthGuard('jwt'), AuthenticateGuard, PermissionsGuard)
 @Controller('companies')
 export class CompanyController {
   constructor(private readonly companyService: CompanyService) { }
 
+  @Features(Permissions.COMPANIES.CREATE)
   @Post()
   @ApiOperation({ summary: 'Criar nova empresa' })
   @ApiResponse({ status: 201, description: 'Empresa criada com sucesso.' })
@@ -21,6 +25,7 @@ export class CompanyController {
     return this.companyService.create(dto);
   }
 
+  @Features(Permissions.COMPANIES.READ_ALL, Permissions.COMPANIES.READ)
   @Get()
   @ApiOperation({ summary: 'Listar empresas com filtros e paginação' })
   @ApiResponse({ status: 200, description: 'Lista de empresas retornada com sucesso.' })
@@ -28,6 +33,7 @@ export class CompanyController {
     return this.companyService.findAll(query);
   }
 
+  @Features(Permissions.COMPANIES.READ_ALL, Permissions.COMPANIES.READ)
   @Get(':id')
   @ApiOperation({ summary: 'Buscar empresa por ID' })
   @ApiResponse({ status: 200, description: 'Empresa encontrada.' })
@@ -36,6 +42,7 @@ export class CompanyController {
     return this.companyService.findById(id);
   }
 
+  @Features(Permissions.COMPANIES.UPDATE)
   @Put(':id')
   @ApiOperation({ summary: 'Atualizar empresa' })
   @ApiResponse({ status: 200, description: 'Empresa atualizada com sucesso.' })
@@ -43,6 +50,7 @@ export class CompanyController {
     return this.companyService.update(id, dto);
   }
 
+  @Features(Permissions.COMPANIES.DELETE)
   @Delete(':id')
   @ApiOperation({ summary: 'Deletar empresa' })
   @ApiResponse({ status: 200, description: 'Empresa removida com sucesso.' })
