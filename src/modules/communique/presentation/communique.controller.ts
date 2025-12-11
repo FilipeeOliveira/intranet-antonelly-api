@@ -18,7 +18,7 @@ import { Permissions } from "src/shared/features";
 @ApiTags("Gestão de Comunicados")
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'), AuthenticateGuard, PermissionsGuard)
-@Controller('communique')
+@Controller('communiques')
 export class CommuniqueController {
 
     constructor(
