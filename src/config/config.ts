@@ -11,6 +11,7 @@ export const envConfig = {
     DATABASE_PORT: process.env.DATABASE_PORT,
     JWT_SECRET: process.env.JWT_SECRET,
     JWT_EXP: process.env.JWT_EXP,
+    API_URL: process.env.API_URL || `http://localhost:${process.env.PORT}`,
     PORT: process.env.PORT,
     MODE: process.env.MODE || 'dev',
 } as const;

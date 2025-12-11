@@ -7,6 +7,7 @@ import { CommuniqueRepository } from "../../infrasctructure/repositories/communi
 import { promises as fs } from "fs";
 import * as path from "path";
 import { join } from "path";
+import { envConfig } from "src/config/config";
 import { SectorRepository } from "src/modules/sectors/infrastructure/repositories/sector.repository";
 import { UsersRepository } from "src/modules/users/infrastructure/repositories/users.repository";
 
@@ -18,10 +19,11 @@ export class CommuniqueService {
         private readonly userRepository: UsersRepository,
     ) { }
 
-    async create(data: CreateCommuniqueDto, imagePath: string) {
+    async create(data: CreateCommuniqueDto, filename: string) {
         return this.communiqueRepository.create({
             ...data,
-            imagePath: `/uploads/communiques/${imagePath}`,
+            imagePath: `/uploads/communiques/${filename}`,
+            imageUrl: envConfig.API_URL + `api/v1/communiques/image/${filename}`,
         });
     }
 
@@ -51,7 +53,7 @@ export class CommuniqueService {
                 authorId: dto.authorId ? dto.authorId : communique.authorId,
             };
 
-            
+
             // 2. Validar setor SOMENTE SE foi enviado no DTO
             if (dto.sectorId) {
                 const sector = await this.sectorRepository.findById(dto.sectorId);
@@ -126,6 +128,21 @@ export class CommuniqueService {
     }
 
     async delete(id: string) {
+
+        const communique = await this.communiqueRepository.findById(id);
+        if (!communique) throw new NotFoundException("Comunicado não encontrado.");
+
+        // Remover imagem associada
+        if (communique.imagePath) {
+            const imagePath = join(process.cwd(), communique.imagePath);
+            try {
+                await fs.unlink(imagePath);
+            }
+            catch (err) {
+                console.warn("Não foi possível deletar a imagem do comunicado:", err);
+            }
+        }
+
         return this.communiqueRepository.delete(id);
     }
 
