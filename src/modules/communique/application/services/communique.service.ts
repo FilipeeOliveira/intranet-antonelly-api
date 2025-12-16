@@ -103,6 +103,7 @@ export class CommuniqueService {
                 }
 
                 updateData.imagePath = `/uploads/communiques/${imagePath}`
+                updateData.imageUrl = envConfig.API_URL + `/api/v1/communiques/image/${imagePath}`
             }
 
             // 6. Limpar undefined
