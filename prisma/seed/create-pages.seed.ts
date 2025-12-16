@@ -6,10 +6,10 @@ const prisma = new PrismaClient();
 export async function createPagesSeed() {
 
     const usersPage = await prisma.page.upsert({
-        where: { name: 'USERS' },
+        where: { name: 'USUÁRIOS' },
         update: {},
         create: {
-            name: 'USERS',
+            name: 'USUÁRIOS',
             features: {
                 create: [
                     {
@@ -59,10 +59,10 @@ export async function createPagesSeed() {
 
 
     const companiesPage = await prisma.page.upsert({
-        where: { name: 'COMPANIES' },
+        where: { name: 'EMPRESAS' },
         update: {},
         create: {
-            name: 'COMPANIES',
+            name: 'EMPRESAS',
             features: {
                 create: [
                     {
@@ -101,10 +101,10 @@ export async function createPagesSeed() {
     });
 
     const communiquesPage = await prisma.page.upsert({
-        where: { name: 'COMMUNIQUES' },
+        where: { name: 'COMUNICADOS' },
         update: {},
         create: {
-            name: 'COMMUNIQUES',
+            name: 'COMUNICADOS',
             features: {
                 create: [
                     {
@@ -314,10 +314,10 @@ export async function createPagesSeed() {
     });
 
     const meetingsPage = await prisma.page.upsert({
-        where: { name: 'MEETINGS' },
+        where: { name: 'RESERVAS_DE_SALAS' },
         update: {},
         create: {
-            name: 'MEETINGS',
+            name: 'RESERVAS_DE_SALAS',
             features: {
                 create: [
                     {
@@ -361,10 +361,10 @@ export async function createPagesSeed() {
     });
 
     const sectorsPage = await prisma.page.upsert({
-        where: { name: 'SECTORS' },
+        where: { name: 'SETORES' },
         update: {},
         create: {
-            name: 'SECTORS',
+            name: 'SETORES',
             features: {
                 create: [
                     {
@@ -403,10 +403,10 @@ export async function createPagesSeed() {
     });
 
     const roomsPage = await prisma.page.upsert({
-        where: { name: 'ROOMS' },
+        where: { name: 'SALAS' },
         update: {},
         create: {
-            name: 'ROOMS',
+            name: 'SALAS',
             features: {
                 create: [
                     {
