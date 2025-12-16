@@ -445,10 +445,10 @@ export async function createPagesSeed() {
     });
 
     const permissionsPage = await prisma.page.upsert({
-        where: { name: 'PERMISSIONS' },
+        where: { name: 'PERMISSÕES' },
         update: {},
         create: {
-            name: 'PERMISSIONS',
+            name: 'PERMISSÕES',
             features: {
                 create: [
                     {
