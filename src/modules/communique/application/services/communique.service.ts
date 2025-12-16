@@ -7,8 +7,10 @@ import { CommuniqueRepository } from "../../infrasctructure/repositories/communi
 import { promises as fs } from "fs";
 import * as path from "path";
 import { join } from "path";
+import { envConfig } from "src/config/config";
 import { SectorRepository } from "src/modules/sectors/infrastructure/repositories/sector.repository";
 import { UsersRepository } from "src/modules/users/infrastructure/repositories/users.repository";
+import { CommuniquesGateway } from "../../infrasctructure/gateways/communiques.gateway";
 
 @Injectable()
 export class CommuniqueService {
@@ -16,13 +18,19 @@ export class CommuniqueService {
         private readonly communiqueRepository: CommuniqueRepository,
         private readonly sectorRepository: SectorRepository,
         private readonly userRepository: UsersRepository,
+        private readonly communiquesGateway: CommuniquesGateway
     ) { }
 
-    async create(data: CreateCommuniqueDto, imagePath: string) {
-        return this.communiqueRepository.create({
+    async create(data: CreateCommuniqueDto, filename: string) {
+        const communique = await this.communiqueRepository.create({
             ...data,
-            imagePath: `/uploads/communiques/${imagePath}`,
+            imagePath: `/uploads/communiques/${filename}`,
+            imageUrl: envConfig.API_URL + `/api/v1/communiques/image/${filename}`,
         });
+
+        this.communiquesGateway.emitCreated(communique);
+
+        return communique;
     }
 
     async findById(id: string) {
@@ -39,93 +47,120 @@ export class CommuniqueService {
         dto: Partial<UpdateCommuniqueDto>,
         imagePath?: string
     ) {
-
         try {
-            // 1. Buscar comunicado
-            const communique = await this.communiqueRepository.findById(id);
-            if (!communique) throw new NotFoundException("Comunicado não encontrado.");
+            // 1. Buscar comunicado (JÁ COM RELATIONS)
+            const communique = await this.communiqueRepository.findById(id)
+            if (!communique) {
+                throw new NotFoundException('Comunicado não encontrado.')
+            }
 
+            // 2. Montar dados de update (fallback para valores atuais)
             const updateData: any = {
                 ...dto,
-                sectorId: dto.sectorId ? dto.sectorId : communique.sectorId,
-                authorId: dto.authorId ? dto.authorId : communique.authorId,
-            };
+                sectorId: dto.sectorId ?? communique.sectorId,
+                authorId: dto.authorId ?? communique.authorId,
+            }
 
-            
-            // 2. Validar setor SOMENTE SE foi enviado no DTO
+            // 3. Validar setor SOMENTE se enviado
             if (dto.sectorId) {
-                const sector = await this.sectorRepository.findById(dto.sectorId);
-
+                const sector = await this.sectorRepository.findById(dto.sectorId)
                 if (!sector) {
-                    throw new BadRequestException("Setor não encontrado. Verifique o ID do setor.");
+                    throw new BadRequestException(
+                        'Setor não encontrado. Verifique o ID do setor.'
+                    )
                 }
-
-                updateData.sectorId = dto.sectorId;
             }
 
+            // 4. Validar autor SOMENTE se enviado
             if (dto.authorId) {
-                const author = await this.userRepository.findById(dto.authorId);
-
+                const author = await this.userRepository.findById(dto.authorId)
                 if (!author) {
-                    throw new BadRequestException("Autor não encontrado. Verifique o ID do autor.");
+                    throw new BadRequestException(
+                        'Autor não encontrado. Verifique o ID do autor.'
+                    )
                 }
-
-                updateData.authorId = dto.authorId;
             }
 
-            // 3. Se existir nova imagem — validar e substituir
+            // 5. Nova imagem (se existir)
             if (imagePath) {
-
-                // Valida extensão
-                const validExtensions = [".png", ".jpg", ".jpeg", ".webp"];
-                const ext = path.extname(imagePath).toLowerCase();
+                const validExtensions = ['.png', '.jpg', '.jpeg', '.webp']
+                const ext = path.extname(imagePath).toLowerCase()
 
                 if (!validExtensions.includes(ext)) {
-                    throw new BadRequestException("Apenas imagens PNG, JPG, JPEG ou WEBP são permitidas.");
+                    throw new BadRequestException(
+                        'Apenas imagens PNG, JPG, JPEG ou WEBP são permitidas.'
+                    )
                 }
 
-                // Remover imagem antiga se existir
+                // Remove imagem antiga
                 if (communique.imagePath) {
-                    const oldImagePath = join(process.cwd(), communique.imagePath);
-
+                    const oldImagePath = join(process.cwd(), communique.imagePath)
                     try {
-                        await fs.unlink(oldImagePath);
+                        await fs.unlink(oldImagePath)
                     } catch (err) {
-                        console.warn("Não foi possível deletar a imagem antiga:", err);
+                        console.warn('Não foi possível deletar a imagem antiga:', err)
                     }
                 }
 
-                // Atualiza caminho da nova imagem
-                updateData.imagePath = `/uploads/communiques/${imagePath}`;
+                updateData.imagePath = `/uploads/communiques/${imagePath}`
+                updateData.imageUrl = envConfig.API_URL + `/api/v1/communiques/image/${imagePath}`
             }
 
-
+            // 6. Limpar undefined
             for (const key in updateData) {
                 if (updateData[key] === undefined) {
-                    delete updateData[key];
+                    delete updateData[key]
                 }
             }
 
-            // 4. Atualizar no repositório
-            const updated = await this.communiqueRepository.update(id, updateData);
+            // 7. Persistir no banco
+            await this.communiqueRepository.update(id, updateData)
 
-            // 5. Retorno com nome da imagem extraído automaticamente
-            return {
-                ...updated,
-                imageName: updated.imagePath ? path.basename(updated.imagePath) : null,
-            };
-        }
-        catch (error) {
+            // 8. MERGE EM MEMÓRIA (preserva relations)
+            const updatedCommunique = {
+                ...communique,   // mantém relations
+                ...updateData,   // sobrescreve campos simples
+            }
 
-            console.error("Erro ao atualizar comunicado:", error);
+            const response = {
+                ...updatedCommunique,
+                imageName: updatedCommunique.imagePath
+                    ? path.basename(updatedCommunique.imagePath)
+                    : null,
+            }
 
-            if (error instanceof HttpException) throw error;
+            // 9. Emitir evento WS com objeto COMPLETO
+            this.communiquesGateway.emitUpdated(response)
 
-            throw new InternalServerErrorException("Erro ao atualizar comunicado.");
+            return response
+        } catch (error) {
+            console.error('Erro ao atualizar comunicado:', error)
+
+            if (error instanceof HttpException) throw error
+
+            throw new InternalServerErrorException('Erro ao atualizar comunicado.')
         }
     }
 
+
     async delete(id: string) {
+
+        const communique = await this.communiqueRepository.findById(id);
+        if (!communique) throw new NotFoundException("Comunicado não encontrado.");
+
+        // Remover imagem associada
+        if (communique.imagePath) {
+            const imagePath = join(process.cwd(), communique.imagePath);
+            try {
+                await fs.unlink(imagePath);
+            }
+            catch (err) {
+                console.warn("Não foi possível deletar a imagem do comunicado:", err);
+            }
+        }
+
+        this.communiquesGateway.emitDeleted(id);
+
         return this.communiqueRepository.delete(id);
     }
 

@@ -19,6 +19,14 @@ export class UpdateCommuniqueDto {
     description?: string;
 
     @ApiProperty({
+        description: 'Nível de severidade do comunicado',
+        example: 'INFO',
+    })
+    @IsString({ message: 'Severity deve ser uma string' })
+    @IsOptional()
+    severity?: string;
+
+    @ApiProperty({
         description: 'ID do autor do comunicado',
         example: 'uuid-do-autor',
     })

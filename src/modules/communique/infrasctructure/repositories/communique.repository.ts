@@ -8,11 +8,57 @@ export class CommuniqueRepository {
     constructor(private readonly prisma: PrismaService) { }
 
     async create(data: any) {
-        return this.prisma.communique.create({ data });
+        const createdData = await this.prisma.communique.create({ data });
+        let communique = await this.findById(createdData.id);
+
+        return communique;
     }
 
     async findById(id: string) {
-        return this.prisma.communique.findUnique({ where: { id } });
+        let communique = await this.prisma.communique.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                title: true,
+                description: true,
+                severity: true,
+                imagePath: true,
+                sectorId: true,
+                authorId: true,
+                createdAt: true,
+                updatedAt: true,
+                author: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        role: {
+                            select: {
+                                id: true,
+                                key: true,
+                                description: true,
+                            }
+                        },
+                        sector: {
+                            select: {
+                                id: true,
+                                name: true,
+                                description: true,
+                            }
+                        }
+                    }
+                },
+                sector: {
+                    select: {
+                        id: true,
+                        name: true,
+                        description: true,
+                    }
+                },
+            }
+        });
+
+        return communique;
     }
 
     async findAll(query: CommuniqueQueryDto) {
@@ -31,7 +77,7 @@ export class CommuniqueRepository {
                     author: {
                         name: {
                             contains: search, mode: 'insensitive',
-                        }
+                        },
                     }
                 },
                 { severity: { contains: search, mode: 'insensitive' } },
@@ -61,7 +107,18 @@ export class CommuniqueRepository {
                 skip,
                 take: limit,
                 orderBy,
-                include: { sector: true },
+                include: {
+                    author: {
+                        select: {
+                            id: true,
+                            name: true,
+                            email: true,
+                            role: true,
+                            sector: true,
+                        },
+                    },
+                    sector: true
+                }
             }),
             this.prisma.communique.count({ where }),
         ]);

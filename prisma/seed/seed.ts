@@ -10,6 +10,7 @@ import { createRoomsSeed } from './create-rooms.seed';
 import { createVisitHistorySeed } from './create-visit-history.seed';
 import { createMeetingScheduleSeed } from './create-meeting-schedule.seed';
 import { createUsersFeatures } from './create-users-features';
+import { createCommuniquesSeed } from './create-communiques.seed';
 dotenv.config();
 
 const prisma = new PrismaClient();
@@ -26,6 +27,7 @@ async function main() {
   const visitHistoryCreated = await createVisitHistorySeed();
   const meetingScheduleCreated = await createMeetingScheduleSeed();
   const usersFeaturesCreated = await createUsersFeatures();
+  const communiquesCreated = await createCommuniquesSeed();
 
   console.log('🌱 Seed finalizada com sucesso!');
 }

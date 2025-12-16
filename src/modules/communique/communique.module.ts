@@ -6,6 +6,7 @@ import { CommuniqueRepository } from "./infrasctructure/repositories/communique.
 import { CommuniqueController } from "./presentation/communique.controller";
 import { SectorsModule } from "../sectors/sectors.module";
 import { UsersModule } from "../users/users.module";
+import { CommuniquesGateway } from "./infrasctructure/gateways/communiques.gateway";
 
 @Module({
     imports: [
@@ -19,6 +20,7 @@ import { UsersModule } from "../users/users.module";
     providers: [
         CommuniqueService,
         CommuniqueRepository,
+        CommuniquesGateway
     ],
     exports: [
         CommuniqueService

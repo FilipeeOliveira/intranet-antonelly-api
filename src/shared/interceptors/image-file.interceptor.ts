@@ -9,13 +9,13 @@ export const imageFileInterceptor = (fieldName = "image") =>
       destination: "./uploads/communiques",
       filename: (req, file, callback) => {
         // Corrige caracteres especiais
-        const originalName = Buffer.from(file.originalname, "latin1").toString("utf8");
+        const originalName = Buffer.from(file.originalname.trim(), "latin1").toString("utf8");
         const nameWithoutExt = originalName.replace(extname(originalName), "");
 
         const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
         const extension = extname(originalName);
 
-        callback(null, `${nameWithoutExt}-${uniqueSuffix}${extension}`);
+        callback(null, `${uniqueSuffix}${extension}`);
       },
     }),
     fileFilter: (req, file, callback) => {

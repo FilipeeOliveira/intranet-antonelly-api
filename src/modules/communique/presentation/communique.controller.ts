@@ -14,11 +14,13 @@ import { UpdateCommuniqueDto } from "../domain/dtos/update-communique.dto";
 import { PermissionsGuard } from "src/modules/permissions/presentation/guards/permissions.guard";
 import { Features } from "src/modules/permissions/presentation/guards/features.decorator";
 import { Permissions } from "src/shared/features";
+import { JwtAuthGuard } from "src/modules/auth/presentation/guards/jwt-auth.guard";
+import { Public } from "src/modules/auth/presentation/decorators/public.decorator";
 
 @ApiTags("Gestão de Comunicados")
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'), AuthenticateGuard, PermissionsGuard)
-@Controller('communique')
+@UseGuards(JwtAuthGuard, AuthenticateGuard, PermissionsGuard)
+@Controller('communiques')
 export class CommuniqueController {
 
     constructor(
@@ -72,7 +74,8 @@ export class CommuniqueController {
         return this.communiqueService.findAll(query);
     }
 
-    @Features(...Object.values(Permissions.COMMUNIQUES))
+    // @Features(...Object.values(Permissions.COMMUNIQUES))
+    @Public()
     @Get("image/:filename")
     async viewImage(
         @Param("filename") filename: string,
