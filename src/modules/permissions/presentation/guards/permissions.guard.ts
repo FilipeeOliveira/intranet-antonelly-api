@@ -22,8 +22,6 @@ export class PermissionsGuard implements CanActivate {
             context.getHandler(),
         );
 
-        console.log("Permissions: ", Permissions);
-
         if (!requiredFeatures || requiredFeatures.length === 0) return true;
 
         const request = context.switchToHttp().getRequest();

@@ -77,7 +77,7 @@ export class CommuniqueRepository {
                     author: {
                         name: {
                             contains: search, mode: 'insensitive',
-                        }
+                        },
                     }
                 },
                 { severity: { contains: search, mode: 'insensitive' } },
@@ -108,7 +108,15 @@ export class CommuniqueRepository {
                 take: limit,
                 orderBy,
                 include: {
-                    author: true,
+                    author: {
+                        select: {
+                            id: true,
+                            name: true,
+                            email: true,
+                            role: true,
+                            sector: true,
+                        },
+                    },
                     sector: true
                 }
             }),
