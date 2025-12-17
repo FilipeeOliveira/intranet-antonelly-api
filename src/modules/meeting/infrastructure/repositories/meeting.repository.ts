@@ -68,7 +68,27 @@ export class MeetingRepository {
                 include: {
                     Sector: true,
                     Room: true,
-                    Responsible: true,
+                    Responsible: {
+                        select: {
+                            id: true,
+                            name: true,
+                            email: true,
+                            sector: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    description: true
+                                }
+                            },
+                            role: {
+                                select: {
+                                    id: true,
+                                    key: true,
+                                    description: true,
+                                }
+                            }
+                        },
+                    },
                 },
             }),
             this.prisma.meetingSchedule.count({ where }),
@@ -123,7 +143,20 @@ export class MeetingRepository {
             include: {
                 Sector: true,
                 Room: true,
-                Responsible: true,
+                Responsible: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        role: {
+                            select: {
+                                id: true,
+                                key: true,
+                                description: true,
+                            }
+                        }
+                    },
+                },
             },
         });
     }

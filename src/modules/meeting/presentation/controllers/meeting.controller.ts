@@ -3,13 +3,13 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagg
 
 import { AuthGuard } from '@nestjs/passport';
 import { AuthenticateGuard } from 'src/modules/auth/presentation/guards/authenticate.guard';
+import { Features } from 'src/modules/permissions/presentation/guards/features.decorator';
+import { PermissionsGuard } from 'src/modules/permissions/presentation/guards/permissions.guard';
+import { Permissions } from 'src/shared/features';
 import { MeetingService } from '../../application/service/meeting.service';
 import { CreateMeetingDto } from '../../domain/dto/create-meeting.dto';
 import { MeetingQueryDto } from '../../domain/dto/meeting-query.dto';
 import { UpdateMeetingDto } from '../../domain/dto/update-meeting.dto';
-import { PermissionsGuard } from 'src/modules/permissions/presentation/guards/permissions.guard';
-import { Permissions } from 'src/shared/features';
-import { Features } from 'src/modules/permissions/presentation/guards/features.decorator';
 
 @ApiTags('Agendamento de Reuniões')
 @ApiBearerAuth()
