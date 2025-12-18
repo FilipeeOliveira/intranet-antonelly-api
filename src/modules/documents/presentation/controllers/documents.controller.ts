@@ -103,11 +103,12 @@ export class DocumentsController {
         }
 
         const filePath = document.filePath;
+        const filename = `${document.title}.pdf`;
+        const encodedFilename = encodeURIComponent(filename);
 
-        // força o navegador a baixar o arquivo
         res.setHeader(
             "Content-Disposition",
-            `attachment; filename="${document.title}.pdf"`
+            `attachment; filename="${filename}"; filename*=UTF-8''${encodedFilename}`
         );
         res.setHeader("Content-Type", "application/pdf");
 
@@ -233,11 +234,12 @@ export class DocumentsController {
         }
 
         const filePath = document.filePath;
+        const filename = `${document.title}.pdf`;
+        const encodedFilename = encodeURIComponent(filename);
 
-        // força o navegador a baixar o arquivo
         res.setHeader(
             "Content-Disposition",
-            `attachment; filename="${document.title}.pdf"`
+            `attachment; filename="${filename}"; filename*=UTF-8''${encodedFilename}`
         );
         res.setHeader("Content-Type", "application/pdf");
 

@@ -6,7 +6,7 @@ import { BadRequestException } from "@nestjs/common";
 export const pdfFileInterceptor = (fieldName = "document") =>
   FileInterceptor(fieldName, {
     storage: diskStorage({
-      destination: "./uploads/documents",
+      destination: "./uploads/documents/current",
       filename: (req, file, callback) => {
         const originalName = Buffer.from(file.originalname, 'latin1').toString('utf8');
         const nameWithoutExt = originalName.replace(extname(originalName), '');

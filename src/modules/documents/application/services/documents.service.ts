@@ -168,7 +168,11 @@ export class DocumentsService {
                 const oldPath = join(process.cwd(), document.filePath);
                 const historyDir = join(process.cwd(), 'uploads/documents/history');
 
-                const oldFileName = path.basename(document.filePath);
+                const fileNameWithoutExt = document.filePath.replace('.pdf', '');
+                const fileVersionSafe = document.version.replace('.', '_');
+                const finalFileName = fileNameWithoutExt + '_v' + fileVersionSafe + '.pdf';
+
+                const oldFileName = path.basename(finalFileName);
                 const historyPath = join(historyDir, oldFileName);
 
                 // garantir diretório
