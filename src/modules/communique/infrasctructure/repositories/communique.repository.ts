@@ -99,7 +99,7 @@ export class CommuniqueRepository {
 
         // Construir ordenação
         const orderBy: any = {};
-        orderBy[sortBy || 'title'] = sortOrder || 'asc';
+        orderBy[sortBy || 'createdAt'] = sortOrder || 'desc';
 
         const [communiques, total] = await Promise.all([
             this.prisma.communique.findMany({

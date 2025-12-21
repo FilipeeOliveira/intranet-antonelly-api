@@ -36,6 +36,10 @@ export class UsersService {
     return user;
   }
 
+  async findAllBySector(sectorId: string) {
+    return await this.usersRepository.findAllBySector(sectorId);
+  }
+
   async create(createUserDto: CreateUserDto) {
     this.logger.log(`Criando novo usuário: ${createUserDto.email}`);
 

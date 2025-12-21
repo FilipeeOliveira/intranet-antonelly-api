@@ -1,15 +1,17 @@
 import { Module } from "@nestjs/common";
+import { EmailModule } from "../email/email.module";
 import { PrismaModule } from "../prisma/prisma.module";
-import { SectorService } from "../sectors/application/services/sector.service";
-import { CommuniqueService } from "./application/services/communique.service";
-import { CommuniqueRepository } from "./infrasctructure/repositories/communique.repository";
-import { CommuniqueController } from "./presentation/communique.controller";
 import { SectorsModule } from "../sectors/sectors.module";
 import { UsersModule } from "../users/users.module";
+import { CommuniqueService } from "./application/services/communique.service";
 import { CommuniquesGateway } from "./infrasctructure/gateways/communiques.gateway";
+import { CommuniqueRepository } from "./infrasctructure/repositories/communique.repository";
+import { CommuniqueController } from "./presentation/communique.controller";
+import { SendEmailCommuniqueBySector } from "./application/use-cases/send-email-communique-by-sector";
 
 @Module({
     imports: [
+        EmailModule,
         PrismaModule,
         SectorsModule,
         UsersModule
@@ -20,10 +22,12 @@ import { CommuniquesGateway } from "./infrasctructure/gateways/communiques.gatew
     providers: [
         CommuniqueService,
         CommuniqueRepository,
-        CommuniquesGateway
+        CommuniquesGateway,
+        SendEmailCommuniqueBySector
     ],
     exports: [
-        CommuniqueService
+        CommuniqueService,
+        SendEmailCommuniqueBySector
     ],
 })
 export class CommuniqueModule { }

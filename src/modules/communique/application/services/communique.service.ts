@@ -11,6 +11,8 @@ import { envConfig } from "src/config/config";
 import { SectorRepository } from "src/modules/sectors/infrastructure/repositories/sector.repository";
 import { UsersRepository } from "src/modules/users/infrastructure/repositories/users.repository";
 import { CommuniquesGateway } from "../../infrasctructure/gateways/communiques.gateway";
+import { EmailService } from "src/modules/email/application/services/email.service";
+import { SendEmailCommuniqueBySector } from "../use-cases/send-email-communique-by-sector";
 
 @Injectable()
 export class CommuniqueService {
@@ -18,7 +20,9 @@ export class CommuniqueService {
         private readonly communiqueRepository: CommuniqueRepository,
         private readonly sectorRepository: SectorRepository,
         private readonly userRepository: UsersRepository,
-        private readonly communiquesGateway: CommuniquesGateway
+        private readonly communiquesGateway: CommuniquesGateway,
+        private readonly emailService: EmailService,
+        private readonly sendEmailCommuniqueBySector: SendEmailCommuniqueBySector,
     ) { }
 
     async create(data: CreateCommuniqueDto, filename: string) {
@@ -27,6 +31,19 @@ export class CommuniqueService {
             imagePath: `/uploads/communiques/${filename}`,
             imageUrl: envConfig.API_URL + `/api/v1/communiques/image/${filename}`,
         });
+
+        this.sendEmailCommuniqueBySector.execute(
+            communique.sectorId,
+            {
+                title: communique.title,
+                description: communique.description,
+                severity: communique.severity,
+                imageUrl: communique.imagePath,
+                sector: communique.sector,
+                author: communique.author,
+                createdAt: communique.createdAt.toISOString(),
+            }
+        );
 
         this.communiquesGateway.emitCreated(communique);
 
