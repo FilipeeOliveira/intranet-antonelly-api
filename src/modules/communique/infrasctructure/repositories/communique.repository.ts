@@ -22,6 +22,7 @@ export class CommuniqueRepository {
                 title: true,
                 description: true,
                 severity: true,
+                imageUrl: true,
                 imagePath: true,
                 sectorId: true,
                 authorId: true,
