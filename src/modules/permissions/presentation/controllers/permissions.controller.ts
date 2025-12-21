@@ -57,4 +57,22 @@ export class PermissionsController {
     ) {
         return this.permissionsService.revokeFeature(userId, featureId);
     }
+
+    @Features(Permissions.PERMISSIONS.ASSIGN_USER)
+    @Post('user/:id/features')
+    assignManyFeatures(
+        @Param('id') userId: string,
+        @Body('featureIds') featureIds: string[],
+    ) {
+        return this.permissionsService.assingManyFeatures(userId, featureIds);
+    }
+
+    @Features(Permissions.PERMISSIONS.REVOKE_USER_FEATURE)
+    @Delete('user/:id/features')
+    revokeManyFeatures(
+        @Param('id') userId: string,
+        @Body('featureIds') featureIds: string[],
+    ) {
+        return this.permissionsService.revokeManyFeatures(userId, featureIds);
+    }
 }

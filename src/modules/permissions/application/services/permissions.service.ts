@@ -2,27 +2,27 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 
 export interface Feature {
-  id: string
-  prettyName: string
-  key: string
-  description: string
-  pageId: string
+    id: string
+    prettyName: string
+    key: string
+    description: string
+    pageId: string
 }
 
 // Interface para Page (agrupamento de features)
 export interface Page {
-  id: string
-  name: string
-  features: Feature[]
+    id: string
+    name: string
+    features: Feature[]
 }
 
 // Response completo da listagem de páginas com features
 export interface PagesWithFeaturesResponse {
-  data: Page[]
-  total: number
-  page: number
-  limit: number
-  totalPages: number
+    data: Page[]
+    total: number
+    page: number
+    limit: number
+    totalPages: number
 }
 
 
@@ -101,9 +101,26 @@ export class PermissionsService {
         });
     }
 
+    async assingManyFeatures(userId: string, featureIds: string[]) {
+        const data = featureIds.map((featureId) => ({ userId, featureId }));
+        return this.prisma.userPermission.createMany({
+            data,
+            skipDuplicates: true,
+        });
+    }
+
     async revokeFeature(userId: string, featureId: string) {
         return this.prisma.userPermission.deleteMany({
             where: { userId, featureId },
+        });
+    }
+
+    async revokeManyFeatures(userId: string, featureIds: string[]) {
+        return this.prisma.userPermission.deleteMany({
+            where: {
+                userId,
+                featureId: { in: featureIds },
+            },
         });
     }
 }

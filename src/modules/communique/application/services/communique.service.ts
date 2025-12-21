@@ -13,6 +13,7 @@ import { UsersRepository } from "src/modules/users/infrastructure/repositories/u
 import { CommuniquesGateway } from "../../infrasctructure/gateways/communiques.gateway";
 import { EmailService } from "src/modules/email/application/services/email.service";
 import { SendEmailCommuniqueBySector } from "../use-cases/send-email-communique-by-sector";
+import { SendNotificationAboutCommunique } from "../use-cases/send-notification-about-communique";
 
 @Injectable()
 export class CommuniqueService {
@@ -21,7 +22,7 @@ export class CommuniqueService {
         private readonly sectorRepository: SectorRepository,
         private readonly userRepository: UsersRepository,
         private readonly communiquesGateway: CommuniquesGateway,
-        private readonly emailService: EmailService,
+        private readonly sendNotificationAboutCommunique: SendNotificationAboutCommunique,
         private readonly sendEmailCommuniqueBySector: SendEmailCommuniqueBySector,
     ) { }
 
@@ -46,6 +47,11 @@ export class CommuniqueService {
         );
 
         this.communiquesGateway.emitCreated(communique);
+        this.sendNotificationAboutCommunique.execute({
+            title: communique.title,
+            description: communique.description,
+            severity: communique.severity,
+        });
 
         return communique;
     }

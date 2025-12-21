@@ -1,17 +1,122 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/modules/prisma/prisma.service";
+import { NotificationQueryDto } from "../../domain/dto/notification-query.dto";
+
+type NotificationUpdateWhere = {
+  ids?: string[];
+  severity?: string;
+  read?: boolean;
+};
+
+type NotificationUpdateData = {
+  read?: boolean;
+};
 
 @Injectable()
 export class NotificationRepository {
   constructor(private readonly prisma: PrismaService) { }
 
-  async findAll() {
-    return this.prisma.notification.findMany({
+  async countAll(filters?: NotificationQueryDto) {
+    const {
+      page = 1,
+      limit = 10,
+      search,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+      read,
+    } = filters ?? {};
+
+    const skip = (page - 1) * limit;
+
+    return this.prisma.notification.count({
+      skip,
+      take: limit,
+
+      where: {
+        ...(search && {
+          OR: [
+            {
+              title: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+            {
+              description: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            }
+          ],
+        }),
+
+        ...(read === 'read' && { read: true }),
+        ...(read === 'unread' && { read: false }),
+      },
+
       orderBy: {
-        createdAt: "desc",
+        [sortBy]: sortOrder,
       },
     });
   }
+
+  async findAll(filters?: NotificationQueryDto) {
+    const {
+      page = 1,
+      limit = 10,
+      search,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+      read,
+    } = filters ?? {};
+
+    const skip = (page - 1) * limit;
+
+    return this.prisma.notification.findMany({
+      skip,
+      take: limit,
+
+      where: {
+        ...(search && {
+          OR: [
+            {
+              title: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+            {
+              description: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            }
+          ],
+        }),
+
+        ...(read === 'read' && { read: true }),
+        ...(read === 'unread' && { read: false }),
+      },
+
+      orderBy: {
+        [sortBy]: sortOrder,
+      },
+    });
+  }
+
+  async markManyAsRead(ids: string[]) {
+    return this.prisma.notification.updateMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+      data: {
+        read: true,
+      },
+    });
+  }
+
 
   async findById(id: string) {
     return this.prisma.notification.findUnique({
@@ -35,6 +140,7 @@ export class NotificationRepository {
       title?: string;
       description?: string;
       severity?: string;
+      read?: boolean;
     },
   ) {
     return this.prisma.notification.update({

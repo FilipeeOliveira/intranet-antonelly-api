@@ -8,13 +8,16 @@ import { CommuniquesGateway } from "./infrasctructure/gateways/communiques.gatew
 import { CommuniqueRepository } from "./infrasctructure/repositories/communique.repository";
 import { CommuniqueController } from "./presentation/communique.controller";
 import { SendEmailCommuniqueBySector } from "./application/use-cases/send-email-communique-by-sector";
+import { NotificationModule } from "../notification/notification.module";
+import { SendNotificationAboutCommunique } from "./application/use-cases/send-notification-about-communique";
 
 @Module({
     imports: [
         EmailModule,
         PrismaModule,
         SectorsModule,
-        UsersModule
+        UsersModule,
+        NotificationModule
     ],
     controllers: [
         CommuniqueController
@@ -23,11 +26,13 @@ import { SendEmailCommuniqueBySector } from "./application/use-cases/send-email-
         CommuniqueService,
         CommuniqueRepository,
         CommuniquesGateway,
-        SendEmailCommuniqueBySector
+        SendEmailCommuniqueBySector,
+        SendNotificationAboutCommunique
     ],
     exports: [
         CommuniqueService,
-        SendEmailCommuniqueBySector
+        SendEmailCommuniqueBySector,
+        SendNotificationAboutCommunique
     ],
 })
 export class CommuniqueModule { }

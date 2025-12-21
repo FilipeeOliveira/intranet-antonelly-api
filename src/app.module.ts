@@ -9,6 +9,7 @@ import { CompaniesModule } from './modules/companies/companies.module';
 import { CronjobsModule } from './modules/cronjobs/cronjobs.module';
 import { DocumentsModule } from './modules/documents/documents.module';
 import { MeetingModule } from './modules/meeting/meeting.module';
+import { NotificationModule } from './modules/notification/notification.module';
 import { PermissionsModule } from './modules/permissions/permissions.module';
 import { PrismaModule } from './modules/prisma/prisma.module';
 import { RoomsModule } from './modules/rooms/rooms.module';
@@ -36,6 +37,7 @@ import { LoggingInterceptor } from './shared/interceptors/logging.interceptor';
     VisitHistoryModule,
     MeetingModule,
     RoomsModule,
+    NotificationModule,
     ScheduleModule.forRoot(),
   ],
   controllers: [],
