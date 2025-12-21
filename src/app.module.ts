@@ -17,6 +17,7 @@ import { SectorsModule } from './modules/sectors/sectors.module';
 import { UsersModule } from './modules/users/users.module';
 import { VisitHistoryModule } from './modules/visit-history/visit-history.module';
 import { LoggingInterceptor } from './shared/interceptors/logging.interceptor';
+import { RolesModule } from './modules/roles/roles.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { LoggingInterceptor } from './shared/interceptors/logging.interceptor';
     MeetingModule,
     RoomsModule,
     NotificationModule,
+    RolesModule,
     ScheduleModule.forRoot(),
   ],
   controllers: [],
