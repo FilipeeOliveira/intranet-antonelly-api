@@ -147,9 +147,23 @@ export class CommuniqueService {
             }
 
             // 9. Emitir evento WS com objeto COMPLETO
-            this.communiquesGateway.emitUpdated(response)
+            this.communiquesGateway.emitUpdated(response);
 
-            return response
+            this.sendEmailCommuniqueBySector.execute(
+                updatedCommunique.sectorId,
+                {
+                    title: `${updatedCommunique.title}`,
+                    description: updatedCommunique.description,
+                    severity: updatedCommunique.severity,
+                    imageUrl: updatedCommunique.imagePath,
+                    sector: updatedCommunique.sector,
+                    author: updatedCommunique.author,
+                    createdAt: updatedCommunique.createdAt.toISOString(),
+                    isUpdate: true,
+                }
+            );
+
+            return response;
         } catch (error) {
             console.error('Erro ao atualizar comunicado:', error)
 

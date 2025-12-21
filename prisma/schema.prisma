@@ -83,7 +83,7 @@ model UserPermission {
   userId    String
   featureId String
 
-  user    User    @relation(fields: [userId], references: [id])
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   feature Feature @relation(fields: [featureId], references: [id])
 
   @@unique([userId, featureId])

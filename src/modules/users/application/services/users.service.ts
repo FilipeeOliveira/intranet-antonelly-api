@@ -4,10 +4,11 @@ import { UsersRepository } from '../../infrastructure/repositories/users.reposit
 import { CreateUserDto } from '../../domain/dto/create-user.dto';
 import { UserQueryDto } from '../../domain/dto/user-query.dto';
 import { UpdateUserDto } from '../../domain/dto/update-user.dto';
-import { EmailService } from '../../../../shared/services/email.service';
 import { PasswordUtil } from '../../../../shared/utils/password.util';
 import { SectorService } from 'src/modules/sectors/application/services/sector.service';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
+import { EmailService } from 'src/modules/email/application/services/email.service';
+import { SendWelcomeEmailUseCase } from '../use-cases/send-welcome-email.use-case';
 
 @Injectable()
 export class UsersService {
@@ -17,6 +18,7 @@ export class UsersService {
     private readonly usersRepository: UsersRepository,
     private readonly sectorService: SectorService,
     private readonly emailService: EmailService,
+    private readonly sendWelcomeEmailUseCase: SendWelcomeEmailUseCase,
     private readonly prisma: PrismaService
   ) { }
 
@@ -73,11 +75,14 @@ export class UsersService {
     // Criar usuário no banco
     const user = await this.usersRepository.create(createUserDto, hashedPassword);
 
-    // Enviar email com senha temporária (mock)
-    await this.emailService.sendTemporaryPasswordEmail(user.email, {
-      userName: user.name,
-      email: user.email,
-      temporaryPassword,
+    // Enviar email de boas-vindas com senha temporária
+    this.sendWelcomeEmailUseCase.execute({
+      to: user.email,
+      context: {
+        name: user.name,
+        email: user.email,
+        temporaryPassword,
+      }
     });
 
     this.logger.log(`Usuário criado com sucesso: ${user.email}`);

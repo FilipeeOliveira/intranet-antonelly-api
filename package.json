@@ -10,6 +10,7 @@
     "copy:email-templates": "cpx \"src/modules/email/templates/**/*\" dist/src/modules/email/templates",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "seed": "ts-node ./prisma/seed/seed.ts",
+    "db:reset": "npx prisma migrate reset --force && npm run seed",
     "start": "nest start",
     "dev": "nest start --watch",
     "start:dev": "nest start --watch",
