@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
-import { PrismaClient } from "@prisma/client";
+import { PrismaService } from "src/modules/prisma/prisma.service";
 import { RoleQueryDto } from "../../domain/dto/role-query.dto";
 
 @Injectable()
 export class RolesRepository {
-    constructor(private readonly prisma: PrismaClient) { }
+    constructor(private readonly prisma: PrismaService) { }
 
     async findAll(filters?: RoleQueryDto) {
         const {
