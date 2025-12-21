@@ -64,19 +64,19 @@ export class EmailService {
      * Envia email de redefinição de senha
      * (mantém assinatura para compatibilidade)
      */
-    async sendResetPasswordEmail(to: string, link: string): Promise<void> {
-        this.logger.log(`Enviando email de redefinição de senha para: ${to}`);
-
-        await this.mailerService.sendMail({
-            to,
-            subject: "Redefinição de senha",
-            template: "reset-password",
-            context: {
-                link,
-            },
-        });
-
-        this.logger.log(`Email de redefinição de senha enviado para: ${to}`);
+    sendResetPasswordEmail(email: string, data: { name: string; email: string; temporaryPassword: string }) {
+        this.mailerService.sendMail({
+            to: email,
+            subject: 'Redefinição de Senha',
+            template: 'reset-password',
+            context: data,
+        })
+            .then(() => {
+                this.logger.log(`Email de redefinição de senha enviado para: ${email}`);
+            })
+            .catch((error) => {
+                this.logger.error(`Erro ao enviar email de redefinição de senha para: ${email}`, error);
+            });
     }
 
     /**
@@ -107,28 +107,4 @@ export class EmailService {
             `Comunicado "${context.title}" enviado com sucesso`,
         );
     }
-
-    sendTemporaryPasswordEmail(
-        email: string,
-        data: { userName: string; email: string; temporaryPassword: string },
-    ): Promise<void> {
-        throw new Error("Method not implemented.");
-    }
-
-    //   /**
-    //    * Teste de conexão SMTP
-    //    * (mantém compatibilidade conceitual com mock antigo)
-    //    */
-    //   async testEmailConnection(): Promise<boolean> {
-    //     this.logger.log("Testando conexão de email...");
-
-    //     try {
-    //       await this.mailerService.verify();
-    //       this.logger.log("✅ Conexão SMTP verificada com sucesso");
-    //       return true;
-    //     } catch (error) {
-    //       this.logger.error("❌ Falha ao verificar conexão SMTP", error);
-    //       return false;
-    //     }
-    //   }
 }

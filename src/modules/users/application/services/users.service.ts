@@ -167,9 +167,9 @@ export class UsersService {
     // Atualizar senha no banco
     await this.usersRepository.updatePassword(id, hashedPassword, true);
 
-    // Enviar email com nova senha temporária (mock)
-    await this.emailService.sendTemporaryPasswordEmail(user.email, {
-      userName: user.name,
+    // Enviar email com nova senha temporária
+    this.emailService.sendResetPasswordEmail(user.email, {
+      name: user.name,
       email: user.email,
       temporaryPassword,
     });
