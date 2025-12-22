@@ -9,14 +9,13 @@ import {
     Post,
     Query,
 } from "@nestjs/common";
-import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { RolesService } from "../application/roles.service";
 import { CreateRoleDto } from "../domain/dto/create-role.dto";
 import { RoleQueryDto } from "../domain/dto/role-query.dto";
 import { UpdateRoleDto } from "../domain/dto/update-role.dto";
-
-
 @ApiTags("Funções e Permissões")
+@ApiBearerAuth()
 @Controller("roles")
 export class RolesController {
     constructor(private readonly rolesService: RolesService) { }

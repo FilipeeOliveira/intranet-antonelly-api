@@ -83,4 +83,29 @@ export class RolesRepository {
             where: { id },
         });
     }
+
+    async getRoleFeatures(roleId: string) {
+        return this.prisma.roleFeature.findMany({
+            where: { roleId },
+            select: {
+                featureId: true,
+            },
+        });
+    }
+
+    async replaceRoleFeatures(roleId: string, featureIds: string[]) {
+        return this.prisma.$transaction([
+            this.prisma.roleFeature.deleteMany({
+                where: { roleId },
+            }),
+            this.prisma.roleFeature.createMany({
+                data: featureIds.map((featureId) => ({
+                    roleId,
+                    featureId,
+                })),
+                skipDuplicates: true,
+            }),
+        ]);
+    }
+
 }

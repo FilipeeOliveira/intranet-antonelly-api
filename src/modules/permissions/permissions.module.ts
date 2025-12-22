@@ -8,6 +8,7 @@ import { PrismaModule } from '../prisma/prisma.module';
   providers: [
     PermissionsService
   ],
+  exports: [PermissionsService],
   controllers: [PermissionsController]
 })
 export class PermissionsModule { }

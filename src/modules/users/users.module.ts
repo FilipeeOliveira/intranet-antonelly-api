@@ -7,13 +7,17 @@ import { UsersService } from './application/services/users.service';
 import { UsersRepository } from './infrastructure/repositories/users.repository';
 import { UsersController } from './presentation/controllers/users.controller';
 import { SendWelcomeEmailUseCase } from './application/use-cases/send-welcome-email.use-case';
+import { RolesModule } from '../roles/roles.module';
+import { PermissionsModule } from '../permissions/permissions.module';
 
 @Module({
   imports: [
     PrismaModule,
     AuthModule,
     SectorsModule,
-    EmailModule
+    EmailModule,
+    RolesModule,
+    PermissionsModule
   ],
   controllers: [UsersController],
   providers: [

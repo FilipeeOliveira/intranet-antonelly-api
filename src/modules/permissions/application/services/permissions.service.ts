@@ -101,7 +101,7 @@ export class PermissionsService {
         });
     }
 
-    async assingManyFeatures(userId: string, featureIds: string[]) {
+    async assignManyFeatures(userId: string, featureIds: string[]) {
         const data = featureIds.map((featureId) => ({ userId, featureId }));
         return this.prisma.userPermission.createMany({
             data,

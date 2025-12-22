@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE "public"."Notification" (
+CREATE TABLE "public"."notifications" (
     "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
@@ -7,5 +7,5 @@ CREATE TABLE "public"."Notification" (
     "read" BOOLEAN NOT NULL DEFAULT FALSE,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    CONSTRAINT "Notification_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "notification_pkey" PRIMARY KEY ("id")
 );
