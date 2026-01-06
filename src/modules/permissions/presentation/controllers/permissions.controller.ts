@@ -1,15 +1,16 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { AuthenticateGuard } from 'src/modules/auth/presentation/guards/authenticate.guard';
+import { Permissions } from 'src/shared/features';
 import { PermissionsService } from '../../application/services/permissions.service';
 import { Features } from '../guards/features.decorator';
 import { PermissionsGuard } from '../guards/permissions.guard';
-import { AuthGuard } from '@nestjs/passport';
-import { AuthenticateGuard } from 'src/modules/auth/presentation/guards/authenticate.guard';
-import { Permissions } from 'src/shared/features';
 
 @UseGuards(AuthGuard('jwt'), AuthenticateGuard, PermissionsGuard)
 @ApiTags('Permissões')
 @Controller('permissions')
+@ApiBearerAuth()
 export class PermissionsController {
     constructor(private readonly permissionsService: PermissionsService) { }
 
@@ -56,5 +57,23 @@ export class PermissionsController {
         @Param('featureId') featureId: string,
     ) {
         return this.permissionsService.revokeFeature(userId, featureId);
+    }
+
+    @Features(Permissions.PERMISSIONS.ASSIGN_USER)
+    @Post('user/:id/features')
+    assignManyFeatures(
+        @Param('id') userId: string,
+        @Body('featureIds') featureIds: string[],
+    ) {
+        return this.permissionsService.assignManyFeatures(userId, featureIds);
+    }
+
+    @Features(Permissions.PERMISSIONS.REVOKE_USER_FEATURE)
+    @Delete('user/:id/features')
+    revokeManyFeatures(
+        @Param('id') userId: string,
+        @Body('featureIds') featureIds: string[],
+    ) {
+        return this.permissionsService.revokeManyFeatures(userId, featureIds);
     }
 }

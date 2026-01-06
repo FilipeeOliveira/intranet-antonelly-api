@@ -9,8 +9,8 @@ export interface EmailTemplateData {
 }
 
 @Injectable()
-export class EmailService {
-  private readonly logger = new Logger(EmailService.name);
+export class LegacyEmailService {
+  private readonly logger = new Logger(LegacyEmailService.name);
 
   constructor() {
     this.logger.log('EmailService initialized - Mock mode active');

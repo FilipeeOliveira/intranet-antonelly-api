@@ -14,4 +14,9 @@ export const envConfig = {
     API_URL: process.env.API_URL || `http://localhost:${process.env.PORT}`,
     PORT: process.env.PORT,
     MODE: process.env.MODE || 'dev',
+    MAIL_HOST: process.env.MAIL_HOST,
+    MAIL_PORT: process.env.MAIL_PORT,
+    MAIL_USER: process.env.MAIL_USER,
+    MAIL_PASS: process.env.MAIL_PASS,
+    MAIL_FROM: process.env.MAIL_FROM || 'Intranet Antonelly',
 } as const;

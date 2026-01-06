@@ -15,7 +15,8 @@ model Role {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  users User[]
+  users        User[]
+  roleFeatures RoleFeature[]
 
   @@map("roles")
 }
@@ -67,13 +68,14 @@ model Page {
 }
 
 model Feature {
-  id          String           @id @default(uuid())
-  prettyName  String? // ex: View Products, Create Product
-  key         String           @unique // ex: VIEW_PRODUCTS, CREATE_PRODUCT
-  description String?
-  pageId      String
-  page        Page             @relation(fields: [pageId], references: [id])
-  users       UserPermission[]
+  id           String           @id @default(uuid())
+  prettyName   String? // ex: View Products, Create Product
+  key          String           @unique // ex: VIEW_PRODUCTS, CREATE_PRODUCT
+  description  String?
+  pageId       String
+  page         Page             @relation(fields: [pageId], references: [id])
+  users        UserPermission[]
+  roleFeatures RoleFeature[]
 
   @@map("features")
 }
@@ -83,7 +85,7 @@ model UserPermission {
   userId    String
   featureId String
 
-  user    User    @relation(fields: [userId], references: [id])
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   feature Feature @relation(fields: [featureId], references: [id])
 
   @@unique([userId, featureId])
@@ -220,4 +222,31 @@ model Communique {
   author User   @relation(fields: [authorId], references: [id])
 
   @@map("communiques")
+}
+
+model Notification {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  severity    String
+  read        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("notifications")
+}
+
+model RoleFeature {
+  id        String @id @default(uuid())
+  roleId    String
+  featureId String
+
+  role    Role    @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  feature Feature @relation(fields: [featureId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([roleId, featureId])
+
+  @@map("role_features")
 }

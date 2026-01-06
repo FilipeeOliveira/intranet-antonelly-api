@@ -78,6 +78,16 @@ export class UsersRepository {
     };
   }
 
+  async findAllBySector(sectorId: string) {
+    return this.prisma.user.findMany({
+      where: { sectorId },
+      include: {
+        role: true,
+        sector: true,
+      },
+    });
+  }
+
   async findById(id: string): Promise<UserResponseDto | null> {
     const user = await this.prisma.user.findUnique({
       where: { id },
@@ -146,7 +156,7 @@ export class UsersRepository {
 
   async update(id: string, data: Partial<CreateUserDto>) {
     const updateData: any = { ...data };
-  
+
 
     return this.prisma.user.update({
       where: { id },

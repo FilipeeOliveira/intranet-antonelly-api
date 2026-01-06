@@ -62,15 +62,15 @@ export class CommuniqueQueryDto {
     })
     @IsOptional()
     @IsEnum(['title', 'severity', 'createdAt'])
-    sortBy?: string = 'title';
+    sortBy?: string = 'createdAt';
 
     @ApiProperty({
         description: 'Direção da ordenação',
         enum: ['asc', 'desc'],
-        default: 'asc',
+        default: 'desc',
         required: false,
     })
     @IsOptional()
     @IsEnum(['asc', 'desc'])
-    sortOrder?: 'asc' | 'desc' = 'asc';
+    sortOrder?: 'asc' | 'desc' = 'desc';
 }

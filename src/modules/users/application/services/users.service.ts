@@ -1,13 +1,16 @@
-import { Injectable, ConflictException, NotFoundException, Logger } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { UsersRepository } from '../../infrastructure/repositories/users.repository';
-import { CreateUserDto } from '../../domain/dto/create-user.dto';
-import { UserQueryDto } from '../../domain/dto/user-query.dto';
-import { UpdateUserDto } from '../../domain/dto/update-user.dto';
-import { EmailService } from '../../../../shared/services/email.service';
-import { PasswordUtil } from '../../../../shared/utils/password.util';
-import { SectorService } from 'src/modules/sectors/application/services/sector.service';
+import { EmailService } from 'src/modules/email/application/services/email.service';
+import { PermissionsService } from 'src/modules/permissions/application/services/permissions.service';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
+import { RolesRepository } from 'src/modules/roles/infrastructure/repositories/roles.repository';
+import { SectorService } from 'src/modules/sectors/application/services/sector.service';
+import { PasswordUtil } from '../../../../shared/utils/password.util';
+import { CreateUserDto } from '../../domain/dto/create-user.dto';
+import { UpdateUserDto } from '../../domain/dto/update-user.dto';
+import { UserQueryDto } from '../../domain/dto/user-query.dto';
+import { UsersRepository } from '../../infrastructure/repositories/users.repository';
+import { SendWelcomeEmailUseCase } from '../use-cases/send-welcome-email.use-case';
 
 @Injectable()
 export class UsersService {
@@ -17,6 +20,9 @@ export class UsersService {
     private readonly usersRepository: UsersRepository,
     private readonly sectorService: SectorService,
     private readonly emailService: EmailService,
+    private readonly sendWelcomeEmailUseCase: SendWelcomeEmailUseCase,
+    private readonly rolesRepository: RolesRepository,
+    private readonly permissionsService: PermissionsService,
     private readonly prisma: PrismaService
   ) { }
 
@@ -34,6 +40,10 @@ export class UsersService {
     }
 
     return user;
+  }
+
+  async findAllBySector(sectorId: string) {
+    return await this.usersRepository.findAllBySector(sectorId);
   }
 
   async create(createUserDto: CreateUserDto) {
@@ -69,11 +79,19 @@ export class UsersService {
     // Criar usuário no banco
     const user = await this.usersRepository.create(createUserDto, hashedPassword);
 
-    // Enviar email com senha temporária (mock)
-    await this.emailService.sendTemporaryPasswordEmail(user.email, {
-      userName: user.name,
-      email: user.email,
-      temporaryPassword,
+    const roleFeatures = await this.rolesRepository.getRoleFeatures(user?.roleId || user?.role?.id);
+    const featureIds = roleFeatures.map((rf) => rf.featureId);
+
+    await this.permissionsService.assignManyFeatures(user.id, featureIds);
+
+    // Enviar email de boas-vindas com senha temporária
+    this.sendWelcomeEmailUseCase.execute({
+      to: user.email,
+      context: {
+        name: user.name,
+        email: user.email,
+        temporaryPassword,
+      }
     });
 
     this.logger.log(`Usuário criado com sucesso: ${user.email}`);
@@ -93,6 +111,23 @@ export class UsersService {
       role: user.role,
     };
   }
+
+  async changeUserRole(userId: string, oldRoleId: string, newRoleId: string) {
+    // features da role antiga
+    const oldRoleFeatures = await this.rolesRepository.getRoleFeatures(oldRoleId);
+    const oldFeatureIds = oldRoleFeatures.map((rf) => rf.featureId);
+
+    // remove apenas as features da role antiga
+    await this.permissionsService.revokeManyFeatures(userId, oldFeatureIds);
+
+    // features da nova role
+    const newRoleFeatures = await this.rolesRepository.getRoleFeatures(newRoleId);
+    const newFeatureIds = newRoleFeatures.map((rf) => rf.featureId);
+
+    // adiciona novas
+    await this.permissionsService.assignManyFeatures(userId, newFeatureIds);
+  }
+
 
   async update(id: string, updateUserDto: UpdateUserDto) {
     this.logger.log(`Atualizando usuário: ${id}`);
@@ -115,6 +150,8 @@ export class UsersService {
         throw new Error(`Role ${updateUserDto.role} não encontrada`);
       }
 
+      await this.changeUserRole(id, existingUser.role.id, role.id);
+      
       existingUser.role = role;
       delete updateUserDto.role;
     }
@@ -158,9 +195,9 @@ export class UsersService {
     // Atualizar senha no banco
     await this.usersRepository.updatePassword(id, hashedPassword, true);
 
-    // Enviar email com nova senha temporária (mock)
-    await this.emailService.sendTemporaryPasswordEmail(user.email, {
-      userName: user.name,
+    // Enviar email com nova senha temporária
+    this.emailService.sendResetPasswordEmail(user.email, {
+      name: user.name,
       email: user.email,
       temporaryPassword,
     });
