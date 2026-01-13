@@ -7,7 +7,6 @@ import {
 import { Reflector } from '@nestjs/core';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { FEATURES_KEY } from './features.decorator';
-import { Permissions } from 'src/shared/features';
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
@@ -45,11 +44,14 @@ export class PermissionsGuard implements CanActivate {
             userFeatures.includes(f),
         );
 
+        console.log('User Features:', userFeatures);
+        console.log('Required Features:', requiredFeatures);
+        console.log('Has At Least One:', hasAtLeastOne);
+
         // 🔹 Opção 2: precisa ter TODAS as features
         // const hasAll = requiredFeatures.every((f) => userFeatures.includes(f));
-
         if (!hasAtLeastOne)
-            throw new ForbiddenException('Acesso negado às funcionalidades requeridas');
+            throw new ForbiddenException('Você não tem permissão para acessar este recurso/ação');
 
         return true;
     }

@@ -14,7 +14,7 @@ export class RoomsController {
         private readonly roomsService: RoomsService,
     ) { }
 
-    @Features(Permissions.ROOMS.CREATE)
+    @Features(Permissions.ROOMS.WRITE)
     @Post()
     @ApiOperation({ summary: 'Criar nova sala' })
     @ApiResponse({ status: 201, description: 'Sala criada com sucesso.' })
@@ -22,7 +22,7 @@ export class RoomsController {
         return await this.roomsService.create(createRoomDto);
     }
 
-    @Features(Permissions.ROOMS.READ_ALL, Permissions.ROOMS.READ)
+    @Features(Permissions.ROOMS.READ)
     @Get()
     @ApiOperation({ summary: 'Listar salas com filtros e paginação' })
     @ApiResponse({ status: 200, description: 'Lista de salas retornada com sucesso.' })
@@ -30,7 +30,7 @@ export class RoomsController {
         return await this.roomsService.findAll(query);
     }
 
-    @Features(Permissions.ROOMS.READ_BY_ID, Permissions.ROOMS.READ)
+    @Features(Permissions.ROOMS.READ)
     @Get(':id')
     @ApiOperation({ summary: 'Buscar sala por ID' })
     @ApiResponse({ status: 200, description: 'Sala encontrada com sucesso.' })
@@ -39,7 +39,7 @@ export class RoomsController {
     }
 
 
-    @Features(Permissions.ROOMS.UPDATE)
+    @Features(Permissions.ROOMS.WRITE)
     @Put(':id')
     @ApiOperation({ summary: 'Atualizar sala' })
     @ApiResponse({ status: 200, description: 'Sala atualizada com sucesso.' })
@@ -47,7 +47,7 @@ export class RoomsController {
         return await this.roomsService.update(id, updateRoomDto);
     }
 
-    @Features(Permissions.ROOMS.DELETE)
+    @Features(Permissions.ROOMS.WRITE)
     @Delete(':id')
     @ApiOperation({ summary: 'Deletar sala' })
     @ApiResponse({ status: 200, description: 'Sala removida com sucesso.' })

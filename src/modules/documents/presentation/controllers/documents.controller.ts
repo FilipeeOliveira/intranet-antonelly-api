@@ -44,7 +44,7 @@ import { DocumentQueryDto } from "../../domain/dto/document-query.dto";
 export class DocumentsController {
     constructor(private readonly documentsService: DocumentsService) { }
 
-    @Features(Permissions.DOCUMENTS.CREATE)
+    @Features(Permissions.DOCUMENTS.WRITE)
     @Post()
     @UseInterceptors(pdfFileInterceptor())
     @ApiConsumes("multipart/form-data")
@@ -76,7 +76,7 @@ export class DocumentsController {
     }
 
     // Listar documentos
-    @Features(Permissions.DOCUMENTS.READ_ALL, Permissions.DOCUMENTS.READ)
+    @Features(Permissions.DOCUMENTS.READ)
     @Get()
     @ApiOperation({ summary: "Listar documentos com filtros e paginação" })
     @ApiResponse({ status: 200, description: "Lista de documentos retornada com sucesso." })
@@ -85,7 +85,7 @@ export class DocumentsController {
     }
 
     // Buscar documento por ID
-    @Features(Permissions.DOCUMENTS.READ_BY_ID, Permissions.DOCUMENTS.READ)
+    @Features(Permissions.DOCUMENTS.READ)
     @Get(":id")
     @ApiOperation({ summary: "Buscar documento por ID" })
     @ApiResponse({ status: 200, description: "Documento encontrado." })
@@ -94,7 +94,7 @@ export class DocumentsController {
         return this.documentsService.findById(id);
     }
 
-    @Features(Permissions.DOCUMENTS.READ_ALL, Permissions.DOCUMENTS.READ_BY_ID, Permissions.DOCUMENTS.READ)
+    @Features(Permissions.DOCUMENTS.READ)
     @Get(":id/download")
     async downloadDocument(@Param("id") id: string, @Res() res: Response) {
         const document = await this.documentsService.findById(id);
@@ -116,7 +116,7 @@ export class DocumentsController {
         fileStream.pipe(res);
     }
 
-    @Features(Permissions.DOCUMENTS.READ_ALL, Permissions.DOCUMENTS.READ_BY_ID, Permissions.DOCUMENTS.READ)
+    @Features(Permissions.DOCUMENTS.READ)
     @Get(":id/view")
     @ApiOperation({ summary: "Visualizar documento PDF inline no navegador" })
     @ApiResponse({ status: 200, description: "PDF retornado para visualização inline.", schema: { type: "string", format: "binary" } })
@@ -166,7 +166,7 @@ export class DocumentsController {
         }
     }
 
-    @Features(Permissions.DOCUMENTS.READ_ALL, Permissions.DOCUMENTS.READ_BY_ID, Permissions.DOCUMENTS.READ)
+    @Features(Permissions.DOCUMENTS.READ)
     @Get('history/:id')
     @ApiOperation({ summary: "Obter histórico de versões de um documento" })
     @ApiResponse({ status: 200, description: "Histórico de versões retornado com sucesso." })
@@ -175,7 +175,7 @@ export class DocumentsController {
         return this.documentsService.getHistory(id);
     }
 
-    @Features(Permissions.DOCUMENTS.READ_ALL, Permissions.DOCUMENTS.READ_BY_ID, Permissions.DOCUMENTS.READ)
+    @Features(Permissions.DOCUMENTS.READ)
     @Get("history/:id/view")
     @ApiOperation({ summary: "Visualizar documento PDF antigo inline no navegador" })
     @ApiResponse({ status: 200, description: "PDF retornado para visualização inline.", schema: { type: "string", format: "binary" } })
@@ -225,7 +225,7 @@ export class DocumentsController {
         }
     }
 
-    @Features(Permissions.DOCUMENTS.READ_ALL, Permissions.DOCUMENTS.READ_BY_ID, Permissions.DOCUMENTS.READ)
+    @Features(Permissions.DOCUMENTS.READ)
     @Get("history/:id/download")
     async downloadDocumentHistory(@Param("id") id: string, @Res() res: Response) {
         const document = await this.documentsService.findHistoryById(id);
@@ -247,7 +247,7 @@ export class DocumentsController {
         fileStream.pipe(res);
     }
 
-    @Features(Permissions.DOCUMENTS.UPDATE)
+    @Features(Permissions.DOCUMENTS.WRITE)
     @Put(":id")
     @UseInterceptors(pdfFileInterceptor())
     @ApiConsumes("multipart/form-data")
@@ -277,7 +277,7 @@ export class DocumentsController {
         return this.documentsService.update(id, updateDto, filePath);
     }
 
-    @Features(Permissions.DOCUMENTS.DELETE)
+    @Features(Permissions.DOCUMENTS.WRITE)
     @Delete(":id")
     @ApiOperation({ summary: "Deletar documento e arquivo físico" })
     @ApiResponse({ status: 200, description: "Documento removido com sucesso." })
