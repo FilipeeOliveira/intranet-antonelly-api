@@ -20,15 +20,15 @@ import {
   ApiTags
 } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
+import { Features } from 'src/modules/permissions/presentation/guards/features.decorator';
+import { PermissionsGuard } from 'src/modules/permissions/presentation/guards/permissions.guard';
+import { Permissions } from 'src/shared/features';
 import { SkipTemporaryPasswordCheck, TemporaryPasswordGuard } from '../../../auth/presentation/guards/temporary-password.guard';
 import { UsersService } from '../../application/services/users.service';
 import { CreateUserDto } from '../../domain/dto/create-user.dto';
 import { UpdateUserDto } from '../../domain/dto/update-user.dto';
 import { UserQueryDto } from '../../domain/dto/user-query.dto';
 import { PaginatedUsersResponseDto, UserResponseDto } from '../../domain/dto/user-response.dto';
-import { PermissionsGuard } from 'src/modules/permissions/presentation/guards/permissions.guard';
-import { Features } from 'src/modules/permissions/presentation/guards/features.decorator';
-import { Permissions } from 'src/shared/features';
 
 @ApiTags('Gestão de Usuários')
 @Controller('users')
@@ -37,7 +37,7 @@ import { Permissions } from 'src/shared/features';
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
-  @Features(Permissions.USERS.READ_ALL, Permissions.USERS.READ)
+  @Features(Permissions.USERS.READ)
   @Get()
   @ApiOperation({ summary: 'Listar usuários com filtros e paginação' })
   @ApiResponse({
@@ -51,7 +51,7 @@ export class UsersController {
     return this.usersService.findAll(query);
   }
 
-  @Features(Permissions.USERS.READ_BY_ID, Permissions.USERS.READ)
+  @Features(Permissions.USERS.READ)
   @Get(':id')
   @ApiOperation({ summary: 'Buscar usuário por ID' })
   @ApiParam({ name: 'id', description: 'ID do usuário' })
@@ -67,7 +67,7 @@ export class UsersController {
     return this.usersService.findById(id);
   }
 
-  @Features(Permissions.USERS.CREATE)
+  @Features(Permissions.USERS.WRITE)
   @Post()
   @SkipTemporaryPasswordCheck()
   @HttpCode(HttpStatus.CREATED)
@@ -86,7 +86,7 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-  @Features(Permissions.USERS.UPDATE)
+  @Features(Permissions.USERS.WRITE)
   @Put(':id')
   @ApiOperation({ summary: 'Atualizar dados do usuário' })
   @ApiParam({ name: 'id', description: 'ID do usuário' })
@@ -107,7 +107,7 @@ export class UsersController {
     return this.usersService.update(id, updateUserDto);
   }
 
-  @Features(Permissions.USERS.RESET_PASSWORD)
+  @Features(Permissions.USERS.WRITE)
   @Put(':id/reset-password')
   @HttpCode(HttpStatus.OK)
   @Throttle({ default: { limit: 5, ttl: 300000 } }) // 5 resets por 5 minutos
@@ -124,7 +124,7 @@ export class UsersController {
     return this.usersService.resetPassword(id);
   }
 
-  @Features(Permissions.USERS.TOGGLE_ACTIVE_STATUS)
+  @Features(Permissions.USERS.WRITE)
   @Put(':id/toggle-status')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Ativar/desativar usuário' })
@@ -141,7 +141,7 @@ export class UsersController {
     return this.usersService.toggleStatus(id);
   }
 
-  @Features(Permissions.USERS.DELETE)
+  @Features(Permissions.USERS.WRITE)
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
   @Throttle({ default: { limit: 3, ttl: 300000 } }) // 3 exclusões por 5 minutos

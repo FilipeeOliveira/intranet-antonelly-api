@@ -7,6 +7,12 @@ import { PermissionsService } from '../../application/services/permissions.servi
 import { Features } from '../guards/features.decorator';
 import { PermissionsGuard } from '../guards/permissions.guard';
 
+const NESTED_PERMISSIONS = [
+    /* Se tem permissão de usuários, automaticamente tem permissão de permissões */
+    Permissions.USERS.READ,
+    Permissions.USERS.WRITE,
+];
+
 @UseGuards(AuthGuard('jwt'), AuthenticateGuard, PermissionsGuard)
 @ApiTags('Permissões')
 @Controller('permissions')
@@ -14,7 +20,7 @@ import { PermissionsGuard } from '../guards/permissions.guard';
 export class PermissionsController {
     constructor(private readonly permissionsService: PermissionsService) { }
 
-    @Features(Permissions.PERMISSIONS.ASSIGN_USER)
+    @Features(Permissions.PERMISSIONS.WRITE, Permissions.USERS.WRITE)
     @Post('user/:id')
     setUserPermissions(
         @Param('id', ParseIntPipe) userId: string,
@@ -23,19 +29,19 @@ export class PermissionsController {
         return this.permissionsService.setUserPermissions(userId, featureIds);
     }
 
-    @Features(Permissions.PERMISSIONS.READ_FEATURES_BY_USER_ID, Permissions.PERMISSIONS.READ)
+    @Features(Permissions.PERMISSIONS.READ, Permissions.USERS.READ)
     @Get('user/:id')
     getUserPermissions(@Param('id') userId: string) {
         return this.permissionsService.getUserPermissions(userId);
     }
 
-    @Features(Permissions.PERMISSIONS.READ_FEATURES_BY_USER_ID, Permissions.PERMISSIONS.READ)
+    @Features(Permissions.PERMISSIONS.READ, Permissions.USERS.READ)
     @Get('user/:id/features')
     getUserFeatures(@Param('id') userId: string) {
         return this.permissionsService.getUserFeatures(userId);
     }
 
-    @Features(Permissions.PERMISSIONS.ASSIGN_USER)
+    @Features(Permissions.PERMISSIONS.WRITE, Permissions.USERS.WRITE)
     @Post('user/:id/feature/:featureId')
     assignFeature(
         @Param('id') userId: string,
@@ -44,13 +50,13 @@ export class PermissionsController {
         return this.permissionsService.assignFeature(userId, featureId);
     }
 
-    @Features(Permissions.PERMISSIONS.READ_ALL_PAGES_WITH_FEATURES, Permissions.PERMISSIONS.READ)
+    @Features(Permissions.PERMISSIONS.READ, Permissions.USERS.READ)
     @Get('pages')
     getPages() {
         return this.permissionsService.getAllPagesWithFeatures();
     }
 
-    @Features(Permissions.PERMISSIONS.REVOKE_USER_FEATURE)
+    @Features(Permissions.PERMISSIONS.WRITE, Permissions.USERS.WRITE)
     @Delete('user/:id/feature/:featureId')
     revokeFeature(
         @Param('id') userId: string,
@@ -59,7 +65,7 @@ export class PermissionsController {
         return this.permissionsService.revokeFeature(userId, featureId);
     }
 
-    @Features(Permissions.PERMISSIONS.ASSIGN_USER)
+    @Features(Permissions.PERMISSIONS.WRITE, Permissions.USERS.WRITE)
     @Post('user/:id/features')
     assignManyFeatures(
         @Param('id') userId: string,
@@ -68,7 +74,7 @@ export class PermissionsController {
         return this.permissionsService.assignManyFeatures(userId, featureIds);
     }
 
-    @Features(Permissions.PERMISSIONS.REVOKE_USER_FEATURE)
+    @Features(Permissions.PERMISSIONS.WRITE, Permissions.USERS.WRITE)
     @Delete('user/:id/features')
     revokeManyFeatures(
         @Param('id') userId: string,

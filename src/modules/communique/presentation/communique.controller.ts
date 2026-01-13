@@ -1,21 +1,20 @@
 import { BadRequestException, Body, Controller, Delete, Get, NotFoundException, Param, Post, Put, Query, Res, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
-import { AuthGuard } from "@nestjs/passport";
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from "@nestjs/swagger";
 import { AuthenticateGuard } from "src/modules/auth/presentation/guards/authenticate.guard";
-import { CreateCommuniqueDto } from "../domain/dtos/create-communique.dto";
-import { CommuniqueQueryDto } from "../domain/dtos/communique-query.dto";
-import { CommuniqueService } from "../application/services/communique.service";
 import { imageFileInterceptor } from "src/shared/interceptors/image-file.interceptor";
+import { CommuniqueService } from "../application/services/communique.service";
+import { CommuniqueQueryDto } from "../domain/dtos/communique-query.dto";
+import { CreateCommuniqueDto } from "../domain/dtos/create-communique.dto";
 
 import { Response } from "express";
-import { join } from "path";
 import * as fs from "fs";
-import { UpdateCommuniqueDto } from "../domain/dtos/update-communique.dto";
-import { PermissionsGuard } from "src/modules/permissions/presentation/guards/permissions.guard";
-import { Features } from "src/modules/permissions/presentation/guards/features.decorator";
-import { Permissions } from "src/shared/features";
-import { JwtAuthGuard } from "src/modules/auth/presentation/guards/jwt-auth.guard";
+import { join } from "path";
 import { Public } from "src/modules/auth/presentation/decorators/public.decorator";
+import { JwtAuthGuard } from "src/modules/auth/presentation/guards/jwt-auth.guard";
+import { Features } from "src/modules/permissions/presentation/guards/features.decorator";
+import { PermissionsGuard } from "src/modules/permissions/presentation/guards/permissions.guard";
+import { Permissions } from "src/shared/features";
+import { UpdateCommuniqueDto } from "../domain/dtos/update-communique.dto";
 
 @ApiTags("Gestão de Comunicados")
 @ApiBearerAuth()
@@ -27,7 +26,7 @@ export class CommuniqueController {
         private readonly communiqueService: CommuniqueService
     ) { }
 
-    @Features(Permissions.COMMUNIQUES.CREATE)
+    @Features(Permissions.COMMUNIQUES.WRITE)
     @Post()
     @UseInterceptors(imageFileInterceptor())
     @ApiConsumes("multipart/form-data")
@@ -58,7 +57,7 @@ export class CommuniqueController {
         return this.communiqueService.create(body, imagePath);
     }
 
-    @Features(Permissions.COMMUNIQUES.READ_BY_ID, Permissions.COMMUNIQUES.READ)
+    @Features(Permissions.COMMUNIQUES.READ)
     @Get(':id')
     async getCommuniqueById(
         @Param('id') id: string
@@ -66,7 +65,7 @@ export class CommuniqueController {
         return this.communiqueService.findById(id);
     }
 
-    @Features(Permissions.COMMUNIQUES.READ_ALL, Permissions.COMMUNIQUES.READ)
+    @Features(Permissions.COMMUNIQUES.READ)
     @Get()
     async getAllCommuniques(
         @Query() query: CommuniqueQueryDto
@@ -90,7 +89,7 @@ export class CommuniqueController {
         return res.sendFile(imagePath);
     }
 
-    @Features(Permissions.COMMUNIQUES.UPDATE)
+    @Features(Permissions.COMMUNIQUES.WRITE)
     @Put(':id')
     @UseInterceptors(imageFileInterceptor())
     @ApiConsumes("multipart/form-data")
@@ -120,7 +119,7 @@ export class CommuniqueController {
         return this.communiqueService.update(id, body, imagePath);
     }
 
-    @Features(Permissions.COMMUNIQUES.DELETE)
+    @Features(Permissions.COMMUNIQUES.WRITE)
     @Delete(':id')
     async deleteCommunique(
         @Param('id') id: string

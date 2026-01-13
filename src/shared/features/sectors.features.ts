@@ -1,8 +1,4 @@
 export const SectorsFeatures = {
     READ: 'SECTORS_READ',
-    READ_ALL: 'SECTORS_READ_ALL',
-    READ_BY_ID: 'SECTORS_READ_BY_ID',
-    CREATE: 'SECTORS_CREATE',
-    UPDATE: 'SECTORS_UPDATE',
-    DELETE: 'SECTORS_DELETE',
+    WRITE: 'SECTORS_WRITE',
 } as const;

@@ -173,7 +173,6 @@ export class VisitHistoryRepository {
   }
 
   async update(id: string, data: Partial<VisitHistory>) {
-
     return this.prisma.visitHistory.update({
       where: { id },
       data,

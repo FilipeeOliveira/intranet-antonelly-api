@@ -19,7 +19,7 @@ import { VisitHistoryQueryDto } from '../../domain/dto/visit-history-query.dto';
 export class VisitHistoryController {
     constructor(private readonly visitHistoryService: VisitHistoryService) { }
 
-    @Features(Permissions.VISIT_SCHEDULES.CREATE)
+    @Features(Permissions.VISIT_HISTORY_GENERAL.WRITE)
     @Post('schedule')
     @ApiOperation({ summary: 'Agendar uma visita para um visitante' })
     @ApiResponse({ status: 201, description: 'Visita agendada com sucesso.' })
@@ -27,7 +27,7 @@ export class VisitHistoryController {
         return this.visitHistoryService.createVisitSchedule(createVisitScheduleDto);
     }
 
-    @Features(Permissions.VISIT_PRESENTS.CREATE)
+    @Features(Permissions.VISIT_HISTORY_GENERAL.WRITE)
     @Post('add')
     @ApiOperation({ summary: 'Adicionar um novo registro de visita' })
     @ApiResponse({ status: 201, description: 'Registro de visita adicionado com sucesso.' })
@@ -35,7 +35,7 @@ export class VisitHistoryController {
         return this.visitHistoryService.create(createVisitHistoryDto);
     }
 
-    @Features(Permissions.VISIT_PRESENTS.UPDATE)
+    @Features(Permissions.VISIT_HISTORY_GENERAL.WRITE)
     @Patch('start')
     @ApiOperation({ summary: 'Iniciar uma nova visita' })
     @ApiResponse({ status: 201, description: 'Visita iniciada com sucesso.' })
@@ -43,7 +43,7 @@ export class VisitHistoryController {
         return this.visitHistoryService.startVisit(startVisitDto.visitHistoryId);
     }
 
-    @Features(Permissions.VISIT_PRESENTS.UPDATE, Permissions.VISIT_PRESENTS.CONFIRM_EXIT)
+    @Features(Permissions.VISIT_HISTORY_GENERAL.WRITE)
     @Patch('leave')
     @ApiOperation({ summary: 'Finalizar a visita de um visitante' })
     @ApiResponse({ status: 200, description: 'Visita finalizada com sucesso.' })
@@ -51,7 +51,7 @@ export class VisitHistoryController {
         return this.visitHistoryService.endVisit(endVisitDto.visitHistoryId);
     }
 
-    @Features(Permissions.VISIT_SCHEDULES.CANCEL)
+    @Features(Permissions.VISIT_HISTORY_GENERAL.WRITE)
     @Patch('cancel/:id')
     @ApiOperation({ summary: 'Cancelar uma visita agendada pelo ID' })
     @ApiResponse({ status: 200, description: 'Visita agendada cancelada com sucesso.' })
@@ -67,7 +67,7 @@ export class VisitHistoryController {
         return await this.visitHistoryService.update(id, updateData);
     }
 
-    @Features(Permissions.VISIT_PRESENTS.READ_ALL, Permissions.VISIT_SCHEDULES.READ_ALL, Permissions.VISIT_HISTORY.READ_ALL)
+    @Features(Permissions.VISIT_HISTORY_GENERAL.READ)
     @Get()
     @ApiOperation({ summary: 'Obter histórico de visitas com filtros' })
     @ApiResponse({ status: 200, description: 'Histórico de visitas retornado com sucesso.' })
@@ -75,7 +75,7 @@ export class VisitHistoryController {
         return this.visitHistoryService.findAll(query);
     }
 
-    @Features(Permissions.VISIT_PRESENTS.READ_ALL, Permissions.VISIT_SCHEDULES.READ_ALL, Permissions.VISIT_HISTORY.READ_ALL)
+    @Features(Permissions.VISIT_HISTORY_GENERAL.READ)
     @Get('total-count')
     @ApiOperation({ summary: 'Obter a contagem total de registros de visita' })
     @ApiResponse({ status: 200, description: 'Contagem total de registros de visita retornada com sucesso.' })
@@ -83,7 +83,7 @@ export class VisitHistoryController {
         return this.visitHistoryService.getTotalCount();
     }
 
-    @Features(Permissions.VISIT_PRESENTS.READ_BY_ID, Permissions.VISIT_SCHEDULES.READ_BY_ID, Permissions.VISIT_HISTORY.READ_BY_ID)
+    @Features(Permissions.VISIT_HISTORY_GENERAL.READ)
     @Get(':id')
     @ApiOperation({ summary: 'Obter um registro de visita pelo ID' })
     @ApiResponse({ status: 200, description: 'Registro de visita retornado com sucesso.' })
@@ -91,7 +91,7 @@ export class VisitHistoryController {
         return await this.visitHistoryService.findById(id);
     }
 
-    @Features(Permissions.VISIT_PRESENTS.DELETE, Permissions.VISIT_SCHEDULES.DELETE, Permissions.VISIT_HISTORY.DELETE)
+    @Features(Permissions.VISIT_HISTORY_GENERAL.WRITE)
     @Delete(':id')
     @ApiOperation({ summary: 'Excluir um registro de visita pelo ID' })
     @ApiResponse({ status: 200, description: 'Registro de visita excluído com sucesso.' })

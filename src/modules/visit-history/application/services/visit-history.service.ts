@@ -118,7 +118,6 @@ export class VisitHistoryService {
     }
 
     return this.visitHistoryRepository.update(visitHistoryId, {
-      ...isVisitStarted,
       status: VisitHistoryStatus.PRESENT,
       arrivedAt: getCurrentUtcDate(),
     });
@@ -126,7 +125,7 @@ export class VisitHistoryService {
 
   async endVisit(visitHistoryId: string): Promise<VisitHistory> {
     const isVisitStarted = await this.visitHistoryRepository.findById(visitHistoryId);
-    if (!isVisitStarted) {
+    if (!isVisitStarted) {  
       throw new NotFoundException('A visita não foi encontrada.');
     }
 

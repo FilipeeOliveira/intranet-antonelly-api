@@ -68,9 +68,7 @@ const byDomain = (domains: string[]) => (f: { key: string }) =>
 
 function isReadFeature(key: string) {
   return (
-    key.endsWith("_READ") ||
-    key.endsWith("_READ_ALL") ||
-    key.endsWith("_READ_BY_ID")
+    key.endsWith("_READ")
   );
 }
 
@@ -114,9 +112,6 @@ export async function createRoleFeaturesSeed() {
             !isReadFeature(f.key),
         )
         .map((f) => f.id),
-
-      // Features de exportação
-      ...features.filter((f) => f.key.endsWith("_EXPORT")).map((f) => f.id),
     ],
 
     GERENTE: [
