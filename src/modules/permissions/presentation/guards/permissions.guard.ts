@@ -3,6 +3,7 @@ import {
     ExecutionContext,
     ForbiddenException,
     Injectable,
+    UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
@@ -26,7 +27,7 @@ export class PermissionsGuard implements CanActivate {
         const request = context.switchToHttp().getRequest();
         const user = request.user;
 
-        if (!user) throw new ForbiddenException('Usuário não autenticado');
+        if (!user) throw new UnauthorizedException('Usuário não autenticado');
 
         const userPerms = await this.prisma.user.findUnique({
             where: { id: user.id },
@@ -35,7 +36,7 @@ export class PermissionsGuard implements CanActivate {
             },
         });
 
-        if (!userPerms) throw new ForbiddenException('Usuário não encontrado');
+        if (!userPerms) throw new UnauthorizedException('Usuário não encontrado');
 
         const userFeatures = userPerms.permissions.map((p) => p.feature.key);
 
