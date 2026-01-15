@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 
 export interface Feature {
@@ -36,8 +36,16 @@ export class PermissionsService {
         });
     }
 
-    // permissions.service.ts
     async setUserPermissions(userId: string, featureIds: string[]) {
+        // Verifica se o usuário existe
+        const userExists = await this.prisma.user.findUnique({
+            where: { id: userId },
+        });
+
+        if (!userExists) {
+            throw new NotFoundException(`User with ID ${userId} not found`);
+        }
+
         // Remove todas as permissões antigas
         await this.prisma.userPermission.deleteMany({
             where: { userId },
@@ -64,7 +72,11 @@ export class PermissionsService {
             include: { permissions: { include: { feature: true } } },
         });
 
-        return user?.permissions.map((p) => p.feature) || [];
+        if (!user) {
+            throw new NotFoundException(`User with ID ${userId} not found`);
+        }
+
+        return user.permissions.map((p) => p.feature);
     }
 
 
@@ -77,6 +89,10 @@ export class PermissionsService {
                 },
             },
         });
+
+        if (!user) {
+            throw new NotFoundException(`User with ID ${userId} not found`);
+        }
 
         // Converter em formato JSON estruturado
         const pages: Record<string, any> = {};
