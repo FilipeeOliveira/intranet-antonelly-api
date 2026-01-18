@@ -110,3 +110,4 @@ Após executar o seed, os seguintes usuários estarão disponíveis:
 
 Este é um projeto interno da empresa Antonelly.
 
+

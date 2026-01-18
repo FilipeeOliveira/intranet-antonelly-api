@@ -47,6 +47,7 @@ export class LoginUseCase {
         setor: user.setor || undefined,
         role: user.role.key,
         permissions: user.permissions.map(p => p.feature.key),
+        isTemporaryPassword: user.isTemporaryPassword,
       };
 
       return {

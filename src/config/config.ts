@@ -12,6 +12,7 @@ export const envConfig = {
     JWT_SECRET: process.env.JWT_SECRET,
     JWT_EXP: process.env.JWT_EXP,
     API_URL: process.env.API_URL || `http://localhost:${process.env.PORT}`,
+    FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
     PORT: process.env.PORT,
     MODE: process.env.MODE || 'dev',
     MAIL_HOST: process.env.MAIL_HOST,

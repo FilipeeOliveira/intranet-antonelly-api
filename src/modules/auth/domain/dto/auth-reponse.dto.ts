@@ -26,6 +26,12 @@ export class UserProfileDto {
     required: false,
   })
   permissions?: string[];
+
+  @ApiProperty({
+    description: 'Indica se o usuário está usando uma senha temporária e precisa alterá-la',
+    required: false,
+  })
+  isTemporaryPassword?: boolean;
 }
 
 export class AuthResponseDto {
