@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { envConfig } from 'src/config/config';
+import { EmailModule } from '../email/email.module';
 import { PrismaModule } from '../prisma/prisma.module';
 import { AuthService } from './application/services/auth.service';
 import { ChangeTemporaryPasswordUseCase } from './application/use-cases/change-temporary-password.use-case';
@@ -24,6 +25,7 @@ import { TemporaryPasswordGuard } from './presentation/guards/temporary-password
       signOptions: { expiresIn: '1h' },
     }),
     PrismaModule,
+    EmailModule,
   ],
   controllers: [AuthController],
   providers: [

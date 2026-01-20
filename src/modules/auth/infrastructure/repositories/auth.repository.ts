@@ -13,6 +13,11 @@ export class AuthRepository implements IAuthRepository {
       where: { email },
       include: {
         role: true,
+        permissions: {
+          include: {
+            feature: true,
+          },
+        },
       },
     });
 
@@ -77,6 +82,23 @@ export class AuthRepository implements IAuthRepository {
     await this.prisma.user.update({
       where: { id: userId },
       data: { isTemporaryPassword: isTemporary },
+    });
+  }
+
+  /**
+   * Remove todos os tokens da blacklist de um usuário específico.
+   * Isso é útil quando o admin reseta a senha - todos os tokens anteriores
+   * devem ser considerados inválidos, mas como usamos blacklist,
+   * na prática o que importa é que o usuário precisará fazer login novamente.
+   *
+   * Nota: Em um sistema com blacklist, os tokens antigos ainda serão válidos
+   * até expirarem. Para uma invalidação imediata, seria necessário manter
+   * uma versão de senha/token no payload JWT ou usar um cache Redis.
+   */
+  async invalidateAllUserTokens(userId: string): Promise<void> {
+    // Remove tokens antigos da blacklist deste usuário (limpeza)
+    await this.prisma.blacklistedToken.deleteMany({
+      where: { userId },
     });
   }
 

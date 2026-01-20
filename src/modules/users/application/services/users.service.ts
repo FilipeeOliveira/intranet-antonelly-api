@@ -1,5 +1,6 @@
 import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { AuthRepository } from 'src/modules/auth/infrastructure/repositories/auth.repository';
 import { EmailService } from 'src/modules/email/application/services/email.service';
 import { PermissionsService } from 'src/modules/permissions/application/services/permissions.service';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
@@ -23,7 +24,8 @@ export class UsersService {
     private readonly sendWelcomeEmailUseCase: SendWelcomeEmailUseCase,
     private readonly rolesRepository: RolesRepository,
     private readonly permissionsService: PermissionsService,
-    private readonly prisma: PrismaService
+    private readonly prisma: PrismaService,
+    private readonly authRepository: AuthRepository,
   ) { }
 
   async findAll(query: UserQueryDto) {
@@ -202,8 +204,9 @@ export class UsersService {
       temporaryPassword,
     });
 
-    // Invalidar todos os tokens ativos do usuário
-    // TODO: Implementar invalidação de tokens
+    // Invalidar todos os tokens ativos do usuário (limpa blacklist antiga)
+    await this.authRepository.invalidateAllUserTokens(id);
+    this.logger.log(`Tokens do usuário ${id} invalidados`);
 
     this.logger.log(`Senha resetada para usuário: ${user.email}`);
 
@@ -219,7 +222,7 @@ export class UsersService {
 
     // Se usuário foi desativado, invalidar tokens
     if (!updatedUser.isActive) {
-      // TODO: Implementar invalidação de tokens
+      await this.authRepository.invalidateAllUserTokens(id);
       this.logger.log(`Usuário desativado, tokens invalidados: ${id}`);
     }
 

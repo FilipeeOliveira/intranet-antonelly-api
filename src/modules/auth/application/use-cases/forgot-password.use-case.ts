@@ -1,14 +1,18 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthRepository } from '../../infrastructure/repositories/auth.repository';
 import { ForgotPasswordDto } from '../../domain/dto/forgot-password.dto';
+import { EmailService } from 'src/modules/email/application/services/email.service';
 import { envConfig } from 'src/config/config';
 
 @Injectable()
 export class ForgotPasswordUseCase {
+  private readonly logger = new Logger(ForgotPasswordUseCase.name);
+
   constructor(
     private readonly authRepository: AuthRepository,
     private readonly jwtService: JwtService,
+    private readonly emailService: EmailService,
   ) {}
 
   async execute(forgotPasswordDto: ForgotPasswordDto): Promise<{ message: string; resetToken?: string }> {
@@ -29,18 +33,30 @@ export class ForgotPasswordUseCase {
       type: 'password_reset',
     };
 
-    const resetToken = this.jwtService.sign(resetPayload, { 
+    const resetToken = this.jwtService.sign(resetPayload, {
       expiresIn: '15m',
       secret: envConfig.JWT_SECRET + '_RESET', // Secret diferente para maior segurança
     });
 
-    // Em produção, aqui enviaria o email
-    // await this.emailService.sendPasswordResetEmail(user.email, resetToken);
+    // Montar link de recuperação
+    const resetLink = `${envConfig.FRONTEND_URL}/reset-password?token=${resetToken}`;
+
+    // Enviar email de recuperação de senha
+    try {
+      await this.emailService.sendForgotPasswordEmail(user.email, {
+        name: user.name,
+        resetLink,
+      });
+      this.logger.log(`Email de recuperação enviado para: ${user.email}`);
+    } catch (error) {
+      this.logger.error(`Falha ao enviar email de recuperação para: ${user.email}`, error);
+      // Não lançamos erro para não revelar se o email existe ou não
+    }
 
     return {
       message: 'Se o email existir no sistema, um link de recuperação será enviado.',
-      // Remover resetToken em produção - apenas para desenvolvimento/testes
-      resetToken, 
+      // Retorna resetToken apenas em modo de desenvolvimento para facilitar testes
+      ...(envConfig.MODE === 'dev' && { resetToken }),
     };
   }
 }

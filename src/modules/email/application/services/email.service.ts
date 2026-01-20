@@ -61,7 +61,7 @@ export class EmailService {
     }
 
     /**
-     * Envia email de redefinição de senha
+     * Envia email de redefinição de senha (com senha temporária - usado pelo admin)
      * (mantém assinatura para compatibilidade)
      */
     sendResetPasswordEmail(email: string, data: { name: string; email: string; temporaryPassword: string }) {
@@ -77,6 +77,27 @@ export class EmailService {
             .catch((error) => {
                 this.logger.error(`Erro ao enviar email de redefinição de senha para: ${email}`, error);
             });
+    }
+
+    /**
+     * Envia email de recuperação de senha com link (fluxo "esqueci minha senha")
+     */
+    async sendForgotPasswordEmail(email: string, data: { name: string; resetLink: string }): Promise<void> {
+        this.logger.log(`Enviando email de recuperação de senha para: ${email}`);
+
+        try {
+            await this.mailerService.sendMail({
+                to: email,
+                subject: 'Recuperação de Senha - Intranet Antonelly',
+                template: 'forgot-password',
+                context: data,
+            });
+
+            this.logger.log(`Email de recuperação de senha enviado para: ${email}`);
+        } catch (error) {
+            this.logger.error(`Erro ao enviar email de recuperação de senha para: ${email}`, error);
+            throw error;
+        }
     }
 
     /**

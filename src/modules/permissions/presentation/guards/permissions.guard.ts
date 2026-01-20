@@ -44,11 +44,7 @@ export class PermissionsGuard implements CanActivate {
         const hasAtLeastOne = requiredFeatures.some((f) =>
             userFeatures.includes(f),
         );
-
-        console.log('User Features:', userFeatures);
-        console.log('Required Features:', requiredFeatures);
-        console.log('Has At Least One:', hasAtLeastOne);
-
+        
         // 🔹 Opção 2: precisa ter TODAS as features
         // const hasAll = requiredFeatures.every((f) => userFeatures.includes(f));
         if (!hasAtLeastOne)
