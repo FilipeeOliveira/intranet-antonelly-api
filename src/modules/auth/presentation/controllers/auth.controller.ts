@@ -81,7 +81,7 @@ export class AuthController {
   @Throttle({ default: { limit: 3, ttl: 300000 } }) // 3 tentativas por 5 minutos
   @ApiBody({ type: ChangeTemporaryPasswordDto, description: 'Alterar senha temporária para permanente'})
   @ApiOkResponse({ description: 'Senha temporária alterada com sucesso' })
-  @ApiUnauthorizedResponse({ description: 'Senha temporária atual inválida' })
+  @ApiUnauthorizedResponse({ description: 'Usuário não encontrado ou inativo' })
   @ApiBadRequestResponse({ description: 'Senhas não coincidem ou usuário sem senha temporária' })
   async changeTemporaryPassword(
     @CurrentUser() user: any,

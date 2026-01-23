@@ -3,14 +3,6 @@ import { IsNotEmpty, IsString, MinLength, Matches } from 'class-validator';
 
 export class ChangeTemporaryPasswordDto {
   @ApiProperty({
-    description: 'Senha temporária atual',
-    example: 'TempPass@123',
-  })
-  @IsString({ message: 'Senha temporária deve ser uma string' })
-  @IsNotEmpty({ message: 'Senha temporária é obrigatória' })
-  currentPassword: string;
-
-  @ApiProperty({
     description: 'Nova senha permanente do usuário',
     example: 'MinhaNovaSenh@123',
     minLength: 8,
