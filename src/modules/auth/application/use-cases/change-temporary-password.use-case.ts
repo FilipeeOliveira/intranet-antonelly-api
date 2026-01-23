@@ -11,7 +11,7 @@ export class ChangeTemporaryPasswordUseCase {
     userId: string,
     changePasswordDto: ChangeTemporaryPasswordDto,
   ): Promise<{ message: string }> {
-    const { currentPassword, newPassword, confirmPassword } = changePasswordDto;
+    const { newPassword, confirmPassword } = changePasswordDto;
 
     // Verificar se as senhas coincidem
     if (newPassword !== confirmPassword) {
@@ -27,12 +27,6 @@ export class ChangeTemporaryPasswordUseCase {
     // Verificar se realmente tem senha temporária
     if (!user.isTemporaryPassword) {
       throw new BadRequestException('Usuário não possui senha temporária');
-    }
-
-    // Verificar senha temporária atual
-    const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
-    if (!isCurrentPasswordValid) {
-      throw new UnauthorizedException('Senha temporária atual inválida');
     }
 
     // Hash da nova senha com salt rounds 12
