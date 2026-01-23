@@ -50,8 +50,10 @@ export class MeetingRepository {
         }
 
         if (startDate) {
-            const endDate = moment(startDate).endOf('day').toDate(); // Evita que traga dados de dias posteriores.
-            where.date = { gte: moment(startDate).startOf('day').toDate(), lte: endDate };
+            // Usa UTC para consistência com a forma como as datas são armazenadas
+            const startOfDay = moment.utc(startDate).startOf('day').toDate();
+            const endOfDay = moment.utc(startDate).endOf('day').toDate();
+            where.date = { gte: startOfDay, lte: endOfDay };
         }
 
         const orderBy: any = [
@@ -120,14 +122,16 @@ export class MeetingRepository {
 
         switch (status) {
             case MeetingStatus.SCHEDULED:
+                // Busca reuniões agendadas que já deveriam ter começado (startTime <= hora atual)
                 Object.assign(where, {
-                    startTime: { gte: hour, lte: hour },
+                    startTime: { lte: hour },
                 });
                 break;
 
             case MeetingStatus.IN_PROGRESS:
+                // Busca reuniões em andamento que já deveriam ter terminado (endTime <= hora atual)
                 Object.assign(where, {
-                    endTime: { gte: hour, lte: hour },
+                    endTime: { lte: hour },
                 });
                 break;
         }
