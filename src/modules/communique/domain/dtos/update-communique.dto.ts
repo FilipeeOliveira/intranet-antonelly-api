@@ -48,4 +48,13 @@ export class UpdateCommuniqueDto {
         format: 'binary',
     })
     image?: Express.Multer.File;
+
+    @ApiProperty({
+        description: 'Remove a imagem do comunicado (enviar "true" para remover)',
+        example: 'true',
+        required: false,
+    })
+    @IsString()
+    @IsOptional()
+    removeImage?: string;
 }

@@ -134,8 +134,19 @@ export class CommuniqueRepository {
     }
 
     async update(id: string, data: UpdateCommuniqueDto) {
+        const { sectorId, authorId, ...rest } = data as any;
 
-        return this.prisma.communique.update({ where: { id }, data });
+        const updateData: any = { ...rest };
+
+        if (sectorId) {
+            updateData.sector = { connect: { id: sectorId } };
+        }
+
+        if (authorId) {
+            updateData.author = { connect: { id: authorId } };
+        }
+
+        return this.prisma.communique.update({ where: { id }, data: updateData });
     }
 
     async delete(id: string) {
