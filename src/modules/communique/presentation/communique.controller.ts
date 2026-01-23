@@ -47,12 +47,9 @@ export class CommuniqueController {
     })
     async createCommunique(
         @Body() body: CreateCommuniqueDto,
-        @UploadedFile() file: Express.Multer.File
+        @UploadedFile() file?: Express.Multer.File
     ) {
-
-        if (!file) throw new BadRequestException("Imagem do comunicado é obrigatória.");
-
-        const imagePath = file.filename;
+        const imagePath = file?.filename;
 
         return this.communiqueService.create(body, imagePath);
     }

@@ -211,8 +211,8 @@ model Communique {
   title       String
   description String
   severity    String
-  imagePath   String
-  imageUrl    String
+  imagePath   String?
+  imageUrl    String?
   authorId    String
   sectorId    String
   createdAt   DateTime @default(now())

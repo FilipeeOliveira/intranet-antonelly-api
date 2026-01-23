@@ -26,11 +26,11 @@ export class CommuniqueService {
         private readonly sendEmailCommuniqueBySector: SendEmailCommuniqueBySector,
     ) { }
 
-    async create(data: CreateCommuniqueDto, filename: string) {
+    async create(data: CreateCommuniqueDto, filename?: string) {
         const communique = await this.communiqueRepository.create({
             ...data,
-            imagePath: `/uploads/communiques/${filename}`,
-            imageUrl: envConfig.API_URL + `/api/v1/communiques/image/${filename}`,
+            imagePath: filename ? `/uploads/communiques/${filename}` : null,
+            imageUrl: filename ? envConfig.API_URL + `/api/v1/communiques/image/${filename}` : null,
         });
 
         this.sendEmailCommuniqueBySector.execute(
@@ -127,14 +127,25 @@ export class CommuniqueService {
 
                 updateData.imagePath = `/uploads/communiques/${imagePath}`
                 updateData.imageUrl = envConfig.API_URL + `/api/v1/communiques/image/${imagePath}`
+            } else if (dto.removeImage === 'true' && communique.imagePath) {
+                // Remover imagem sem substituir
+                const oldImagePath = join(process.cwd(), communique.imagePath)
+                try {
+                    await fs.unlink(oldImagePath)
+                } catch (err) {
+                    console.warn('Não foi possível deletar a imagem:', err)
+                }
+                updateData.imagePath = null
+                updateData.imageUrl = null
             }
 
-            // 6. Limpar undefined
+            // 6. Limpar undefined e campos que não existem no schema
             for (const key in updateData) {
                 if (updateData[key] === undefined) {
                     delete updateData[key]
                 }
             }
+            delete updateData.removeImage
 
             // 7. Persistir no banco
             await this.communiqueRepository.update(id, updateData)
