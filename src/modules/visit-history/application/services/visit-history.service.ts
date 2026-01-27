@@ -92,20 +92,17 @@ export class VisitHistoryService {
     totalPresent: number;
     totalScheduled: number;
     totalLeft: number;
-    totalCanceled: number;
   }> {
-    const [totalPresent, totalScheduled, totalLeft, totalCanceled] = await Promise.all([
+    const [totalPresent, totalScheduled, totalLeft] = await Promise.all([
       this.visitHistoryRepository.count({ status: VisitHistoryStatus.PRESENT }),
       this.visitHistoryRepository.count({ status: VisitHistoryStatus.SCHEDULED }),
       this.visitHistoryRepository.count({ status: VisitHistoryStatus.LEFT }),
-      this.visitHistoryRepository.count({ status: VisitHistoryStatus.CANCELED }),
     ]);
 
     return {
       totalPresent,
       totalScheduled,
       totalLeft,
-      totalCanceled,
     };
   }
 
@@ -173,7 +170,7 @@ export class VisitHistoryService {
     return this.visitHistoryRepository.update(id, updateDto);
   }
 
-  async cancelScheduledVisit(id: string): Promise<VisitHistory> {
+  async cancelScheduledVisit(id: string): Promise<{ message: string }> {
     const history = await this.visitHistoryRepository.findById(id);
     if (!history) throw new NotFoundException('Histórico não encontrado.');
 
@@ -181,9 +178,9 @@ export class VisitHistoryService {
       throw new BadRequestException('Apenas visitas agendadas podem ser canceladas.');
     }
 
-    return this.visitHistoryRepository.update(id, {
-      status: VisitHistoryStatus.CANCELED,
-    });
+    await this.visitHistoryRepository.delete(id);
+
+    return { message: 'Visita cancelada e removida com sucesso.' };
   }
 
   async delete(id: string): Promise<VisitHistory> {
