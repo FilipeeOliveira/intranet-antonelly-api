@@ -152,11 +152,11 @@ export class VisitHistoryService {
     if (!history) throw new NotFoundException('Histórico não encontrado.');
 
     let updateDto: Partial<VisitHistory> = {
-      name: dto.visitorName ?? history.name,
-      cpf: dto.visitorCpf ?? history.cpf,
-      phone: dto.visitorPhone ?? history.phone,
-      description: dto.description ?? history.description,
-      companyId: dto.companyId ?? history.companyId,
+      name: dto.visitorName !== undefined ? dto.visitorName : history.name,
+      cpf: dto.visitorCpf !== undefined ? dto.visitorCpf : history.cpf,
+      phone: dto.visitorPhone !== undefined ? dto.visitorPhone : history.phone,
+      description: dto.description !== undefined ? dto.description : history.description,
+      companyId: dto.companyId !== undefined ? dto.companyId : history.companyId,
     };
 
     if (dto.arrivedAt) {
