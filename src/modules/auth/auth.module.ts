@@ -22,7 +22,7 @@ import { TemporaryPasswordGuard } from './presentation/guards/temporary-password
     PassportModule,
     JwtModule.register({
       secret: envConfig.JWT_SECRET,
-      signOptions: { expiresIn: '1h' },
+      signOptions: { expiresIn: envConfig.JWT_EXPIRES_IN },
     }),
     PrismaModule,
     EmailModule,
