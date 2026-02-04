@@ -6,8 +6,10 @@ import { LoginDto } from '../../domain/dto/login.dto';
 import { AuthResponseDto } from '../../domain/dto/auth-reponse.dto';
 import { ForgotPasswordDto } from '../../domain/dto/forgot-password.dto';
 import { ResetPasswordDto } from '../../domain/dto/reset-password.dto';
+import { ValidateResetTokenDto } from '../../domain/dto/validate-reset-token.dto';
 import { ForgotPasswordUseCase } from '../../application/use-cases/forgot-password.use-case';
 import { ResetPasswordUseCase } from '../../application/use-cases/reset-password.use-case';
+import { ValidateResetTokenUseCase } from '../../application/use-cases/validate-reset-token.use-case';
 import { LogoutUseCase } from '../../application/use-cases/logout.use-case';
 import { ChangeTemporaryPasswordUseCase } from '../../application/use-cases/change-temporary-password.use-case';
 import { ChangeTemporaryPasswordDto } from '../../domain/dto/change-temporary-password.dto';
@@ -23,6 +25,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly forgotPasswordUseCase: ForgotPasswordUseCase,
     private readonly resetPasswordUseCase: ResetPasswordUseCase,
+    private readonly validateResetTokenUseCase: ValidateResetTokenUseCase,
     private readonly logoutUseCase: LogoutUseCase,
     private readonly changeTemporaryPasswordUseCase: ChangeTemporaryPasswordUseCase,
   ) {}
@@ -47,6 +50,17 @@ export class AuthController {
   async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto): Promise<{ message: string }> {
     const result = await this.forgotPasswordUseCase.execute(forgotPasswordDto);
     return { message: result.message };
+  }
+
+  @Post('validate-reset-token')
+  @HttpCode(HttpStatus.OK)
+  @SkipTemporaryPasswordCheck()
+  @Throttle({ default: { limit: 10, ttl: 300000 } }) // 10 tentativas por 5 minutos
+  @ApiBody({ type: ValidateResetTokenDto, description: 'Token de recuperação para validação'})
+  @ApiOkResponse({ description: 'Token válido' })
+  @ApiUnauthorizedResponse({ description: 'Token inválido ou expirado' })
+  async validateResetToken(@Body() validateResetTokenDto: ValidateResetTokenDto): Promise<{ valid: boolean; message: string; expiresAt?: string }> {
+    return this.validateResetTokenUseCase.execute(validateResetTokenDto);
   }
 
   @Post('reset-password')
