@@ -10,6 +10,7 @@ import { ForgotPasswordUseCase } from './application/use-cases/forgot-password.u
 import { LoginUseCase } from './application/use-cases/login.use-case';
 import { LogoutUseCase } from './application/use-cases/logout.use-case';
 import { ResetPasswordUseCase } from './application/use-cases/reset-password.use-case';
+import { ValidateResetTokenUseCase } from './application/use-cases/validate-reset-token.use-case';
 import { ValidateUserUseCase } from './application/use-cases/validate-user.use-case';
 import { AuthRepository } from './infrastructure/repositories/auth.repository';
 import { JwtStrategy } from './infrastructure/strategies/jwt.strategy';
@@ -36,6 +37,7 @@ import { TemporaryPasswordGuard } from './presentation/guards/temporary-password
     ValidateUserUseCase,
     ForgotPasswordUseCase,
     ResetPasswordUseCase,
+    ValidateResetTokenUseCase,
     LogoutUseCase,
     ChangeTemporaryPasswordUseCase,
 

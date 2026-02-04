@@ -34,7 +34,7 @@ export class ForgotPasswordUseCase {
     };
 
     const resetToken = this.jwtService.sign(resetPayload, {
-      expiresIn: '15m',
+      expiresIn: envConfig.RESET_TOKEN_EXPIRES_IN,
       secret: envConfig.JWT_SECRET + '_RESET', // Secret diferente para maior segurança
     });
 
