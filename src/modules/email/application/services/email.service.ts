@@ -2,6 +2,11 @@ import { Injectable, Logger } from "@nestjs/common";
 import { MailerService } from "@nestjs-modules/mailer";
 import moment from "moment";
 
+const SEVERITY_CONFIG: Record<string, { label: string; color: string }> = {
+    INFO: { label: 'Informativo', color: '#10b981' },
+    WARNING: { label: 'Atenção', color: '#f97316' },
+};
+
 export interface CommuniqueEmailContext {
     isUpdate?: boolean;
     title: string;
@@ -111,16 +116,21 @@ export class EmailService {
             `Enviando comunicado "${context.title}" para ${to.length} destinatários`,
         );
 
+        const severityInfo = SEVERITY_CONFIG[context.severity] || { label: context.severity, color: '#71717a' };
+
         await this.mailerService.sendMail({
             to,
-            subject: `${context?.isUpdate ? '(Atualização de Comunicado) ' : ''}[${context.severity}] ${context.title}`,
+            subject: `${context?.isUpdate ? '(Atualização de Comunicado) ' : ''}[${severityInfo.label}] ${context.title}`,
             template: "communique",
             context: {
                 ...context,
                 isUpdate: context?.isUpdate,
+                severityLabel: severityInfo.label,
+                severityColor: severityInfo.color,
                 createdAt: moment(context.createdAt)
                     .utc(true)
                     .format("DD/MM/YYYY HH:mm"),
+                year: new Date().getFullYear(),
             },
         });
 
