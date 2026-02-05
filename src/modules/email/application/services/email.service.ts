@@ -59,7 +59,10 @@ export class EmailService {
             to,
             subject: "Bem-vindo!",
             template: "welcome",
-            context
+            context: {
+                ...context,
+                year: new Date().getFullYear(),
+            },
         });
 
         this.logger.log(`Email de boas-vindas enviado para: ${to}`);
@@ -74,7 +77,10 @@ export class EmailService {
             to: email,
             subject: 'Redefinição de Senha',
             template: 'reset-password',
-            context: data,
+            context: {
+                ...data,
+                year: new Date().getFullYear(),
+            },
         })
             .then(() => {
                 this.logger.log(`Email de redefinição de senha enviado para: ${email}`);
@@ -95,7 +101,10 @@ export class EmailService {
                 to: email,
                 subject: 'Recuperação de Senha - Intranet Antonelly',
                 template: 'forgot-password',
-                context: data,
+                context: {
+                    ...data,
+                    year: new Date().getFullYear(),
+                },
             });
 
             this.logger.log(`Email de recuperação de senha enviado para: ${email}`);
