@@ -15,9 +15,10 @@ export class VisitHistoryRepository {
 
     let where: any = {};
     if (search) {
-      where = {
-        name: { contains: search, mode: 'insensitive' },
-      }
+      where.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { cpf: { contains: search, mode: 'insensitive' } },
+      ];
     }
 
     if (status) {

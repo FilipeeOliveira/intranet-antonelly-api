@@ -2,113 +2,196 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <title>Bem-vindo</title>
+    <title>Bem-vindo ao sistema</title>
   </head>
 
-  <body style="margin:0; padding:0; background-color:#f4f4f4; font-family: Arial, sans-serif;">
+  <body style="margin:0; padding:0; background:#f4f5f7; font-family: Arial, Helvetica, sans-serif;">
     <table width="100%" cellpadding="0" cellspacing="0">
       <tr>
-        <td align="center" style="padding: 24px;">
+        <td align="center" style="padding:32px 16px;">
+
           <!-- Container -->
           <table
             width="600"
             cellpadding="0"
             cellspacing="0"
-            style="background:#ffffff; border-radius:6px; overflow:hidden;"
+            style="
+              background:#ffffff;
+              border-radius:12px;
+              overflow:hidden;
+              border:1px solid #e5e7eb;
+            "
           >
 
             <!-- Header -->
             <tr>
-              <td style="padding:16px 24px; background:#1f2937; color:#ffffff;">
-                <h2 style="margin:0; font-size:18px;">
-                  Bem-vindo ao sistema
-                </h2>
+              <td style="background:#10b981; padding:20px 24px;">
+                <table width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td align="left" valign="middle">
+                      <p
+                        style="
+                          margin:0;
+                          font-size:20px;
+                          font-weight:bold;
+                          color:#ffffff;
+                        "
+                      >
+                        Bem-vindo ao sistema
+                      </p>
+                    </td>
+
+                    <td align="right" valign="middle">
+                      <span
+                        style="
+                          display:inline-block;
+                          background:#059669;
+                          color:#ffffff;
+                          font-size:12px;
+                          font-weight:bold;
+                          padding:6px 12px;
+                          border-radius:999px;
+                        "
+                      >
+                        CONTA CRIADA
+                      </span>
+                    </td>
+                  </tr>
+                </table>
               </td>
             </tr>
 
             <!-- Content -->
             <tr>
-              <td style="padding:24px;">
-                <h1 style="margin-top:0; font-size:22px; color:#111827;">
+              <td style="padding:28px 24px;">
+
+                <!-- Saudação -->
+                <h1
+                  style="
+                    margin:0 0 12px 0;
+                    font-size:22px;
+                    color:#111827;
+                  "
+                >
                   Olá, {{name}} 👋
                 </h1>
 
-                <p style="font-size:14px; color:#374151; line-height:1.6;">
-                  Sua conta foi criada com sucesso. Utilize as credenciais abaixo
-                  para acessar o sistema.
-                </p>
-
-                <!-- Email -->
-                <div
+                <p
                   style="
-                    margin: 16px 0;
-                    padding: 12px 16px;
-                    background-color: #f3f4f6;
-                    border-radius: 4px;
-                    font-size: 14px;
-                    color: #111827;
+                    margin:0 0 24px 0;
+                    font-size:14px;
+                    color:#4b5563;
+                    line-height:1.6;
                   "
                 >
-                  <strong>E-mail de acesso:</strong><br />
-                  <span
+                  Sua conta foi criada com sucesso. Abaixo estão as informações
+                  necessárias para acessar o sistema.
+                </p>
+
+                <!-- Card Email -->
+                <div
+                  style="
+                    margin-bottom:16px;
+                    padding:16px;
+                    border:1px solid #e5e7eb;
+                    border-radius:8px;
+                    background:#f9fafb;
+                  "
+                >
+                  <p
                     style="
-                      display: inline-block;
-                      margin-top: 6px;
+                      margin:0 0 6px 0;
+                      font-size:12px;
+                      font-weight:bold;
+                      color:#6b7280;
+                      text-transform:uppercase;
+                      letter-spacing:0.04em;
+                    "
+                  >
+                    E-mail de acesso
+                  </p>
+                  <p
+                    style="
+                      margin:0;
+                      font-size:14px;
+                      color:#10b981;
                       font-family: monospace;
-                      background: #e5e7eb;
-                      padding: 6px 10px;
-                      border-radius: 4px;
                     "
                   >
                     {{email}}
-                  </span>
+                  </p>
                 </div>
 
                 {{#if temporaryPassword}}
+                <!-- Card Senha -->
                 <div
                   style="
-                    margin: 16px 0;
-                    padding: 12px 16px;
-                    background-color: #f3f4f6;
-                    border-radius: 4px;
-                    font-size: 14px;
-                    color: #111827;
+                    margin-bottom:24px;
+                    padding:16px;
+                    border:1px solid #e5e7eb;
+                    border-radius:8px;
+                    background:#f9fafb;
                   "
                 >
-                  <strong>Senha temporária:</strong><br />
-                  <span
+                  <p
                     style="
-                      display: inline-block;
-                      margin-top: 6px;
+                      margin:0 0 6px 0;
+                      font-size:12px;
+                      font-weight:bold;
+                      color:#6b7280;
+                      text-transform:uppercase;
+                      letter-spacing:0.04em;
+                    "
+                  >
+                    Senha temporária
+                  </p>
+                  <p
+                    style="
+                      margin:0;
+                      font-size:15px;
+                      font-weight:bold;
+                      color:#111827;
                       font-family: monospace;
-                      font-size: 16px;
-                      background: #e5e7eb;
-                      padding: 6px 10px;
-                      border-radius: 4px;
+                      letter-spacing:1px;
                     "
                   >
                     {{temporaryPassword}}
-                  </span>
+                  </p>
                 </div>
                 {{/if}}
 
-                <p style="font-size:14px; color:#374151; line-height:1.6;">
-                  Por segurança, recomendamos que você altere sua senha no
-                  primeiro acesso.
-                </p>
+                <!-- CTA -->
+                <div style="text-align:center; margin-bottom:24px;">
+                  <a
+                    href="{{loginUrl}}"
+                    style="
+                      display:inline-block;
+                      background:#10b981;
+                      color:#ffffff;
+                      text-decoration:none;
+                      padding:12px 28px;
+                      border-radius:8px;
+                      font-size:14px;
+                      font-weight:bold;
+                    "
+                  >
+                    Acessar o sistema
+                  </a>
+                </div>
 
-                <hr
+                <!-- Aviso -->
+                <p
                   style="
-                    border: none;
-                    border-top: 1px solid #e5e7eb;
-                    margin: 24px 0;
+                    margin:0;
+                    font-size:13px;
+                    color:#6b7280;
+                    line-height:1.6;
                   "
-                />
-
-                <p style="font-size:12px; color:#6b7280;">
-                  Caso tenha dúvidas ou dificuldades no acesso, entre em contato
-                  com o setor responsável.
+                >
+                  Por segurança, recomendamos que você altere sua senha no primeiro
+                  acesso.
                 </p>
+
               </td>
             </tr>
 
@@ -116,13 +199,20 @@
             <tr>
               <td
                 style="
-                  padding: 16px 24px;
-                  background: #f9fafb;
-                  text-align: center;
+                  padding:16px 24px;
+                  background:#f9fafb;
+                  text-align:center;
+                  border-top:1px solid #e5e7eb;
                 "
               >
-                <p style="font-size:11px; color:#9ca3af; margin:0;">
-                  Este é um e-mail automático. Por favor, não responda.
+                <p
+                  style="
+                    margin:0;
+                    font-size:11px;
+                    color:#6b7280;
+                  "
+                >
+                  © {{year}} • Este é um e-mail automático. Por favor, não responda.
                 </p>
               </td>
             </tr>

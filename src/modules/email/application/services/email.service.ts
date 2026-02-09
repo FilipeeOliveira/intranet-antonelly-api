@@ -2,6 +2,11 @@ import { Injectable, Logger } from "@nestjs/common";
 import { MailerService } from "@nestjs-modules/mailer";
 import moment from "moment";
 
+const SEVERITY_CONFIG: Record<string, { label: string; color: string }> = {
+    INFO: { label: 'Informativo', color: '#10b981' },
+    WARNING: { label: 'Atenção', color: '#f97316' },
+};
+
 export interface CommuniqueEmailContext {
     isUpdate?: boolean;
     title: string;
@@ -54,7 +59,10 @@ export class EmailService {
             to,
             subject: "Bem-vindo!",
             template: "welcome",
-            context
+            context: {
+                ...context,
+                year: new Date().getFullYear(),
+            },
         });
 
         this.logger.log(`Email de boas-vindas enviado para: ${to}`);
@@ -69,7 +77,10 @@ export class EmailService {
             to: email,
             subject: 'Redefinição de Senha',
             template: 'reset-password',
-            context: data,
+            context: {
+                ...data,
+                year: new Date().getFullYear(),
+            },
         })
             .then(() => {
                 this.logger.log(`Email de redefinição de senha enviado para: ${email}`);
@@ -90,7 +101,10 @@ export class EmailService {
                 to: email,
                 subject: 'Recuperação de Senha - Intranet Antonelly',
                 template: 'forgot-password',
-                context: data,
+                context: {
+                    ...data,
+                    year: new Date().getFullYear(),
+                },
             });
 
             this.logger.log(`Email de recuperação de senha enviado para: ${email}`);
@@ -111,16 +125,21 @@ export class EmailService {
             `Enviando comunicado "${context.title}" para ${to.length} destinatários`,
         );
 
+        const severityInfo = SEVERITY_CONFIG[context.severity] || { label: context.severity, color: '#71717a' };
+
         await this.mailerService.sendMail({
             to,
-            subject: `${context?.isUpdate ? '(Atualização de Comunicado) ' : ''}[${context.severity}] ${context.title}`,
+            subject: `${context?.isUpdate ? '(Atualização de Comunicado) ' : ''}[${severityInfo.label}] ${context.title}`,
             template: "communique",
             context: {
                 ...context,
                 isUpdate: context?.isUpdate,
+                severityLabel: severityInfo.label,
+                severityColor: severityInfo.color,
                 createdAt: moment(context.createdAt)
                     .utc(true)
                     .format("DD/MM/YYYY HH:mm"),
+                year: new Date().getFullYear(),
             },
         });
 
