@@ -10,11 +10,12 @@ import { CreateSectorDto } from '../../domain/dto/create-sector.dto';
 import { SectorQueryDto } from '../../domain/dto/sector-query.dto';
 import { UpdateSectorDto } from '../../domain/dto/update-sector.dto';
 
-const NESTED_PERMISSIONS = [
-    Permissions.COMMUNIQUES.WRITE,
-    Permissions.COMMUNIQUES.READ,
-    Permissions.DOCUMENTS.WRITE,
-    Permissions.DOCUMENTS.READ
+/** Telas que precisam LER setores: Usuarios, Comunicados, Reservas, Procedimentos */
+const READ_ALLOWED_BY = [
+    Permissions.USERS.READ, Permissions.USERS.WRITE,
+    Permissions.COMMUNIQUES.READ, Permissions.COMMUNIQUES.WRITE,
+    Permissions.MEETINGS.READ, Permissions.MEETINGS.WRITE,
+    Permissions.DOCUMENTS.READ, Permissions.DOCUMENTS.WRITE,
 ];
 
 @ApiTags('Gestão de Setores')
@@ -26,7 +27,7 @@ export class SectorController {
 
 
 
-    @Features(Permissions.SECTORS.WRITE, ...NESTED_PERMISSIONS)
+    @Features(Permissions.SECTORS.WRITE, Permissions.USERS.WRITE)
     @Post()
     @ApiOperation({ summary: 'Criar novo setor' })
     @ApiResponse({ status: 201, description: 'Setor criado com sucesso.' })
@@ -34,7 +35,7 @@ export class SectorController {
         return this.sectorService.create(dto);
     }
 
-    @Features(Permissions.SECTORS.READ, ...NESTED_PERMISSIONS)
+    @Features(Permissions.SECTORS.READ, ...READ_ALLOWED_BY)
     @Get()
     @ApiOperation({ summary: 'Listar setores com filtros e paginação' })
     @ApiResponse({ status: 200, description: 'Lista de setores retornada com sucesso.' })
@@ -42,7 +43,7 @@ export class SectorController {
         return this.sectorService.findAll(query);
     }
 
-    @Features(Permissions.SECTORS.READ, ...NESTED_PERMISSIONS)
+    @Features(Permissions.SECTORS.READ, ...READ_ALLOWED_BY)
     @Get(':id')
     @ApiOperation({ summary: 'Buscar setor por ID' })
     @ApiResponse({ status: 200, description: 'Setor encontrado.' })
@@ -51,7 +52,7 @@ export class SectorController {
         return this.sectorService.findById(id);
     }
 
-    @Features(Permissions.SECTORS.WRITE)
+    @Features(Permissions.SECTORS.WRITE, Permissions.USERS.WRITE)
     @Put(':id')
     @ApiOperation({ summary: 'Atualizar setor' })
     @ApiResponse({ status: 200, description: 'Setor atualizado com sucesso.' })
@@ -59,7 +60,7 @@ export class SectorController {
         return this.sectorService.update(id, dto);
     }
 
-    @Features(Permissions.SECTORS.WRITE)
+    @Features(Permissions.SECTORS.WRITE, Permissions.USERS.WRITE)
     @Delete(':id')
     @ApiOperation({ summary: 'Deletar setor' })
     @ApiResponse({ status: 200, description: 'Setor removido com sucesso.' })

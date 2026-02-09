@@ -82,7 +82,7 @@ export class DocumentRepository {
       data: {
         ...data,
         version: '1.0',
-        status: DocumentStatus.PENDING,
+        status: DocumentStatus.APPROVED,
       },
       include: { sector: true },
     });

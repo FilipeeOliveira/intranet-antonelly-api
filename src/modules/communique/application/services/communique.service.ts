@@ -7,7 +7,6 @@ import { CommuniqueRepository } from "../../infrasctructure/repositories/communi
 import { promises as fs } from "fs";
 import * as path from "path";
 import { join } from "path";
-import { envConfig } from "src/config/config";
 import { SectorRepository } from "src/modules/sectors/infrastructure/repositories/sector.repository";
 import { UsersRepository } from "src/modules/users/infrastructure/repositories/users.repository";
 import { CommuniquesGateway } from "../../infrasctructure/gateways/communiques.gateway";
@@ -30,7 +29,7 @@ export class CommuniqueService {
         const communique = await this.communiqueRepository.create({
             ...data,
             imagePath: filename ? `/uploads/communiques/${filename}` : null,
-            imageUrl: filename ? envConfig.API_URL + `/api/v1/communiques/image/${filename}` : null,
+            imageUrl: filename ? `/api/v1/communiques/image/${filename}` : null,
         });
 
         this.sendEmailCommuniqueBySector.execute(
@@ -126,7 +125,7 @@ export class CommuniqueService {
                 }
 
                 updateData.imagePath = `/uploads/communiques/${imagePath}`
-                updateData.imageUrl = envConfig.API_URL + `/api/v1/communiques/image/${imagePath}`
+                updateData.imageUrl = `/api/v1/communiques/image/${imagePath}`
             } else if (dto.removeImage === 'true' && communique.imagePath) {
                 // Remover imagem sem substituir
                 const oldImagePath = join(process.cwd(), communique.imagePath)

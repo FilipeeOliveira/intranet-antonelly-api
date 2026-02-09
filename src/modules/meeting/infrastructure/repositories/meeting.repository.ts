@@ -13,10 +13,11 @@ export enum MeetingStatus {
 export class MeetingRepository {
     constructor(private readonly prisma: PrismaService) { }
 
-    async findConflict(date: Date, startTime: string, endTime: string, excludeId?: string) {
+    async findConflict(date: Date, startTime: string, endTime: string, roomId: string, excludeId?: string) {
         return this.prisma.meetingSchedule.findFirst({
             where: {
                 date,
+                roomId,
                 id: excludeId ? { not: excludeId } : undefined,
                 AND: [
                     {

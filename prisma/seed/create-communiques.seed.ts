@@ -46,7 +46,7 @@ export async function createCommuniquesSeed() {
       authorId: author.id,
       sectorId: author.sectorId,
       imagePath: '/uploads/communiques/1765916768275-859146728.png', // Exemplo de imagem
-      imageUrl: 'http://localhost:3005/api/v1/communiques/image/1765916831539-992297317.png', // Exemplo de URL
+      imageUrl: '/api/v1/communiques/image/1765916831539-992297317.png', // Exemplo de URL
       createdAt: new Date(
         Date.now() - Math.floor(Math.random() * 1000 * 60 * 60 * 24 * 30)
       ),

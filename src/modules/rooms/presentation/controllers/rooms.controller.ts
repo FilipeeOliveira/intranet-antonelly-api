@@ -1,6 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query } from "@nestjs/common";
-import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
+import { AuthGuard } from "@nestjs/passport";
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { AuthenticateGuard } from "src/modules/auth/presentation/guards/authenticate.guard";
 import { Features } from "src/modules/permissions/presentation/guards/features.decorator";
+import { PermissionsGuard } from "src/modules/permissions/presentation/guards/permissions.guard";
 import { Permissions } from "src/shared/features";
 import { RoomsService } from "../../application/services/rooms.service";
 import { CreateRoomDto } from "../../domain/dto/create-room.dto";
@@ -8,6 +11,8 @@ import { RoomsQueryDto } from "../../domain/dto/rooms-query.dto";
 import { UpdateRoomDto } from "../../domain/dto/update-room.dto";
 
 @ApiTags('Gerenciamento de Salas')
+@ApiBearerAuth()
+@UseGuards(AuthGuard('jwt'), AuthenticateGuard, PermissionsGuard)
 @Controller('rooms')
 export class RoomsController {
     constructor(
@@ -22,7 +27,7 @@ export class RoomsController {
         return await this.roomsService.create(createRoomDto);
     }
 
-    @Features(Permissions.ROOMS.READ)
+    @Features(Permissions.ROOMS.READ, Permissions.MEETINGS.READ, Permissions.MEETINGS.WRITE)
     @Get()
     @ApiOperation({ summary: 'Listar salas com filtros e paginação' })
     @ApiResponse({ status: 200, description: 'Lista de salas retornada com sucesso.' })
@@ -30,7 +35,7 @@ export class RoomsController {
         return await this.roomsService.findAll(query);
     }
 
-    @Features(Permissions.ROOMS.READ)
+    @Features(Permissions.ROOMS.READ, Permissions.MEETINGS.READ, Permissions.MEETINGS.WRITE)
     @Get(':id')
     @ApiOperation({ summary: 'Buscar sala por ID' })
     @ApiResponse({ status: 200, description: 'Sala encontrada com sucesso.' })

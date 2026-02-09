@@ -17,7 +17,7 @@ import { UpdateCompanyDto } from '../../domain/dto/update-companie.dto';
 export class CompanyController {
   constructor(private readonly companyService: CompanyService) { }
 
-  @Features(Permissions.COMPANIES.WRITE)
+  @Features(Permissions.COMPANIES.WRITE, Permissions.VISIT_HISTORY_GENERAL.WRITE)
   @Post()
   @ApiOperation({ summary: 'Criar nova empresa' })
   @ApiResponse({ status: 201, description: 'Empresa criada com sucesso.' })
@@ -25,7 +25,7 @@ export class CompanyController {
     return this.companyService.create(dto);
   }
 
-  @Features(Permissions.COMPANIES.READ)
+  @Features(Permissions.COMPANIES.READ, Permissions.VISIT_HISTORY_GENERAL.READ, Permissions.VISIT_HISTORY_GENERAL.WRITE)
   @Get()
   @ApiOperation({ summary: 'Listar empresas com filtros e paginação' })
   @ApiResponse({ status: 200, description: 'Lista de empresas retornada com sucesso.' })
@@ -33,7 +33,7 @@ export class CompanyController {
     return this.companyService.findAll(query);
   }
 
-  @Features(Permissions.COMPANIES.READ)
+  @Features(Permissions.COMPANIES.READ, Permissions.VISIT_HISTORY_GENERAL.READ, Permissions.VISIT_HISTORY_GENERAL.WRITE)
   @Get(':id')
   @ApiOperation({ summary: 'Buscar empresa por ID' })
   @ApiResponse({ status: 200, description: 'Empresa encontrada.' })
@@ -42,7 +42,7 @@ export class CompanyController {
     return this.companyService.findById(id);
   }
 
-  @Features(Permissions.COMPANIES.WRITE)
+  @Features(Permissions.COMPANIES.WRITE, Permissions.VISIT_HISTORY_GENERAL.WRITE)
   @Put(':id')
   @ApiOperation({ summary: 'Atualizar empresa' })
   @ApiResponse({ status: 200, description: 'Empresa atualizada com sucesso.' })
@@ -50,7 +50,7 @@ export class CompanyController {
     return this.companyService.update(id, dto);
   }
 
-  @Features(Permissions.COMPANIES.WRITE)
+  @Features(Permissions.COMPANIES.WRITE, Permissions.VISIT_HISTORY_GENERAL.WRITE)
   @Delete(':id')
   @ApiOperation({ summary: 'Deletar empresa' })
   @ApiResponse({ status: 200, description: 'Empresa removida com sucesso.' })

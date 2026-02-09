@@ -62,7 +62,7 @@ const FUNCIONARIO_DOMAINS = {
   WRITE: [],
 };
 
-// Helpers fora da função
+// Helpers fora da cargo
 const byDomain = (domains: string[]) => (f: { key: string }) =>
   domains.some((d) => f.key.startsWith(`${d}_`));
 
@@ -182,7 +182,7 @@ export async function createRoleFeaturesSeed() {
  *
  * As roles servem para:
  *   - aplicar permissões iniciais ao criar um usuário
- *   - redefinir permissões quando a função do usuário muda
+ *   - redefinir permissões quando o cargo do usuário muda
  *
  *
  * ============================================================
