@@ -33,15 +33,15 @@ export class CreateMeetingDto {
     @IsString()
     roomId: string;
 
-    @ApiProperty({ description: 'ID do Setor da reunião', example: 'uuid-do-setor', required: true })
-    @IsNotEmpty()
-    @IsString()
-    sectorId: string;
-
-    @ApiProperty({ description: 'ID do Usuário responsável pela reunião', example: 'uuid-do-usuario', required: false })
+    @ApiProperty({ description: 'ID do Setor da reunião', example: 'uuid-do-setor', required: false })
     @IsOptional()
     @IsString()
-    responsibleId?: string;
+    sectorId?: string;
+
+    @ApiProperty({ description: 'ID do Usuário responsável pela reunião', example: 'uuid-do-usuario', required: true })
+    @IsNotEmpty()
+    @IsString()
+    responsibleId: string;
 
     @ApiProperty({ description: 'Status da reunião', example: MeetingStatus.SCHEDULED, enum: MeetingStatus, required: false })
     @IsEnum(MeetingStatus)

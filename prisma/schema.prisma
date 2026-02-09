@@ -192,16 +192,16 @@ model MeetingSchedule {
   date          DateTime // Somente data
   startTime     String // Somente horário em HH:MM
   endTime       String // HH:MM calculado
-  sectorId      String
+  sectorId      String?
   roomId        String
-  responsibleId String?
+  responsibleId String
   status        Int      @default(1) // 1 = agendada, 2 = em andamento, 3 = concluida, 4 = cancelada
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  Sector      Sector   @relation(fields: [sectorId], references: [id])
+  Sector      Sector?  @relation(fields: [sectorId], references: [id])
   Room        Room     @relation(fields: [roomId], references: [id])
-  Responsible User?    @relation(fields: [responsibleId], references: [id])
+  Responsible User     @relation(fields: [responsibleId], references: [id])
 
   @@map("meeting_schedule")
 }

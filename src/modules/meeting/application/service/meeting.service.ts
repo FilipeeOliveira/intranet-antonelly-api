@@ -26,14 +26,16 @@ export class MeetingService {
                 throw new BadRequestException('Sala informada não existe.');
             }
 
-            const sector = await this.sectorService.findById(dto.sectorId);
-            if (!sector) {
-                throw new BadRequestException('Setor informado não existe.');
+            if (dto.sectorId) {
+                const sector = await this.sectorService.findById(dto.sectorId);
+                if (!sector) {
+                    throw new BadRequestException('Setor informado não existe.');
+                }
             }
 
-            const user = dto.responsibleId ? await this.usersService.findById(dto.responsibleId) : null;
-            if (dto?.responsibleId && !user) {
-                throw new BadRequestException('Usuário informado não existe.');
+            const user = await this.usersService.findById(dto.responsibleId);
+            if (!user) {
+                throw new BadRequestException('Responsável informado não existe.');
             }
 
             if (dto.startTime >= dto.endTime) {
@@ -46,6 +48,7 @@ export class MeetingService {
                 dateObj,
                 dto.startTime,
                 dto.endTime,
+                dto.roomId,
             );
 
             if (conflict) {
@@ -58,7 +61,8 @@ export class MeetingService {
 
             return this.meetingRepository.create({
                 ...dto,
-                responsibleId: dto.responsibleId ? user.id : null,
+                sectorId: dto.sectorId || null,
+                responsibleId: user.id,
                 date: dateObj,
             });
         }
@@ -161,10 +165,12 @@ export class MeetingService {
                 }
             }
 
+            const roomId = dto.roomId ?? meeting.roomId;
             const conflict = await this.meetingRepository.findConflict(
                 dateObj,
                 startTime,
                 endTime,
+                roomId,
                 id,
             );
 
