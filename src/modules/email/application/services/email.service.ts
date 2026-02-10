@@ -1,6 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { MailerService } from "@nestjs-modules/mailer";
 import moment from "moment";
+import { envConfig } from "src/config/config";
 
 const SEVERITY_CONFIG: Record<string, { label: string; color: string }> = {
     INFO: { label: 'Informativo', color: '#10b981' },
@@ -61,6 +62,7 @@ export class EmailService {
             template: "welcome",
             context: {
                 ...context,
+                loginUrl: `${envConfig.FRONTEND_URL}/login`,
                 year: new Date().getFullYear(),
             },
         });

@@ -194,14 +194,14 @@ model MeetingSchedule {
   endTime       String // HH:MM calculado
   sectorId      String?
   roomId        String
-  responsibleId String
+  responsibleId String?
   status        Int      @default(1) // 1 = agendada, 2 = em andamento, 3 = concluida, 4 = cancelada
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   Sector      Sector?  @relation(fields: [sectorId], references: [id])
   Room        Room     @relation(fields: [roomId], references: [id])
-  Responsible User     @relation(fields: [responsibleId], references: [id])
+  Responsible User?    @relation(fields: [responsibleId], references: [id], onDelete: SetNull)
 
   @@map("meeting_schedule")
 }
@@ -213,13 +213,13 @@ model Communique {
   severity    String
   imagePath   String?
   imageUrl    String?
-  authorId    String
+  authorId    String?
   sectorId    String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   sector Sector @relation(fields: [sectorId], references: [id])
-  author User   @relation(fields: [authorId], references: [id])
+  author User?  @relation(fields: [authorId], references: [id], onDelete: SetNull)
 
   @@map("communiques")
 }
