@@ -77,13 +77,14 @@ export class CommuniqueService {
             }
 
             // 2. Montar dados de update (fallback para valores atuais)
-            const updateData: any = {
+            const updateData: Partial<UpdateCommuniqueDto> & { imagePath?: string | null; imageUrl?: string | null } = {
                 ...dto,
                 sectorId: dto.sectorId ?? communique.sectorId,
                 authorId: dto.authorId ?? communique.authorId,
             }
 
             // 3. Validar setor SOMENTE se enviado
+            let updatedSector = communique.sector
             if (dto.sectorId) {
                 const sector = await this.sectorRepository.findById(dto.sectorId)
                 if (!sector) {
@@ -91,9 +92,11 @@ export class CommuniqueService {
                         'Setor não encontrado. Verifique o ID do setor.'
                     )
                 }
+                updatedSector = sector
             }
 
             // 4. Validar autor SOMENTE se enviado
+            let updatedAuthor = communique.author
             if (dto.authorId) {
                 const author = await this.userRepository.findById(dto.authorId)
                 if (!author) {
@@ -101,6 +104,7 @@ export class CommuniqueService {
                         'Autor não encontrado. Verifique o ID do autor.'
                     )
                 }
+                updatedAuthor = author as typeof communique.author
             }
 
             // 5. Nova imagem (se existir)
@@ -153,6 +157,8 @@ export class CommuniqueService {
             const updatedCommunique = {
                 ...communique,   // mantém relations
                 ...updateData,   // sobrescreve campos simples
+                sector: updatedSector,
+                author: updatedAuthor,
             }
 
             const response = {
