@@ -80,6 +80,7 @@ export async function createRoleFeaturesSeed() {
   const features = await prisma.feature.findMany();
 
   const roleMap = {
+    SUPERADMIN: roles.find((r) => r.key === "SUPERADMIN"),
     ADMIN: roles.find((r) => r.key === "ADMIN"),
     DIRETOR: roles.find((r) => r.key === "DIRETOR"),
     GERENTE: roles.find((r) => r.key === "GERENTE"),
@@ -96,6 +97,7 @@ export async function createRoleFeaturesSeed() {
     .filter((f) => isReadFeature(f.key))
 
   const roleFeaturesMap: Record<string, string[]> = {
+    SUPERADMIN: features.map((f) => f.id),
     ADMIN: features.map((f) => f.id),
 
     DIRETOR: [

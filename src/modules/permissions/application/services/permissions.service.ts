@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 
 export interface Feature {
@@ -25,10 +25,40 @@ export interface PagesWithFeaturesResponse {
     totalPages: number
 }
 
+// Features protegidas para admins (não podem remover de si mesmos)
+const ADMIN_PROTECTED_FEATURE_KEYS = [
+    'USERS_READ',
+    'USERS_WRITE',
+    'PERMISSIONS_READ',
+    'PERMISSIONS_WRITE',
+];
 
 @Injectable()
 export class PermissionsService {
     constructor(private prisma: PrismaService) { }
+
+    private async isUserSuperAdmin(userId: string): Promise<boolean> {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            include: { role: true },
+        });
+        return user?.role?.key === 'SUPERADMIN';
+    }
+
+    private async isUserAdmin(userId: string): Promise<boolean> {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            include: { role: true },
+        });
+        return user?.role?.key === 'ADMIN';
+    }
+
+    private async getProtectedFeatureIds(): Promise<string[]> {
+        const features = await this.prisma.feature.findMany({
+            where: { key: { in: ADMIN_PROTECTED_FEATURE_KEYS } },
+        });
+        return features.map((f) => f.id);
+    }
 
     async getAllPagesWithFeatures() {
         return this.prisma.page.findMany({
@@ -36,7 +66,21 @@ export class PermissionsService {
         });
     }
 
-    async setUserPermissions(userId: string, featureIds: string[]) {
+    async setUserPermissions(userId: string, featureIds: string[], requesterId?: string) {
+        if (await this.isUserSuperAdmin(userId)) {
+            throw new ForbiddenException('Não é possível alterar permissões do Super Administrador.');
+        }
+
+        // Se admin está editando suas próprias permissões, garantir que as protegidas estão incluídas
+        if (requesterId && requesterId === userId && await this.isUserAdmin(userId)) {
+            const protectedIds = await this.getProtectedFeatureIds();
+            for (const protectedId of protectedIds) {
+                if (!featureIds.includes(protectedId)) {
+                    featureIds.push(protectedId);
+                }
+            }
+        }
+
         // Verifica se o usuário existe
         const userExists = await this.prisma.user.findUnique({
             where: { id: userId },
@@ -112,12 +156,18 @@ export class PermissionsService {
     }
 
     async assignFeature(userId: string, featureId: string) {
+        if (await this.isUserSuperAdmin(userId)) {
+            throw new ForbiddenException('Não é possível alterar permissões do Super Administrador.');
+        }
         return this.prisma.userPermission.create({
             data: { userId, featureId },
         });
     }
 
     async assignManyFeatures(userId: string, featureIds: string[]) {
+        if (await this.isUserSuperAdmin(userId)) {
+            throw new ForbiddenException('Não é possível alterar permissões do Super Administrador.');
+        }
         const data = featureIds.map((featureId) => ({ userId, featureId }));
         return this.prisma.userPermission.createMany({
             data,
@@ -125,13 +175,38 @@ export class PermissionsService {
         });
     }
 
-    async revokeFeature(userId: string, featureId: string) {
+    async revokeFeature(userId: string, featureId: string, requesterId?: string) {
+        if (await this.isUserSuperAdmin(userId)) {
+            throw new ForbiddenException('Não é possível alterar permissões do Super Administrador.');
+        }
+
+        // Se admin está removendo uma permissão protegida de si mesmo
+        if (requesterId && requesterId === userId && await this.isUserAdmin(userId)) {
+            const protectedIds = await this.getProtectedFeatureIds();
+            if (protectedIds.includes(featureId)) {
+                throw new ForbiddenException('Administradores não podem remover suas próprias permissões de Usuários e Permissões.');
+            }
+        }
+
         return this.prisma.userPermission.deleteMany({
             where: { userId, featureId },
         });
     }
 
-    async revokeManyFeatures(userId: string, featureIds: string[]) {
+    async revokeManyFeatures(userId: string, featureIds: string[], requesterId?: string) {
+        if (await this.isUserSuperAdmin(userId)) {
+            throw new ForbiddenException('Não é possível alterar permissões do Super Administrador.');
+        }
+
+        // Se admin está removendo permissões protegidas de si mesmo
+        if (requesterId && requesterId === userId && await this.isUserAdmin(userId)) {
+            const protectedIds = await this.getProtectedFeatureIds();
+            const protectedBeingRemoved = featureIds.filter((id) => protectedIds.includes(id));
+            if (protectedBeingRemoved.length > 0) {
+                throw new ForbiddenException('Administradores não podem remover suas próprias permissões de Usuários e Permissões.');
+            }
+        }
+
         return this.prisma.userPermission.deleteMany({
             where: {
                 userId,

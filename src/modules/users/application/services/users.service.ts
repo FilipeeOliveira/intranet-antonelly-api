@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { AuthRepository } from 'src/modules/auth/infrastructure/repositories/auth.repository';
 import { EmailService } from 'src/modules/email/application/services/email.service';
@@ -6,6 +6,7 @@ import { PermissionsService } from 'src/modules/permissions/application/services
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { RolesRepository } from 'src/modules/roles/infrastructure/repositories/roles.repository';
 import { SectorService } from 'src/modules/sectors/application/services/sector.service';
+import { USER_ROLES } from '../../../../shared/types/users.roles';
 import { PasswordUtil } from '../../../../shared/utils/password.util';
 import { CreateUserDto } from '../../domain/dto/create-user.dto';
 import { UpdateUserDto } from '../../domain/dto/update-user.dto';
@@ -63,6 +64,11 @@ export class UsersService {
       if (existingUsername) {
         throw new ConflictException('Username já está em uso');
       }
+    }
+
+    // Bloquear criação de usuário com role SUPERADMIN
+    if (createUserDto.role === USER_ROLES.SUPERADMIN) {
+      throw new ForbiddenException('Não é possível criar um usuário com o cargo de Super Administrador.');
     }
 
     // Verificar se setor já existe
@@ -144,6 +150,16 @@ export class UsersService {
     }
 
     if (updateUserDto.role) {
+      // Bloquear alteração de role do SUPERADMIN
+      if (existingUser.role?.key === USER_ROLES.SUPERADMIN) {
+        throw new ForbiddenException('Não é possível alterar o cargo do Super Administrador.');
+      }
+
+      // Bloquear atribuição do role SUPERADMIN a qualquer usuário
+      if (updateUserDto.role === USER_ROLES.SUPERADMIN) {
+        throw new ForbiddenException('Não é possível atribuir o cargo de Super Administrador.');
+      }
+
       const role = await this.prisma.role.findUnique({
         where: { key: updateUserDto.role },
       });
@@ -153,8 +169,9 @@ export class UsersService {
       }
 
       await this.changeUserRole(id, existingUser.role.id, role.id);
-      
+
       existingUser.role = role;
+      (updateUserDto as any).roleId = role.id;
       delete updateUserDto.role;
     }
 
@@ -190,6 +207,10 @@ export class UsersService {
 
     const user = await this.findById(id);
 
+    if (user.role?.key === USER_ROLES.SUPERADMIN) {
+      throw new ForbiddenException('Não é possível resetar a senha do Super Administrador.');
+    }
+
     // Gerar nova senha temporária
     const temporaryPassword = PasswordUtil.generateTemporaryPassword();
     const hashedPassword = await bcrypt.hash(temporaryPassword, 12);
@@ -217,6 +238,11 @@ export class UsersService {
 
   async toggleStatus(id: string) {
     this.logger.log(`Alternando status do usuário: ${id}`);
+
+    const user = await this.findById(id);
+    if (user.role?.key === USER_ROLES.SUPERADMIN) {
+      throw new ForbiddenException('Não é possível alterar o status do Super Administrador.');
+    }
 
     const updatedUser = await this.usersRepository.toggleUserStatus(id);
 
@@ -246,7 +272,11 @@ export class UsersService {
   async remove(id: string) {
     this.logger.log(`Removendo usuário: ${id}`);
 
-    await this.findById(id); // Verificar se existe
+    const user = await this.findById(id);
+    if (user.role?.key === USER_ROLES.SUPERADMIN) {
+      throw new ForbiddenException('Não é possível remover o Super Administrador.');
+    }
+
     await this.usersRepository.delete(id);
 
     this.logger.log(`Usuário removido: ${id}`);
