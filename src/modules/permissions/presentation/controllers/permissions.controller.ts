@@ -41,8 +41,9 @@ export class PermissionsController {
     setUserPermissions(
         @Param('id', ParseUUIDPipe) userId: string,
         @Body('featureIds') featureIds: string[],
+        @Req() req: any,
     ) {
-        return this.permissionsService.setUserPermissions(userId, featureIds);
+        return this.permissionsService.setUserPermissions(userId, featureIds, req.user.id);
     }
 
     @UseGuards(AuthGuard('jwt'), AuthenticateGuard, PermissionsGuard)
@@ -82,8 +83,9 @@ export class PermissionsController {
     revokeFeature(
         @Param('id', ParseUUIDPipe) userId: string,
         @Param('featureId', ParseUUIDPipe) featureId: string,
+        @Req() req: any,
     ) {
-        return this.permissionsService.revokeFeature(userId, featureId);
+        return this.permissionsService.revokeFeature(userId, featureId, req.user.id);
     }
 
     @UseGuards(AuthGuard('jwt'), AuthenticateGuard, PermissionsGuard)
@@ -102,7 +104,8 @@ export class PermissionsController {
     revokeManyFeatures(
         @Param('id', ParseUUIDPipe) userId: string,
         @Body('featureIds') featureIds: string[],
+        @Req() req: any,
     ) {
-        return this.permissionsService.revokeManyFeatures(userId, featureIds);
+        return this.permissionsService.revokeManyFeatures(userId, featureIds, req.user.id);
     }
 }

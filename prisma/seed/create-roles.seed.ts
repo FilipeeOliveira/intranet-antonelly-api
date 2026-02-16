@@ -7,6 +7,15 @@ const prisma = new PrismaClient();
 export async function createRolesSeed() {
 
     // Criar roles
+    const superadminRole = await prisma.role.upsert({
+        where: { key: 'SUPERADMIN' },
+        update: {},
+        create: {
+            key: 'SUPERADMIN',
+            description: 'Super Administrador - acesso total e irrevogável',
+        },
+    });
+
     const adminRole = await prisma.role.upsert({
         where: { key: 'ADMIN' },
         update: {},
@@ -52,5 +61,5 @@ export async function createRolesSeed() {
         },
     });
 
-    return { adminRole, gerenteRole, diretorRole, portariaRole, funcionarioRole };
+    return { superadminRole, adminRole, gerenteRole, diretorRole, portariaRole, funcionarioRole };
 }
