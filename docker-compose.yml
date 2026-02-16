@@ -5,6 +5,8 @@ services:
       dockerfile: Dockerfile
       target: development
     container_name: intranetantonelly-api  # Atualizado para refletir o novo nome
+    environment:
+      TZ: America/Manaus
     volumes:
       - .:/home/node/app
       - /home/node/app/.docker/postgres-data
@@ -21,6 +23,7 @@ services:
     image: postgres:16.5
     restart: no
     environment:
+      TZ: America/Manaus
       POSTGRES_DB: intranetantonelly  # Nome do banco alterado
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
