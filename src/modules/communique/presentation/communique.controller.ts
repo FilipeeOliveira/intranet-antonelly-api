@@ -8,7 +8,7 @@ import { CreateCommuniqueDto } from "../domain/dtos/create-communique.dto";
 
 import { Response } from "express";
 import * as fs from "fs";
-import { join } from "path";
+import { basename, join } from "path";
 import { Public } from "src/modules/auth/presentation/decorators/public.decorator";
 import { JwtAuthGuard } from "src/modules/auth/presentation/guards/jwt-auth.guard";
 import { Features } from "src/modules/permissions/presentation/guards/features.decorator";
@@ -77,7 +77,13 @@ export class CommuniqueController {
         @Param("filename") filename: string,
         @Res() res: Response
     ) {
-        const imagePath = join(process.cwd(), "uploads/communiques", filename);
+        const safeFilename = basename(filename);
+        const uploadsDir = join(process.cwd(), "uploads/communiques");
+        const imagePath = join(uploadsDir, safeFilename);
+
+        if (!imagePath.startsWith(uploadsDir)) {
+            throw new BadRequestException("Acesso inválido.");
+        }
 
         if (!fs.existsSync(imagePath)) {
             throw new NotFoundException("Imagem não encontrada.");

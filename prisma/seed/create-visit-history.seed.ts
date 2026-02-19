@@ -5,7 +5,12 @@ import { VisitHistoryStatus } from '../../src/modules/visit-history/domain/enums
 
 const prisma = new PrismaClient();
 
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 export async function createVisitHistorySeed() {
+
+    if (process.env.MODE !== 'dev') return;
 
     const firstCompanie = await prisma.companie.findFirst();
 

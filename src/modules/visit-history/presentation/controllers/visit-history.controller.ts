@@ -60,6 +60,7 @@ export class VisitHistoryController {
     }
 
 
+    @Features(Permissions.VISIT_HISTORY_GENERAL.WRITE)
     @Put(':id')
     @ApiOperation({ summary: 'Atualizar um registro de visita pelo ID' })
     @ApiResponse({ status: 200, description: 'Registro de visita atualizado com sucesso.' })

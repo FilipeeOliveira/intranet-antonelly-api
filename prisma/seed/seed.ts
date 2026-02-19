@@ -17,6 +17,11 @@ dotenv.config();
 const prisma = new PrismaClient();
 
 async function main() {
+
+  if (process.env.MODE !== 'dev') {
+    console.log("🚀 Rodando seeds para ambiente de produção.")
+  };
+
   console.log('🌱 Iniciando seed...');
 
   const rolesCreated = await createRolesSeed();

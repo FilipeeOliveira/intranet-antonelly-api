@@ -130,9 +130,8 @@ export class VisitHistoryService {
       throw new BadRequestException('Esta visita já foi finalizada.');
     }
 
-    await this.visitHistoryRepository.update(isVisitStarted.id, { status: VisitHistoryStatus.LEFT });
-
     return this.visitHistoryRepository.update(isVisitStarted.id, {
+      status: VisitHistoryStatus.LEFT,
       leftAt: getCurrentUtcDate(),
     });
   }

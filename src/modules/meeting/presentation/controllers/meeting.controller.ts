@@ -35,20 +35,20 @@ export class MeetingController {
     }
 
     @Features(Permissions.MEETINGS.READ)
+    @Get('today')
+    @ApiOperation({ summary: 'Listar reuniões agendadas para hoje' })
+    @ApiResponse({ status: 200, description: 'Lista de reuniões de hoje retornada com sucesso.' })
+    async findToday() {
+        return this.meetingService.findToday();
+    }
+
+    @Features(Permissions.MEETINGS.READ)
     @Get(':id')
     @ApiOperation({ summary: 'Buscar reunião por ID' })
     @ApiResponse({ status: 200, description: 'Reunião encontrada.' })
     @ApiResponse({ status: 404, description: 'Reunião não encontrada.' })
     async findById(@Param('id') id: string) {
         return this.meetingService.findById(id);
-    }
-
-    @Features(Permissions.MEETINGS.READ)
-    @Get('today')
-    @ApiOperation({ summary: 'Listar reuniões agendadas para hoje' })
-    @ApiResponse({ status: 200, description: 'Lista de reuniões de hoje retornada com sucesso.' })
-    async findToday() {
-        return this.meetingService.findToday();
     }
 
     @Features(Permissions.MEETINGS.WRITE)

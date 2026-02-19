@@ -1,8 +1,14 @@
 import { PrismaClient } from '@prisma/client'
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
+
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 export async function createCommuniquesSeed() {
+
+  if (process.env.MODE !== 'dev') return;
+
   const users = await prisma.user.findMany({
     include: { sector: true },
   })

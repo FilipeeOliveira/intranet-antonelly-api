@@ -4,6 +4,9 @@ import { addDays } from "date-fns";
 import { CreateMeetingDto } from "../../src/modules/meeting/domain/dto/create-meeting.dto";
 import { MeetingStatus } from "../../src/modules/meeting/infrastructure/repositories/meeting.repository";
 
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 const prisma = new PrismaClient();
 
 interface Meeting extends CreateMeetingDto {
@@ -12,6 +15,8 @@ interface Meeting extends CreateMeetingDto {
 }
 
 export async function createMeetingScheduleSeed() {
+
+    if (process.env.MODE !== 'dev') return;
 
     const subjects = [
         'Revisão de Sprint',
