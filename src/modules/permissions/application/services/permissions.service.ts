@@ -60,10 +60,19 @@ export class PermissionsService {
         return features.map((f) => f.id);
     }
 
-    async getAllPagesWithFeatures() {
-        return this.prisma.page.findMany({
-            include: { features: true },
+    async getAllPagesWithFeatures(includeHidden = false) {
+        const pages = await this.prisma.page.findMany({
+            include: {
+                features: {
+                    where: includeHidden ? undefined : { hidden: false },
+                },
+            },
         });
+
+        if (includeHidden) return pages;
+
+        // Omite páginas cujas todas as features estão ocultas
+        return pages.filter(page => page.features.length > 0);
     }
 
     async setUserPermissions(userId: string, featureIds: string[], requesterId?: string) {
@@ -90,9 +99,14 @@ export class PermissionsService {
             throw new NotFoundException(`User with ID ${userId} not found`);
         }
 
-        // Remove todas as permissões antigas
+        // Remove apenas permissões de features visíveis (hidden = false).
+        // Permissões de features ocultas são gerenciadas internamente e não devem
+        // ser afetadas pelo modal de edição de permissões.
         await this.prisma.userPermission.deleteMany({
-            where: { userId },
+            where: {
+                userId,
+                feature: { hidden: false },
+            },
         });
 
         // Insere as novas

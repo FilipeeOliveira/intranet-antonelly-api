@@ -28,6 +28,26 @@ export class AuthRepository implements IAuthRepository {
     return this.mapToUserEntity(userData);
   }
 
+  async findUserByUsername(username: string): Promise<User | null> {
+    const userData = await this.prisma.user.findUnique({
+      where: { username },
+      include: {
+        role: true,
+        permissions: {
+          include: {
+            feature: true,
+          },
+        },
+      },
+    });
+
+    if (!userData) {
+      return null;
+    }
+
+    return this.mapToUserEntity(userData);
+  }
+
   async findUserById(id: string): Promise<User | null> {
     const userData = await this.prisma.user.findUnique({
       where: { id },

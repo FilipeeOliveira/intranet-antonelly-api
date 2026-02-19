@@ -2,7 +2,13 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 export async function createCompaniesSeed() {
+
+    if (process.env.MODE !== 'dev') return;
+
     // Empresas
     const companies = [
         { name: 'ACME Corp', cnpj: '10433218196071', description: 'Fornecedor de equipamentos' },

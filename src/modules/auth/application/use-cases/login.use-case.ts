@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { AuthResponseDto, UserProfileDto } from '../../domain/dto/auth-reponse.dto';
@@ -14,7 +14,10 @@ export class LoginUseCase {
   ) { }
 
   async execute(loginDto: LoginDto): Promise<AuthResponseDto> {
-    const user = await this.authRepository.findUserByEmail(loginDto.email);
+    const isEmail = loginDto.identifier.includes('@');
+    const user = isEmail
+      ? await this.authRepository.findUserByEmail(loginDto.identifier)
+      : await this.authRepository.findUserByUsername(loginDto.identifier);
 
     if (!user) {
       throw new UnauthorizedException('Credenciais inválidas');
@@ -56,7 +59,8 @@ export class LoginUseCase {
       };
     }
     catch (e) {
-      console.error(e)
+      console.error(e);
+      throw new InternalServerErrorException('Erro interno ao processar autenticação');
     }
   }
 }

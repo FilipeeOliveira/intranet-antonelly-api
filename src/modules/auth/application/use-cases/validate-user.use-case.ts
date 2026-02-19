@@ -18,7 +18,7 @@ export class ValidateUserUseCase {
       id: user.id,
       email: user.email,
       name: user.name,
-      role: user.role.key,
+      role: user.role?.key ?? null,
       setor: user.setor,
     };
   }

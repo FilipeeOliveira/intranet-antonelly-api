@@ -206,6 +206,20 @@ export async function createPagesSeed() {
     });
 
 
+    // Marcar features que existem no back-end mas não devem aparecer no modal de permissões
+    const hiddenFeatureKeys = [
+        Permissions.COMPANIES.READ,
+        Permissions.COMPANIES.WRITE,
+        Permissions.SECTORS.READ,
+        Permissions.SECTORS.WRITE,
+        Permissions.ROOMS.READ,
+        Permissions.ROOMS.WRITE,
+    ];
+    for (const key of hiddenFeatureKeys) {
+        await prisma.$executeRaw`UPDATE features SET hidden = true WHERE key = ${key}`;
+    }
+    console.log(`🙈 Features ocultas marcadas: ${hiddenFeatureKeys.join(', ')}`);
+
     console.log('📄 Páginas e features criadas:');
     console.log(`🧑‍💼 Usuários -> ${usersPage.id}`);
     console.log(`📑 Procedimentos -> ${procedimentosPage.id}`);

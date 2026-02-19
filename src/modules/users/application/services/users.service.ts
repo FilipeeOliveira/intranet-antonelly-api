@@ -92,15 +92,18 @@ export class UsersService {
 
     await this.permissionsService.assignManyFeatures(user.id, featureIds);
 
-    // Enviar email de boas-vindas com senha temporária
-    this.sendWelcomeEmailUseCase.execute({
+    // Enviar email de boas-vindas com senha temporária (fire-and-forget com log de falha)
+    // Em caso de falha, o admin pode usar "Resetar Senha" para reenviar as credenciais
+    void this.sendWelcomeEmailUseCase.execute({
       to: user.email,
       context: {
         name: user.name,
         email: user.email,
         temporaryPassword,
       }
-    });
+    }).catch(err =>
+      this.logger.error(`Falha ao enviar email de boas-vindas para ${user.email}: ${err?.message}`)
+    );
 
     this.logger.log(`Usuário criado com sucesso: ${user.email}`);
 
@@ -183,6 +186,14 @@ export class UsersService {
       }
     }
 
+    // Verificar conflito de username se estiver sendo alterado
+    if (updateUserDto.username && updateUserDto.username !== existingUser.username) {
+      const usernameExists = await this.usersRepository.findByUsername(updateUserDto.username);
+      if (usernameExists) {
+        throw new ConflictException('Username já está em uso');
+      }
+    }
+
     const updatedUser = await this.usersRepository.update(id, updateUserDto);
 
     this.logger.log(`Usuário atualizado: ${id}`);
@@ -218,7 +229,7 @@ export class UsersService {
     // Atualizar senha no banco
     await this.usersRepository.updatePassword(id, hashedPassword, true);
 
-    // Enviar email com nova senha temporária
+    // Enviar email com nova senha temporária (fire-and-forget — erros tratados internamente pelo EmailService)
     this.emailService.sendResetPasswordEmail(user.email, {
       name: user.name,
       email: user.email,

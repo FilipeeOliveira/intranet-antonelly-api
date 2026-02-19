@@ -47,6 +47,9 @@ export class ResetPasswordUseCase {
     // Atualizar a senha no banco
     await this.authRepository.updateUserPassword(user.id, hashedNewPassword);
 
+    // Invalidar tokens anteriores (mesmo padrão do reset via admin)
+    await this.authRepository.invalidateAllUserTokens(user.id);
+
     return {
       message: 'Senha alterada com sucesso. Faça login com sua nova senha.',
     };
