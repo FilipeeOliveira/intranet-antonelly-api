@@ -202,11 +202,18 @@ export class DocumentsService {
 
             // 4. Incrementa versão (formato: 1.0 -> 1.1 -> ... -> 1.9 -> 2.0)
             const [major, minor = '0'] = document.version.split('.');
+            const majorInt = parseInt(major);
             const currentMinor = parseInt(minor);
+
+            if (isNaN(majorInt) || isNaN(currentMinor)) {
+                throw new BadRequestException(
+                    `Versão do documento está em formato inválido: "${document.version}". Esperado: "X.Y".`
+                );
+            }
 
             if (currentMinor >= 9) {
                 // Se chegou em .9, incrementa o major e reseta minor para 0
-                updateData.version = `${parseInt(major) + 1}.0`;
+                updateData.version = `${majorInt + 1}.0`;
             } else {
                 // Caso contrário, apenas incrementa o minor
                 updateData.version = `${major}.${currentMinor + 1}`;
@@ -268,34 +275,28 @@ export class DocumentsService {
         const document = await this.documentRepository.findById(id);
         if (!document) throw new NotFoundException('Documento não encontrado.');
 
-        // 1. Buscar histórico do documento
+        // 1. Buscar histórico e coletar todos os paths ANTES de qualquer deleção
         const historyRecords = await this.documentHistoryRepository.findHistoryByDocumentId(id);
 
-        // 2. Apagar arquivos do histórico
+        const filesToDelete: string[] = [];
+        if (document.filePath) filesToDelete.push(join(process.cwd(), document.filePath));
         for (const record of historyRecords) {
-            if (record.filePath) {
-                try {
-                    await promises.unlink(join(process.cwd(), record.filePath));
-                } catch (err) {
-                    console.error('Erro ao deletar arquivo do histórico:', err);
-                }
-            }
+            if (record.filePath) filesToDelete.push(join(process.cwd(), record.filePath));
         }
 
-        // 3. Deletar registros de histórico do banco
+        // 2. Deletar registros do banco primeiro — se falhar, nenhum arquivo é deletado
         await this.documentHistoryRepository.deleteByDocumentId(id);
+        const deletedDocument = await this.documentRepository.delete(id);
 
-        // 4. Apagar arquivo físico do documento atual
-        if (document.filePath) {
+        // 3. Deletar arquivos físicos após sucesso no banco
+        for (const filePath of filesToDelete) {
             try {
-                await promises.unlink(join(process.cwd(), document.filePath));
+                await promises.unlink(filePath);
             } catch (err) {
-                console.error(err, '[DocumentsService]');
+                console.error('Erro ao deletar arquivo físico:', err);
             }
         }
 
-        // 5. Deletar o documento
-        const deletedDocument = await this.documentRepository.delete(id);
         return { ...deletedDocument, status: deletedDocument.status as DocumentStatus };
     }
 }

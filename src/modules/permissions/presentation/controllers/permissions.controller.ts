@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthenticateGuard } from 'src/modules/auth/presentation/guards/authenticate.guard';
@@ -73,8 +73,8 @@ export class PermissionsController {
     @UseGuards(AuthGuard('jwt'), AuthenticateGuard, PermissionsGuard)
     @Features(Permissions.PERMISSIONS.READ, Permissions.USERS.READ)
     @Get('pages')
-    getPages() {
-        return this.permissionsService.getAllPagesWithFeatures();
+    getPages(@Query('includeHidden') includeHidden?: string) {
+        return this.permissionsService.getAllPagesWithFeatures(includeHidden === 'true');
     }
 
     @UseGuards(AuthGuard('jwt'), AuthenticateGuard, PermissionsGuard)

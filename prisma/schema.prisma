@@ -72,6 +72,7 @@ model Feature {
   prettyName   String? // ex: View Products, Create Product
   key          String           @unique // ex: VIEW_PRODUCTS, CREATE_PRODUCT
   description  String?
+  hidden       Boolean          @default(false)
   pageId       String
   page         Page             @relation(fields: [pageId], references: [id])
   users        UserPermission[]

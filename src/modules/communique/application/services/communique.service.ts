@@ -32,25 +32,30 @@ export class CommuniqueService {
             imageUrl: filename ? `/api/v1/communiques/image/${filename}` : null,
         });
 
-        this.sendEmailCommuniqueBySector.execute(
+        void this.sendEmailCommuniqueBySector.execute(
             communique.sectorId,
             {
                 title: communique.title,
                 description: communique.description,
                 severity: communique.severity,
-                imageUrl: communique.imagePath,
+                imageUrl: communique.imageUrl,
                 sector: communique.sector,
                 author: communique.author,
                 createdAt: communique.createdAt.toISOString(),
             }
-        );
+        ).catch(err => console.error('[CommuniqueService] Falha ao enviar email do comunicado:', err));
 
-        this.communiquesGateway.emitCreated(communique);
-        this.sendNotificationAboutCommunique.execute({
+        try {
+            this.communiquesGateway.emitCreated(communique);
+        } catch (err) {
+            console.error('[CommuniqueService] Falha ao emitir evento WebSocket (created):', err);
+        }
+
+        void this.sendNotificationAboutCommunique.execute({
             title: communique.title,
             description: communique.description,
             severity: communique.severity,
-        });
+        }).catch(err => console.error('[CommuniqueService] Falha ao enviar notificação do comunicado:', err));
 
         return communique;
     }
@@ -169,21 +174,25 @@ export class CommuniqueService {
             }
 
             // 9. Emitir evento WS com objeto COMPLETO
-            this.communiquesGateway.emitUpdated(response);
+            try {
+                this.communiquesGateway.emitUpdated(response);
+            } catch (err) {
+                console.error('[CommuniqueService] Falha ao emitir evento WebSocket (updated):', err);
+            }
 
-            this.sendEmailCommuniqueBySector.execute(
+            void this.sendEmailCommuniqueBySector.execute(
                 updatedCommunique.sectorId,
                 {
                     title: `${updatedCommunique.title}`,
                     description: updatedCommunique.description,
                     severity: updatedCommunique.severity,
-                    imageUrl: updatedCommunique.imagePath,
+                    imageUrl: updatedCommunique.imageUrl,
                     sector: updatedCommunique.sector,
                     author: updatedCommunique.author,
                     createdAt: updatedCommunique.createdAt.toISOString(),
                     isUpdate: true,
                 }
-            );
+            ).catch(err => console.error('[CommuniqueService] Falha ao enviar email de atualização do comunicado:', err));
 
             return response;
         } catch (error) {
@@ -212,7 +221,11 @@ export class CommuniqueService {
             }
         }
 
-        this.communiquesGateway.emitDeleted(id);
+        try {
+            this.communiquesGateway.emitDeleted(id);
+        } catch (err) {
+            console.error('[CommuniqueService] Falha ao emitir evento WebSocket (deleted):', err);
+        }
 
         return this.communiqueRepository.delete(id);
     }
