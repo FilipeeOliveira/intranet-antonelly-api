@@ -13,7 +13,7 @@ export const envConfig = {
     JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '1h',
     RESET_TOKEN_EXPIRES_IN: process.env.RESET_TOKEN_EXPIRES_IN || '15m',
     API_URL: process.env.API_URL || `http://localhost:${process.env.PORT}`,
-    FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
+    FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3300',
     PORT: process.env.PORT,
     MODE: process.env.MODE || 'dev',
     MAIL_HOST: process.env.MAIL_HOST,

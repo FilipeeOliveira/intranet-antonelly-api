@@ -12,7 +12,8 @@ const isProd = envConfig.MODE === 'prod';
             transport: {
                 host: envConfig.MAIL_HOST,
                 port: Number(envConfig.MAIL_PORT),
-                secure: false,
+                // 465 = true | 587 = false
+                secure: true,
                 auth: {
                     user: envConfig.MAIL_USER,
                     pass: envConfig.MAIL_PASS,
@@ -38,4 +39,4 @@ const isProd = envConfig.MODE === 'prod';
         EmailService,
     ],
 })
-export class EmailModule {}
+export class EmailModule { }

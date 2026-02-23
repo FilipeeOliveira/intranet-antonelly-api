@@ -5,6 +5,8 @@ services:
       dockerfile: Dockerfile
       target: development
     container_name: intranetantonelly-api  # Atualizado para refletir o novo nome
+    env_file:
+      - .env
     environment:
       TZ: America/Manaus
     volumes:

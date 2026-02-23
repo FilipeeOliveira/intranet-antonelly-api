@@ -13,6 +13,7 @@ import { UpdateUserDto } from '../../domain/dto/update-user.dto';
 import { UserQueryDto } from '../../domain/dto/user-query.dto';
 import { UsersRepository } from '../../infrastructure/repositories/users.repository';
 import { SendWelcomeEmailUseCase } from '../use-cases/send-welcome-email.use-case';
+import { envConfig } from 'src/config/config';
 
 @Injectable()
 export class UsersService {

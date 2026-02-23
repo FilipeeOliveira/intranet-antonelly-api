@@ -54,20 +54,25 @@ export class EmailService {
         email: string,
         temporaryPassword: string
     }): Promise<void> {
-        this.logger.log(`Enviando email de boas-vindas para: ${to}`);
+        try {
+            this.logger.log(`Enviando email de boas-vindas para: ${to}`);
 
-        await this.mailerService.sendMail({
-            to,
-            subject: "Bem-vindo!",
-            template: "welcome",
-            context: {
-                ...context,
-                loginUrl: `${envConfig.FRONTEND_URL}/login`,
-                year: new Date().getFullYear(),
-            },
-        });
+            await this.mailerService.sendMail({
+                to,
+                subject: "Bem-vindo!",
+                template: "welcome",
+                context: {
+                    ...context,
+                    loginUrl: `${envConfig.FRONTEND_URL}/login`,
+                    year: new Date().getFullYear(),
+                },
+            });
 
-        this.logger.log(`Email de boas-vindas enviado para: ${to}`);
+            this.logger.log(`Email de boas-vindas enviado para: ${to}`);
+        }
+        catch (err) {
+            this.logger.error(`Não foi possível completar o envio de e-mail. Segue o Tracer de Erro: `, err);
+        }
     }
 
     /**
