@@ -33,7 +33,7 @@ export async function bootstrap() {
   //Enable CORS
   app.enableCors();
 
-  const PORT = envConfig.PORT || 3000;
+  const PORT = envConfig.PORT || 3300;
   await app.listen(PORT);
   console.log('\n')
   Logger.debug(`App running on 🚀 http://localhost:${PORT} 🚀`);

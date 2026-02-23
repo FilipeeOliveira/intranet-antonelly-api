@@ -11,7 +11,7 @@ services:
       - .:/home/node/app
       - /home/node/app/.docker/postgres-data
     ports:
-      - '3005:3005'
+      - '5100:5100'
     networks:
       - api-network
     depends_on:
@@ -28,7 +28,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - '5434:5432'  # Porta 5434 mapeada para 5432 (evita conflitos com PostgreSQL local)
+      - '5432:5432'  
     networks:
       - api-network
     healthcheck:
