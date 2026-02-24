@@ -11,5 +11,4 @@ RUN chown -R node:node /home/node/app
 USER node
 
 # CMD ["npm", "run", "start:prod"]
-CMD ["npm", "run", "start:prod"]
-# CMD ["tail", "-f", "/dev/null"]
+CMD ["tail", "-f", "/dev/null"]
