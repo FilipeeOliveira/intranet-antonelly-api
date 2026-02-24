@@ -84,7 +84,7 @@ npm run start:dev
 
 ### Swagger
 
-Você também pode acessar a documentação do Swagger com a REST API em execução localmente visitando [http://localhost:3005/api](http://localhost:3005/api).
+Você também pode acessar a documentação do Swagger com a REST API em execução localmente visitando [http://localhost:5100/api](http://localhost:5100/api).
 
 ## 📁 Estrutura do Projeto
 
