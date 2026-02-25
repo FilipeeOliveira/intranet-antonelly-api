@@ -167,6 +167,7 @@ model VisitHistory {
 
   arrivedAt DateTime  @default(now())
   leftAt    DateTime?
+  createdAt DateTime  @default(now())
 
   companie Companie? @relation(fields: [companyId], references: [id])
 
