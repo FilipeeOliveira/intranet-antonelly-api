@@ -19,30 +19,36 @@ export class VisitHistoryService {
   ) { }
 
   async create(dto: CreateVisitHistoryDto): Promise<VisitHistory> {
+    const cpf = dto?.visitorCpf?.trim() || undefined;
+    const phone = dto?.visitorPhone?.trim() || null;
 
-    const companyExists = await this.companyRepository.findById(dto.companyId);
-    if (dto.companyId && !companyExists) {
-      throw new NotFoundException('Empresa não encontrada.');
+    if (dto.companyId) {
+      const companyExists = await this.companyRepository.findById(dto.companyId);
+      if (!companyExists) {
+        throw new NotFoundException('Empresa não encontrada.');
+      }
     }
 
-    const visitorAlreadyPresent = await this.visitHistoryRepository.findVisitorPresentByCpf({
-      cpf: dto?.visitorCpf,
-    });
-    if (visitorAlreadyPresent) {
-      throw new BadRequestException('O visitante já está presente na empresa.');
-    }
+    if (cpf) {
+      const visitorAlreadyPresent = await this.visitHistoryRepository.findVisitorPresentByCpf({
+        cpf,
+      });
+      if (visitorAlreadyPresent) {
+        throw new BadRequestException('O visitante já está presente na empresa.');
+      }
 
-    const visitorAlreadyScheduled = await this.visitHistoryRepository.findVisitorScheduledByCpf({
-      cpf: dto?.visitorCpf,
-    });
-    if (visitorAlreadyScheduled) {
-      throw new BadRequestException('O visitante já possui um agendamento para essa data.');
+      const visitorAlreadyScheduled = await this.visitHistoryRepository.findVisitorScheduledByCpf({
+        cpf,
+      });
+      if (visitorAlreadyScheduled) {
+        throw new BadRequestException('O visitante já possui um agendamento para essa data.');
+      }
     }
 
     return await this.visitHistoryRepository.create({
       name: dto.visitorName,
-      cpf: dto?.visitorCpf,
-      phone: dto?.visitorPhone,
+      cpf: cpf ?? null,
+      phone,
       description: dto.description,
       companyId: dto?.companyId && dto.companyId.length ? dto.companyId : null,
       status: VisitHistoryStatus.PRESENT,
@@ -51,33 +57,41 @@ export class VisitHistoryService {
   }
 
   async createVisitSchedule(dto: CreateVisitScheduleDto): Promise<VisitHistory> {
+    const cpf = dto?.visitorCpf?.trim() || undefined;
+    const phone = dto?.visitorPhone?.trim() || null;
 
-    const companyExists = await this.companyRepository.findById(dto.companyId);
-    if (dto.companyId && !companyExists) {
-      throw new NotFoundException('Empresa não encontrada.');
+    if (dto.companyId) {
+      const companyExists = await this.companyRepository.findById(dto.companyId);
+      if (!companyExists) {
+        throw new NotFoundException('Empresa não encontrada.');
+      }
     }
 
-    const visitorAlreadyPresent = await this.visitHistoryRepository.findVisitorPresentByCpf({
-      cpf: dto?.visitorCpf,
-    });
-    if (visitorAlreadyPresent) {
-      throw new BadRequestException('O visitante já está presente na empresa.');
-    }
+    if (cpf) {
+      const visitorAlreadyPresent = await this.visitHistoryRepository.findVisitorPresentByCpf({
+        cpf,
+        startDate: getLocalDateToUtcDate(new Date(`${dto.date}T00:00:00`)),
+        endDate: getLocalDateToUtcDate(new Date(`${dto.date}T23:59:59`)),
+      });
+      if (visitorAlreadyPresent) {
+        throw new BadRequestException('O visitante já está presente na empresa.');
+      }
 
-    const visitorAlreadyScheduled = await this.visitHistoryRepository.findVisitorScheduledByCpf({
-      cpf: dto?.visitorCpf,
-      startDate: getLocalDateToUtcDate(new Date(`${dto.date}T00:00:00`)),
-      endDate: getLocalDateToUtcDate(new Date(`${dto.date}T23:59:59`)),
-    });
+      const visitorAlreadyScheduled = await this.visitHistoryRepository.findVisitorScheduledByCpf({
+        cpf,
+        startDate: getLocalDateToUtcDate(new Date(`${dto.date}T00:00:00`)),
+        endDate: getLocalDateToUtcDate(new Date(`${dto.date}T23:59:59`)),
+      });
 
-    if (visitorAlreadyScheduled) {
-      throw new BadRequestException('O visitante já possui um agendamento para essa data.');
+      if (visitorAlreadyScheduled) {
+        throw new BadRequestException('O visitante já possui um agendamento para essa data.');
+      }
     }
 
     const schedule = await this.visitHistoryRepository.create({
       name: dto.visitorName,
-      cpf: dto?.visitorCpf,
-      phone: dto?.visitorPhone,
+      cpf: cpf ?? null,
+      phone,
       description: dto.description,
       arrivedAt: getLocalDateToUtcDate(new Date(`${dto.date}T${dto.time}:00`)),
       companyId: dto?.companyId && dto.companyId.length ? dto.companyId : null,

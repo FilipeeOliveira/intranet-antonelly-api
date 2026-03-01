@@ -59,8 +59,9 @@ export class VisitHistoryRepository {
       };
     }
 
-    const orderBy: any = {};
-    orderBy[sortBy || 'arrivedAt'] = sortOrder || 'desc';
+    const orderBy: any = sortBy
+      ? { [sortBy]: sortOrder || 'desc' }
+      : { createdAt: 'desc' };
 
     const [histories, total] = await Promise.all([
       this.prisma.visitHistory.findMany({
@@ -102,8 +103,8 @@ export class VisitHistoryRepository {
   }) {
 
     const { cpf } = args;
-    args.startDate = moment(args.startDate).startOf('day').toDate() || moment().startOf('day').toDate();
-    args.endDate = moment(args.endDate).endOf('day').toDate() || moment().endOf('day').toDate();
+    args.startDate = args.startDate || moment().startOf('day').toDate();
+    args.endDate = args.endDate || moment().endOf('day').toDate();
 
     return this.prisma.visitHistory.findFirst({
       where: {

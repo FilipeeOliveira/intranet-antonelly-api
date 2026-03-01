@@ -66,19 +66,17 @@ export class VisitHistoryQueryDto {
 
   @ApiProperty({
     description: 'Campo para ordenação',
-    enum: ['arrivedAt', 'leftAt'],
-    default: 'arrivedAt',
+    enum: ['arrivedAt', 'leftAt', 'createdAt'],
     required: false,
   })
   @IsOptional()
-  sortBy?: string = 'arrivedAt';
+  sortBy?: string;
 
   @ApiProperty({
     description: 'Direção da ordenação',
     enum: ['asc', 'desc'],
-    default: 'desc',
     required: false,
   })
   @IsOptional()
-  sortOrder?: 'asc' | 'desc' = 'desc';
+  sortOrder?: 'asc' | 'desc';
 }
