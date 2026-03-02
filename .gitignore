@@ -41,6 +41,7 @@ lerna-debug.log*
 
 .env
 .env.prod
+.dockerfile
 
 # Uploads - arquivos enviados pelos usuários
 /uploads/

@@ -10,7 +10,6 @@ import { join } from "path";
 import { SectorRepository } from "src/modules/sectors/infrastructure/repositories/sector.repository";
 import { UsersRepository } from "src/modules/users/infrastructure/repositories/users.repository";
 import { CommuniquesGateway } from "../../infrasctructure/gateways/communiques.gateway";
-import { EmailService } from "src/modules/email/application/services/email.service";
 import { SendEmailCommuniqueBySector } from "../use-cases/send-email-communique-by-sector";
 import { SendNotificationAboutCommunique } from "../use-cases/send-notification-about-communique";
 

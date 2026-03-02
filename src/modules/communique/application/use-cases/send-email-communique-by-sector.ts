@@ -24,6 +24,6 @@ export class SendEmailCommuniqueBySector {
 
         const to = users.map(user => user.email);
         this.logger.log(`Enviando comunicado para ${to.length} usuários ativos`);
-        this.emailService.sendCommunicationEmail(to, context);
+        this.emailService.sendCommunicationEmail(to, context).catch(err => this.logger.error(`Falha ao enviar email de comunicado: ${err?.message}`));
     }
 }
