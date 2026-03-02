@@ -252,3 +252,41 @@ model RoleFeature {
 
   @@map("role_features")
 }
+
+enum TipoEncomenda {
+  ENCOMENDA
+  CARTA
+  DOCUMENTO
+  PACOTE
+  OUTRO
+}
+
+enum StatusEncomenda {
+  AGUARDANDO_RETIRADA
+  ENTREGUE
+  DEVOLVIDO
+}
+
+model Encomenda {
+  id                String          @id @default(uuid())
+  numeroProtocolo   String          @unique
+  tipo              TipoEncomenda   @default(ENCOMENDA)
+  remetente         String?         @db.VarChar(255)
+  transportadora    String?         @db.VarChar(255)
+  codigoRastreio    String?         @db.VarChar(255)
+  descricao         String?         @db.Text
+  destinatarioNome  String          @db.VarChar(255)
+  destinatarioSetor String?         @db.VarChar(255)
+  destinatarioEmail String          @db.VarChar(255)
+  dataRecebimento   DateTime
+  recebidoPor       String          @db.VarChar(255)
+  status            StatusEncomenda @default(AGUARDANDO_RETIRADA)
+  dataEntrega       DateTime?
+  entreguePara      String?         @db.VarChar(255)
+  entreguePor       String?         @db.VarChar(255)
+  observacoes       String?         @db.Text
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@map("encomendas")
+}

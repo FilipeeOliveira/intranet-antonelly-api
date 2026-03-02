@@ -19,6 +19,7 @@ import { VisitHistoryModule } from './modules/visit-history/visit-history.module
 import { LoggingInterceptor } from './shared/interceptors/logging.interceptor';
 import { RolesModule } from './modules/roles/roles.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { EncomendasModule } from './modules/encomendas/encomendas.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
     NotificationModule,
     RolesModule,
     DashboardModule,
+    EncomendasModule,
     ScheduleModule.forRoot(),
   ],
   controllers: [],
