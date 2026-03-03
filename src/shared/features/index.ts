@@ -1,6 +1,7 @@
 import { CommuniquesFeatures } from './communiques.features';
 import { CompanyFeatures } from './companies.features';
 import { DocumentsFeatures } from './documents.features';
+import { OrdersFeatures } from './orders.features';
 import { MeetingFeatures } from './meeting.features';
 import { PermissionsFeatures } from './permissions.features';
 import { RoomsFeatures } from './rooms.features';
@@ -18,6 +19,7 @@ export const Permissions = {
     ROOMS: RoomsFeatures,
     USERS: UserFeatures,
     PERMISSIONS: PermissionsFeatures,
+    ORDERS: OrdersFeatures,
 } as const;
 
 export type PermissionKey =
@@ -29,7 +31,8 @@ export type PermissionKey =
     | typeof UserFeatures[keyof typeof UserFeatures]
     | typeof PermissionsFeatures[keyof typeof PermissionsFeatures]
     | typeof VisitHistoryGeneralFeatures[keyof typeof VisitHistoryGeneralFeatures]
-    | typeof CommuniquesFeatures[keyof typeof CommuniquesFeatures];
+    | typeof CommuniquesFeatures[keyof typeof CommuniquesFeatures]
+    | typeof OrdersFeatures[keyof typeof OrdersFeatures];
 
 
 export type FeatureGroup = keyof typeof Permissions;

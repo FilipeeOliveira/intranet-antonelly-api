@@ -252,3 +252,41 @@ model RoleFeature {
 
   @@map("role_features")
 }
+
+enum OrderType {
+  PACKAGE
+  LETTER
+  DOCUMENT
+  PARCEL
+  OTHER
+}
+
+enum OrderStatus {
+  AWAITING_PICKUP
+  DELIVERED
+  RETURNED
+}
+
+model Order {
+  id                  String      @id @default(uuid())
+  protocolNumber      String      @unique
+  type                OrderType   @default(PACKAGE)
+  sender              String?     @db.VarChar(255)
+  carrier             String?     @db.VarChar(255)
+  trackingCode        String?     @db.VarChar(255)
+  description         String?     @db.Text
+  recipientName       String      @db.VarChar(255)
+  recipientDepartment String?     @db.VarChar(255)
+  recipientEmail      String      @db.VarChar(255)
+  receivedAt          DateTime
+  receivedBy          String      @db.VarChar(255)
+  status              OrderStatus @default(AWAITING_PICKUP)
+  deliveredAt         DateTime?
+  deliveredTo         String?     @db.VarChar(255)
+  deliveredBy         String?     @db.VarChar(255)
+  notes               String?     @db.Text
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+
+  @@map("orders")
+}

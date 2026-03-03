@@ -4,7 +4,7 @@ import { IsNotEmpty, IsString, MinLength } from 'class-validator';
 export class LoginDto {
   @ApiProperty({
     description: 'Email ou username do usuário',
-    example: 'admin@empresa.com ou admin',
+    example: 'superadmin',
   })
   @IsString({ message: 'Identificador deve ser uma string' })
   @IsNotEmpty({ message: 'Email ou username é obrigatório' })
@@ -12,7 +12,7 @@ export class LoginDto {
 
   @ApiProperty({
     description: 'Senha do usuário',
-    example: 'admin@123',
+    example: 'admin123',
     minLength: 8,
   })
   @IsString({ message: 'Senha deve ser uma string' })
