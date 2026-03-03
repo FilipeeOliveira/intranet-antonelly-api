@@ -59,7 +59,7 @@ export class OrdersService {
     return order;
   }
 
-  async registrarEntrega(id: string, dto: RegisterDeliveryDto, user: { name: string }) {
+  async registerDelivery(id: string, dto: RegisterDeliveryDto, user: { name: string }) {
     const order = await this.ordersRepository.findById(id);
 
     if (!order) {
@@ -80,7 +80,7 @@ export class OrdersService {
     });
   }
 
-  async registrarDevolucao(id: string, dto: RegisterReturnDto) {
+  async registerReturn(id: string, dto: RegisterReturnDto) {
     const order = await this.ordersRepository.findById(id);
 
     if (!order) {

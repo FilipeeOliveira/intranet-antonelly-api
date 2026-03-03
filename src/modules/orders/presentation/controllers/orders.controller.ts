@@ -68,23 +68,23 @@ export class OrdersController {
   @Features(Permissions.ORDERS.WRITE)
   @ApiOperation({ summary: 'Registrar entrega da encomenda ao destinatário' })
   @ApiResponse({ status: 200, description: 'Entrega registrada com sucesso.' })
-  async registrarEntrega(
+  async registerDelivery(
     @Param('id') id: string,
     @Body() dto: RegisterDeliveryDto,
     @CurrentUser() user: { name: string },
   ) {
-    return this.ordersService.registrarEntrega(id, dto, user);
+    return this.ordersService.registerDelivery(id, dto, user);
   }
 
   @Patch(':id/register-return')
   @Features(Permissions.ORDERS.WRITE)
   @ApiOperation({ summary: 'Registrar devolução da encomenda ao remetente' })
   @ApiResponse({ status: 200, description: 'Devolução registrada com sucesso.' })
-  async registrarDevolucao(
+  async registerReturn(
     @Param('id') id: string,
     @Body() dto: RegisterReturnDto,
   ) {
-    return this.ordersService.registrarDevolucao(id, dto);
+    return this.ordersService.registerReturn(id, dto);
   }
 
   @Put(':id')
