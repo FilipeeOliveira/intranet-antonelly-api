@@ -253,40 +253,40 @@ model RoleFeature {
   @@map("role_features")
 }
 
-enum TipoEncomenda {
-  ENCOMENDA
-  CARTA
-  DOCUMENTO
-  PACOTE
-  OUTRO
+enum OrderType {
+  PACKAGE
+  LETTER
+  DOCUMENT
+  PARCEL
+  OTHER
 }
 
-enum StatusEncomenda {
-  AGUARDANDO_RETIRADA
-  ENTREGUE
-  DEVOLVIDO
+enum OrderStatus {
+  AWAITING_PICKUP
+  DELIVERED
+  RETURNED
 }
 
-model Encomenda {
-  id                String          @id @default(uuid())
-  numeroProtocolo   String          @unique
-  tipo              TipoEncomenda   @default(ENCOMENDA)
-  remetente         String?         @db.VarChar(255)
-  transportadora    String?         @db.VarChar(255)
-  codigoRastreio    String?         @db.VarChar(255)
-  descricao         String?         @db.Text
-  destinatarioNome  String          @db.VarChar(255)
-  destinatarioSetor String?         @db.VarChar(255)
-  destinatarioEmail String          @db.VarChar(255)
-  dataRecebimento   DateTime
-  recebidoPor       String          @db.VarChar(255)
-  status            StatusEncomenda @default(AGUARDANDO_RETIRADA)
-  dataEntrega       DateTime?
-  entreguePara      String?         @db.VarChar(255)
-  entreguePor       String?         @db.VarChar(255)
-  observacoes       String?         @db.Text
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
+model Order {
+  id                  String      @id @default(uuid())
+  protocolNumber      String      @unique
+  type                OrderType   @default(PACKAGE)
+  sender              String?     @db.VarChar(255)
+  carrier             String?     @db.VarChar(255)
+  trackingCode        String?     @db.VarChar(255)
+  description         String?     @db.Text
+  recipientName       String      @db.VarChar(255)
+  recipientDepartment String?     @db.VarChar(255)
+  recipientEmail      String      @db.VarChar(255)
+  receivedAt          DateTime
+  receivedBy          String      @db.VarChar(255)
+  status              OrderStatus @default(AWAITING_PICKUP)
+  deliveredAt         DateTime?
+  deliveredTo         String?     @db.VarChar(255)
+  deliveredBy         String?     @db.VarChar(255)
+  notes               String?     @db.Text
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
 
-  @@map("encomendas")
+  @@map("orders")
 }

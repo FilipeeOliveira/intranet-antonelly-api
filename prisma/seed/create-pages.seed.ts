@@ -205,6 +205,28 @@ export async function createPagesSeed() {
         }
     });
 
+    const ordersPage = await prisma.page.upsert({
+        where: { name: 'ORDERS' },
+        update: {},
+        create: {
+            name: 'ORDERS',
+            features: {
+                create: [
+                    {
+                        key: Permissions.ORDERS.READ,
+                        prettyName: 'Visualizar Orders',
+                        description: 'Permite visualizar todas as informações desta página, incluindo listagem de orders, detalhes individuais e status de entrega.'
+                    },
+                    {
+                        key: Permissions.ORDERS.WRITE,
+                        prettyName: 'Ações de escrita de Orders',
+                        description: 'Permite realizar ações de criação, atualização, entrega e devolução de orders no sistema.'
+                    },
+                ]
+            }
+        }
+    });
+
 
     // Marcar features que existem no back-end mas não devem aparecer no modal de permissões
     const hiddenFeatureKeys = [
@@ -230,6 +252,7 @@ export async function createPagesSeed() {
     console.log(`🏭 Setores -> ${sectorsPage.id}`);
     console.log(`🏢 Salas -> ${roomsPage.id}`);
     console.log(`🔐 Permissões -> ${permissionsPage.id}`);
+    console.log(`📦 Orders -> ${ordersPage.id}`);
 
     return [
         usersPage,
@@ -240,6 +263,7 @@ export async function createPagesSeed() {
         roomsPage,
         permissionsPage,
         visitorHistoryPage,
-        procedimentosPage
+        procedimentosPage,
+        ordersPage
     ];
 }

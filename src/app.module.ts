@@ -19,7 +19,7 @@ import { VisitHistoryModule } from './modules/visit-history/visit-history.module
 import { LoggingInterceptor } from './shared/interceptors/logging.interceptor';
 import { RolesModule } from './modules/roles/roles.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
-import { EncomendasModule } from './modules/encomendas/encomendas.module';
+import { OrdersModule } from './modules/orders/orders.module';
 
 @Module({
   imports: [
@@ -43,7 +43,7 @@ import { EncomendasModule } from './modules/encomendas/encomendas.module';
     NotificationModule,
     RolesModule,
     DashboardModule,
-    EncomendasModule,
+    OrdersModule,
     ScheduleModule.forRoot(),
   ],
   controllers: [],

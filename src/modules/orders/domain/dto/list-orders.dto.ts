@@ -1,20 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { StatusEncomenda } from '@prisma/client';
+import { OrderStatus } from '@prisma/client';
 import { Type } from 'class-transformer';
 import { IsEmail, IsEnum, IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 
-export class ListEncomendasDto {
-  @ApiProperty({ enum: StatusEncomenda, required: false })
+export class ListOrdersDto {
+  @ApiProperty({ enum: OrderStatus, required: false })
   @IsOptional()
-  @IsEnum(StatusEncomenda)
-  status?: StatusEncomenda;
+  @IsEnum(OrderStatus)
+  status?: OrderStatus;
 
   @ApiProperty({ required: false })
   @IsOptional()
   @IsEmail()
-  destinatarioEmail?: string;
+  recipientEmail?: string;
 
-  @ApiProperty({ required: false, description: 'Busca por remetente, destinatarioNome ou codigoRastreio' })
+  @ApiProperty({ required: false, description: 'Busca por sender, recipientName ou trackingCode' })
   @IsOptional()
   @IsString()
   search?: string;
@@ -34,7 +34,7 @@ export class ListEncomendasDto {
   @Max(100)
   limit?: number = 10;
 
-  @ApiProperty({ required: false, enum: ['dataRecebimento', 'createdAt', 'status'] })
+  @ApiProperty({ required: false, enum: ['receivedAt', 'createdAt', 'status'] })
   @IsOptional()
   @IsString()
   sortBy?: string;

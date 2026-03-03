@@ -16,6 +16,7 @@ const DIRETOR_DOMAINS = {
     "ROOMS",
     "DOCUMENTS",
     "PERMISSIONS",
+    "ORDERS",
   ],
   WRITE: [
     "COMMUNIQUES",
@@ -45,11 +46,13 @@ const PORTARIA_DOMAINS = {
     "VISIT_PRESENTS",
     "VISIT_HISTORY",
     "PERMISSIONS",
+    "ORDERS",
   ],
   WRITE: [
     "VISIT_SCHEDULES",
     "VISIT_PRESENTS",
     "VISIT_HISTORY",
+    "ORDERS",
   ],
 }
 
