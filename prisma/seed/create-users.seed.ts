@@ -20,7 +20,7 @@ export async function createUsersSeed({ rolesCreated, sectorRecords }: { rolesCr
 
     // Criar usuário Super Administrador
     const superadminUser = await prisma.user.upsert({
-        where: { email: 'superadmin@empresa.com' },
+        where: { email: SUPERADMIN_EMAIL },
         update: {},
         create: {
             name: 'Super Administrador',
