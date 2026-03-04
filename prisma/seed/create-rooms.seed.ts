@@ -10,8 +10,10 @@ export async function createRoomsSeed() {
     ];
 
     for (const room of rooms) {
-        await prisma.room.create({
-            data: room,
+        await prisma.room.upsert({
+            where: { name: room.name },
+            update: {},
+            create: room,
         });
     }
 
