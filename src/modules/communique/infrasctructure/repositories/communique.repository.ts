@@ -5,151 +5,152 @@ import { UpdateCommuniqueDto } from "../../domain/dtos/update-communique.dto";
 
 @Injectable()
 export class CommuniqueRepository {
-    constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
-    async create(data: any) {
-        const createdData = await this.prisma.communique.create({ data });
-        let communique = await this.findById(createdData.id);
+  async create(data: any) {
+    const createdData = await this.prisma.communique.create({ data });
+    const communique = await this.findById(createdData.id);
 
-        return communique;
-    }
+    return communique;
+  }
 
-    async findById(id: string) {
-        let communique = await this.prisma.communique.findUnique({
-            where: { id },
-            select: {
+  async findById(id: string) {
+    const communique = await this.prisma.communique.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        severity: true,
+        imageUrl: true,
+        imagePath: true,
+        sectorId: true,
+        authorId: true,
+        createdAt: true,
+        updatedAt: true,
+        author: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: {
+              select: {
                 id: true,
-                title: true,
+                key: true,
                 description: true,
-                severity: true,
-                imageUrl: true,
-                imagePath: true,
-                sectorId: true,
-                authorId: true,
-                createdAt: true,
-                updatedAt: true,
-                author: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        role: {
-                            select: {
-                                id: true,
-                                key: true,
-                                description: true,
-                            }
-                        },
-                        sector: {
-                            select: {
-                                id: true,
-                                name: true,
-                                description: true,
-                            }
-                        }
-                    }
-                },
-                sector: {
-                    select: {
-                        id: true,
-                        name: true,
-                        description: true,
-                    }
-                },
-            }
-        });
+              },
+            },
+            sector: {
+              select: {
+                id: true,
+                name: true,
+                description: true,
+              },
+            },
+          },
+        },
+        sector: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+          },
+        },
+      },
+    });
 
-        return communique;
+    return communique;
+  }
+
+  async findAll(query: CommuniqueQueryDto) {
+    const { page, limit, search, sector, sectorId, sortBy, sortOrder } = query;
+
+    const skip = (page - 1) * limit;
+
+    // Construir filtros
+    const where: any = {};
+
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: "insensitive" } },
+        { description: { contains: search, mode: "insensitive" } },
+        {
+          author: {
+            name: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+        },
+        { severity: { contains: search, mode: "insensitive" } },
+      ];
     }
 
-    async findAll(query: CommuniqueQueryDto) {
-        const { page, limit, search, sector, sectorId, sortBy, sortOrder } = query;
-
-        const skip = (page - 1) * limit;
-
-        // Construir filtros
-        const where: any = {};
-
-        if (search) {
-            where.OR = [
-                { title: { contains: search, mode: 'insensitive' } },
-                { description: { contains: search, mode: 'insensitive' } },
-                {
-                    author: {
-                        name: {
-                            contains: search, mode: 'insensitive',
-                        },
-                    }
-                },
-                { severity: { contains: search, mode: 'insensitive' } },
-            ];
-        }
-
-        // Prioriza filtro por sectorId (UUID) se fornecido
-        if (sectorId) {
-            where.sectorId = sectorId;
-        }
-        else if (sector) {
-            // Caso contrário, filtra por nome do setor
-            where.sector = {
-                name: {
-                    contains: sector, mode: 'insensitive',
-                }
-            };
-        }
-
-        // Construir ordenação
-        const orderBy: any = {};
-        orderBy[sortBy || 'createdAt'] = sortOrder || 'desc';
-
-        const [communiques, total] = await Promise.all([
-            this.prisma.communique.findMany({
-                where,
-                skip,
-                take: limit,
-                orderBy,
-                include: {
-                    author: {
-                        select: {
-                            id: true,
-                            name: true,
-                            email: true,
-                            role: true,
-                            sector: true,
-                        },
-                    },
-                    sector: true
-                }
-            }),
-            this.prisma.communique.count({ where }),
-        ]);
-
-        return {
-            data: communiques,
-            total,
-            page,
-            limit,
-            totalPages: Math.ceil(total / limit),
-        };
+    // Prioriza filtro por sectorId (UUID) se fornecido
+    if (sectorId) {
+      where.sectorId = sectorId;
+    } else if (sector) {
+      // Caso contrário, filtra por nome do setor
+      where.sector = {
+        name: {
+          contains: sector,
+          mode: "insensitive",
+        },
+      };
     }
 
-    async update(id: string, data: UpdateCommuniqueDto) {
-        const { sectorId, authorId, ...rest } = data as any;
+    // Construir ordenação
+    const orderBy: any = {};
+    orderBy[sortBy || "createdAt"] = sortOrder || "desc";
 
-        const updateData: any = { ...rest };
+    const [communiques, total] = await Promise.all([
+      this.prisma.communique.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy,
+        include: {
+          author: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              role: true,
+              sector: true,
+            },
+          },
+          sector: true,
+        },
+      }),
+      this.prisma.communique.count({ where }),
+    ]);
 
-        if (sectorId) {
-            updateData.sector = { connect: { id: sectorId } };
-        }
+    return {
+      data: communiques,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
 
-        if (authorId) {
-            updateData.author = { connect: { id: authorId } };
-        }
+  async update(id: string, data: UpdateCommuniqueDto) {
+    const { sectorId, authorId, ...rest } = data as any;
 
-        return this.prisma.communique.update({ where: { id }, data: updateData });
+    const updateData: any = { ...rest };
+
+    if (sectorId) {
+      updateData.sector = { connect: { id: sectorId } };
     }
 
-    async delete(id: string) {
-        return this.prisma.communique.delete({ where: { id } });
+    if (authorId) {
+      updateData.author = { connect: { id: authorId } };
     }
+
+    return this.prisma.communique.update({ where: { id }, data: updateData });
+  }
+
+  async delete(id: string) {
+    return this.prisma.communique.delete({ where: { id } });
+  }
 }

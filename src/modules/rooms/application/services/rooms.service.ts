@@ -6,33 +6,31 @@ import { RoomsRepository } from "../../infrastructure/repositories/rooms.reposit
 
 @Injectable()
 export class RoomsService {
-    constructor(
-        private readonly roomsRepository: RoomsRepository,
-    ) { }
+  constructor(private readonly roomsRepository: RoomsRepository) {}
 
-    async create(data: CreateRoomDto) {
-        return this.roomsRepository.create(data);
-    }
+  async create(data: CreateRoomDto) {
+    return this.roomsRepository.create(data);
+  }
 
-    async update(id: string, data: UpdateRoomDto) {
-        const room = await this.roomsRepository.findById(id);
-        if (!room) throw new NotFoundException('Sala não encontrada.');
-        return this.roomsRepository.update(id, data);
-    }
+  async update(id: string, data: UpdateRoomDto) {
+    const room = await this.roomsRepository.findById(id);
+    if (!room) throw new NotFoundException("Sala não encontrada.");
+    return this.roomsRepository.update(id, data);
+  }
 
-    async findAll(query: RoomsQueryDto) {
-        return this.roomsRepository.findAll(query);
-    }
+  async findAll(query: RoomsQueryDto) {
+    return this.roomsRepository.findAll(query);
+  }
 
-    async findById(id: string) {
-        const room = await this.roomsRepository.findById(id);
-        if (!room) throw new NotFoundException('Sala não encontrada.');
-        return room;
-    }
+  async findById(id: string) {
+    const room = await this.roomsRepository.findById(id);
+    if (!room) throw new NotFoundException("Sala não encontrada.");
+    return room;
+  }
 
-    async delete(id: string) {
-        const room = await this.roomsRepository.findById(id);
-        if (!room) throw new NotFoundException('Sala não encontrada.');
-        return this.roomsRepository.delete(id);
-    }
+  async delete(id: string) {
+    const room = await this.roomsRepository.findById(id);
+    if (!room) throw new NotFoundException("Sala não encontrada.");
+    return this.roomsRepository.delete(id);
+  }
 }

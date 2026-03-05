@@ -17,11 +17,13 @@ const DIRETOR_DOMAINS = {
     "DOCUMENTS",
     "PERMISSIONS",
     "ORDERS",
+    "CONSTRUCTIONS",
   ],
   WRITE: [
     "COMMUNIQUES",
     "MEETING",
     "DOCUMENTS",
+    "CONSTRUCTIONS",
   ],
 };
 
@@ -30,12 +32,14 @@ const GERENTE_DOMAINS = {
     "COMMUNIQUES",
     "DOCUMENTS",
     "MEETING",
-    "PERMISSIONS"
+    "PERMISSIONS",
+    "CONSTRUCTIONS",
   ],
   WRITE: [
     "COMMUNIQUES",
     "DOCUMENTS",
     "MEETING",
+    "CONSTRUCTIONS",
   ],
 };
 
@@ -65,14 +69,21 @@ const FUNCIONARIO_DOMAINS = {
   WRITE: [],
 };
 
+// Features que somente ADMIN/SUPERADMIN podem executar
+const ADMIN_ONLY_FEATURES = [
+  "CONSTRUCTIONS_DELETE",
+];
+
 // Helpers fora da cargo
 const byDomain = (domains: string[]) => (f: { key: string }) =>
   domains.some((d) => f.key.startsWith(`${d}_`));
 
 function isReadFeature(key: string) {
-  return (
-    key.endsWith("_READ")
-  );
+  return key.endsWith("_READ");
+}
+
+function isAdminOnly(key: string) {
+  return ADMIN_ONLY_FEATURES.includes(key);
 }
 
 
@@ -109,12 +120,13 @@ export async function createRoleFeaturesSeed() {
         .filter(byDomain(DIRETOR_DOMAINS.READ))
         .map((f) => f.id),
 
-      // Features só de escrita e elimina as de leitura
+      // Features só de escrita, elimina leitura e features exclusivas de admin
       ...features
         .filter(
           (f) =>
             byDomain(DIRETOR_DOMAINS.WRITE)(f) &&
-            !isReadFeature(f.key),
+            !isReadFeature(f.key) &&
+            !isAdminOnly(f.key),
         )
         .map((f) => f.id),
     ],
@@ -122,8 +134,12 @@ export async function createRoleFeaturesSeed() {
     GERENTE: [
       ...baseReadFeatures.filter(byDomain(GERENTE_DOMAINS.READ))
         .map((f) => f.id),
-      ...features.filter((f) => byDomain(GERENTE_DOMAINS.WRITE)(f) && !isReadFeature(f.key))
-        .map((f) => f.id),
+      ...features.filter(
+        (f) =>
+          byDomain(GERENTE_DOMAINS.WRITE)(f) &&
+          !isReadFeature(f.key) &&
+          !isAdminOnly(f.key),
+      ).map((f) => f.id),
     ],
 
     PORTARIA: [

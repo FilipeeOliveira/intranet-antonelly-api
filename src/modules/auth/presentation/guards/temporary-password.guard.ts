@@ -1,12 +1,11 @@
-import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { AuthRepository } from '../../infrastructure/repositories/auth.repository';
+import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from "@nestjs/common";
+import { Reflector } from "@nestjs/core";
+import { AuthRepository } from "../../infrastructure/repositories/auth.repository";
 
 // Decorator para marcar rotas que precisam verificar senha temporária
-export const SKIP_TEMPORARY_PASSWORD_CHECK = 'skipTemporaryPasswordCheck';
-export const SkipTemporaryPasswordCheck = () => 
-  (target: any, propertyKey?: string, descriptor?: PropertyDescriptor) => 
-    Reflect.defineMetadata(SKIP_TEMPORARY_PASSWORD_CHECK, true, descriptor ? descriptor.value : target);
+export const SKIP_TEMPORARY_PASSWORD_CHECK = "skipTemporaryPasswordCheck";
+export const SkipTemporaryPasswordCheck = () => (target: any, propertyKey?: string, descriptor?: PropertyDescriptor) =>
+  Reflect.defineMetadata(SKIP_TEMPORARY_PASSWORD_CHECK, true, descriptor ? descriptor.value : target);
 
 @Injectable()
 export class TemporaryPasswordGuard implements CanActivate {
@@ -17,10 +16,10 @@ export class TemporaryPasswordGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     // Verificar se a rota deve pular a verificação
-    const skipCheck = this.reflector.getAllAndOverride<boolean>(
-      SKIP_TEMPORARY_PASSWORD_CHECK,
-      [context.getHandler(), context.getClass()],
-    );
+    const skipCheck = this.reflector.getAllAndOverride<boolean>(SKIP_TEMPORARY_PASSWORD_CHECK, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
 
     if (skipCheck) {
       return true;
@@ -35,7 +34,7 @@ export class TemporaryPasswordGuard implements CanActivate {
 
     // Buscar dados atualizados do usuário
     const userData = await this.authRepository.findUserById(user.id);
-    
+
     if (!userData) {
       return false;
     }
@@ -44,9 +43,9 @@ export class TemporaryPasswordGuard implements CanActivate {
     if (userData.isTemporaryPassword) {
       throw new ForbiddenException({
         statusCode: 403,
-        message: 'Você deve alterar sua senha temporária antes de continuar',
-        error: 'TEMPORARY_PASSWORD_REQUIRED',
-        changePasswordUrl: '/auth/change-temporary-password',
+        message: "Você deve alterar sua senha temporária antes de continuar",
+        error: "TEMPORARY_PASSWORD_REQUIRED",
+        changePasswordUrl: "/auth/change-temporary-password",
       });
     }
 

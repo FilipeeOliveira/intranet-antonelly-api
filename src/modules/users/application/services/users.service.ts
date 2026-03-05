@@ -1,20 +1,18 @@
-import { ConflictException, ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
-import { AuthRepository } from 'src/modules/auth/infrastructure/repositories/auth.repository';
-import { EmailService } from 'src/modules/email/application/services/email.service';
-import { PermissionsService } from 'src/modules/permissions/application/services/permissions.service';
-import { PrismaService } from 'src/modules/prisma/prisma.service';
-import { RolesRepository } from 'src/modules/roles/infrastructure/repositories/roles.repository';
-import { SectorService } from 'src/modules/sectors/application/services/sector.service';
-import { USER_ROLES } from '../../../../shared/types/users.roles';
-import { PasswordUtil } from '../../../../shared/utils/password.util';
-import { CreateUserDto } from '../../domain/dto/create-user.dto';
-import { UpdateUserDto } from '../../domain/dto/update-user.dto';
-import { UserQueryDto } from '../../domain/dto/user-query.dto';
-import { UsersRepository } from '../../infrastructure/repositories/users.repository';
-import { SendWelcomeEmailUseCase } from '../use-cases/send-welcome-email.use-case';
-import { envConfig } from 'src/config/config';
-
+import { ConflictException, ForbiddenException, Injectable, Logger, NotFoundException } from "@nestjs/common";
+import * as bcrypt from "bcrypt";
+import { AuthRepository } from "src/modules/auth/infrastructure/repositories/auth.repository";
+import { EmailService } from "src/modules/email/application/services/email.service";
+import { PermissionsService } from "src/modules/permissions/application/services/permissions.service";
+import { PrismaService } from "src/modules/prisma/prisma.service";
+import { RolesRepository } from "src/modules/roles/infrastructure/repositories/roles.repository";
+import { SectorService } from "src/modules/sectors/application/services/sector.service";
+import { USER_ROLES } from "../../../../shared/types/users.roles";
+import { PasswordUtil } from "../../../../shared/utils/password.util";
+import { CreateUserDto } from "../../domain/dto/create-user.dto";
+import { UpdateUserDto } from "../../domain/dto/update-user.dto";
+import { UserQueryDto } from "../../domain/dto/user-query.dto";
+import { UsersRepository } from "../../infrastructure/repositories/users.repository";
+import { SendWelcomeEmailUseCase } from "../use-cases/send-welcome-email.use-case";
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
@@ -28,7 +26,7 @@ export class UsersService {
     private readonly permissionsService: PermissionsService,
     private readonly prisma: PrismaService,
     private readonly authRepository: AuthRepository,
-  ) { }
+  ) {}
 
   async findAll(query: UserQueryDto) {
     this.logger.log(`Buscando usuários com filtros: ${JSON.stringify(query)}`);
@@ -40,7 +38,7 @@ export class UsersService {
     const user = await this.usersRepository.findById(id);
 
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
+      throw new NotFoundException("Usuário não encontrado");
     }
 
     return user;
@@ -56,26 +54,26 @@ export class UsersService {
     // Verificar se email já existe
     const existingUser = await this.usersRepository.findByEmail(createUserDto.email);
     if (existingUser) {
-      throw new ConflictException('Email já está em uso');
+      throw new ConflictException("Email já está em uso");
     }
 
     // Verificar se username já existe (se fornecido)
     if (createUserDto.username) {
       const existingUsername = await this.usersRepository.findByUsername(createUserDto.username);
       if (existingUsername) {
-        throw new ConflictException('Username já está em uso');
+        throw new ConflictException("Username já está em uso");
       }
     }
 
     // Bloquear criação de usuário com role SUPERADMIN
     if (createUserDto.role === USER_ROLES.SUPERADMIN) {
-      throw new ForbiddenException('Não é possível criar um usuário com o cargo de Super Administrador.');
+      throw new ForbiddenException("Não é possível criar um usuário com o cargo de Super Administrador.");
     }
 
     // Verificar se setor já existe
     const sectorExists = await this.sectorService.findById(createUserDto.sectorId);
     if (!sectorExists) {
-      throw new NotFoundException('Setor não encontrado');
+      throw new NotFoundException("Setor não encontrado");
     }
 
     // Gerar senha temporária
@@ -95,20 +93,21 @@ export class UsersService {
 
     // Enviar email de boas-vindas com senha temporária (fire-and-forget com log de falha)
     // Em caso de falha, o admin pode usar "Resetar Senha" para reenviar as credenciais
-    void this.sendWelcomeEmailUseCase.execute({
-      to: user.email,
-      context: {
-        name: user.name,
-        email: user.email,
-        temporaryPassword,
-      }
-    }).catch(err =>
-      this.logger.error(`Falha ao enviar email de boas-vindas para ${user.email}: ${err?.message}`)
-    );
+    void this.sendWelcomeEmailUseCase
+      .execute({
+        to: user.email,
+        context: {
+          name: user.name,
+          email: user.email,
+          temporaryPassword,
+        },
+      })
+      .catch((err) => this.logger.error(`Falha ao enviar email de boas-vindas para ${user.email}: ${err?.message}`));
 
     this.logger.log(`Usuário criado com sucesso: ${user.email}`);
 
     // Retornar dados sem senha
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...userWithoutPassword } = user;
     return {
       id: userWithoutPassword.id,
@@ -140,7 +139,6 @@ export class UsersService {
     await this.permissionsService.assignManyFeatures(userId, newFeatureIds);
   }
 
-
   async update(id: string, updateUserDto: UpdateUserDto) {
     this.logger.log(`Atualizando usuário: ${id}`);
 
@@ -149,19 +147,19 @@ export class UsersService {
     if (updateUserDto.sectorId) {
       const sectorExists = await this.sectorService.findById(updateUserDto.sectorId);
       if (!sectorExists) {
-        throw new NotFoundException('Setor não encontrado');
+        throw new NotFoundException("Setor não encontrado");
       }
     }
 
     if (updateUserDto.role) {
       // Bloquear alteração de role do SUPERADMIN
       if (existingUser.role?.key === USER_ROLES.SUPERADMIN) {
-        throw new ForbiddenException('Não é possível alterar o cargo do Super Administrador.');
+        throw new ForbiddenException("Não é possível alterar o cargo do Super Administrador.");
       }
 
       // Bloquear atribuição do role SUPERADMIN a qualquer usuário
       if (updateUserDto.role === USER_ROLES.SUPERADMIN) {
-        throw new ForbiddenException('Não é possível atribuir o cargo de Super Administrador.');
+        throw new ForbiddenException("Não é possível atribuir o cargo de Super Administrador.");
       }
 
       const role = await this.prisma.role.findUnique({
@@ -183,7 +181,7 @@ export class UsersService {
     if (updateUserDto.email && updateUserDto.email !== existingUser.email) {
       const emailExists = await this.usersRepository.findByEmail(updateUserDto.email);
       if (emailExists) {
-        throw new ConflictException('Email já está em uso');
+        throw new ConflictException("Email já está em uso");
       }
     }
 
@@ -191,7 +189,7 @@ export class UsersService {
     if (updateUserDto.username && updateUserDto.username !== existingUser.username) {
       const usernameExists = await this.usersRepository.findByUsername(updateUserDto.username);
       if (usernameExists) {
-        throw new ConflictException('Username já está em uso');
+        throw new ConflictException("Username já está em uso");
       }
     }
 
@@ -199,6 +197,7 @@ export class UsersService {
 
     this.logger.log(`Usuário atualizado: ${id}`);
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...userWithoutPassword } = updatedUser;
     return {
       id: userWithoutPassword.id,
@@ -220,7 +219,7 @@ export class UsersService {
     const user = await this.findById(id);
 
     if (user.role?.key === USER_ROLES.SUPERADMIN) {
-      throw new ForbiddenException('Não é possível resetar a senha do Super Administrador.');
+      throw new ForbiddenException("Não é possível resetar a senha do Super Administrador.");
     }
 
     // Gerar nova senha temporária
@@ -244,7 +243,7 @@ export class UsersService {
     this.logger.log(`Senha resetada para usuário: ${user.email}`);
 
     return {
-      message: 'Senha resetada com sucesso. Nova senha temporária enviada por email.',
+      message: "Senha resetada com sucesso. Nova senha temporária enviada por email.",
     };
   }
 
@@ -253,7 +252,7 @@ export class UsersService {
 
     const user = await this.findById(id);
     if (user.role?.key === USER_ROLES.SUPERADMIN) {
-      throw new ForbiddenException('Não é possível alterar o status do Super Administrador.');
+      throw new ForbiddenException("Não é possível alterar o status do Super Administrador.");
     }
 
     const updatedUser = await this.usersRepository.toggleUserStatus(id);
@@ -266,6 +265,7 @@ export class UsersService {
 
     this.logger.log(`Status do usuário alterado: ${id} - Ativo: ${updatedUser.isActive}`);
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...userWithoutPassword } = updatedUser;
     return {
       id: userWithoutPassword.id,
@@ -286,7 +286,7 @@ export class UsersService {
 
     const user = await this.findById(id);
     if (user.role?.key === USER_ROLES.SUPERADMIN) {
-      throw new ForbiddenException('Não é possível remover o Super Administrador.');
+      throw new ForbiddenException("Não é possível remover o Super Administrador.");
     }
 
     await this.usersRepository.delete(id);
@@ -294,7 +294,7 @@ export class UsersService {
     this.logger.log(`Usuário removido: ${id}`);
 
     return {
-      message: 'Usuário removido com sucesso',
+      message: "Usuário removido com sucesso",
     };
   }
 }

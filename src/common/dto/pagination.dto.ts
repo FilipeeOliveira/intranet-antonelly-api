@@ -1,5 +1,5 @@
-import { IsOptional, IsInt, IsString, IsIn, Min } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsOptional, IsInt, IsString, IsIn, Min } from "class-validator";
+import { Type } from "class-transformer";
 
 export class PaginationParams {
   @IsOptional()
@@ -19,6 +19,6 @@ export class PaginationParams {
   sort?: string;
 
   @IsOptional()
-  @IsIn(['asc', 'desc'])
-  sortDir: 'asc' | 'desc' = 'asc';
+  @IsIn(["asc", "desc"])
+  sortDir: "asc" | "desc" = "asc";
 }

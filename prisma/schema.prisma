@@ -49,12 +49,14 @@ model User {
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
-  sector            Sector             @relation(fields: [sectorId], references: [id])
-  role              Role               @relation(fields: [roleId], references: [id])
+  sector            Sector               @relation(fields: [sectorId], references: [id])
+  role              Role                 @relation(fields: [roleId], references: [id])
   meetings          MeetingSchedule[]
   permissions       UserPermission[]
   blacklistedTokens BlacklistedToken[]
   communiques       Communique[]
+  createdConstructions   Construction[]       @relation("ConstructionCreator")
+  constructionMemberships ConstructionMember[]
 
   @@map("users")
 }
@@ -289,4 +291,59 @@ model Order {
   updatedAt           DateTime    @updatedAt
 
   @@map("orders")
+}
+
+// ─── Constructions ────────────────────────────────────────────────────────────
+
+enum ConstructionStatus {
+  planning
+  in_progress
+  paused
+  completed
+  cancelled
+}
+
+enum ConstructionCategory {
+  OBRAS
+  IP4
+  PORTOS
+  DSM
+}
+
+model Construction {
+  id              String               @id @default(uuid())
+  createdAt       DateTime             @default(now()) @map("created_at")
+  updatedAt       DateTime             @updatedAt @map("updated_at")
+  createdBy       String               @map("created_by")
+
+  name            String
+  category        ConstructionCategory @default(OBRAS)
+  description     String?
+  address         String?
+  client          String?
+  responsible     String?
+  startDate       DateTime             @map("start_date")
+  expectedEndDate DateTime             @map("expected_end_date")
+  actualEndDate   DateTime?            @map("actual_end_date")
+  contractValue   Decimal?             @map("contract_value") @db.Decimal(14, 2)
+  status          ConstructionStatus   @default(planning)
+  imageUrl        String?              @map("image_url")
+
+  creator         User                 @relation("ConstructionCreator", fields: [createdBy], references: [id])
+  members         ConstructionMember[]
+
+  @@map("constructions")
+}
+
+model ConstructionMember {
+  id             String       @id @default(uuid())
+  constructionId String       @map("construction_id")
+  userId         String       @map("user_id")
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  construction   Construction @relation(fields: [constructionId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([constructionId, userId])
+  @@map("construction_members")
 }

@@ -1,4 +1,4 @@
-import * as crypto from 'crypto';
+import * as crypto from "crypto";
 
 export class PasswordUtil {
   /**
@@ -7,31 +7,31 @@ export class PasswordUtil {
    * @returns Senha temporária
    */
   static generateTemporaryPassword(length: number = 12): string {
-    const lowercase = 'abcdefghijklmnopqrstuvwxyz';
-    const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const numbers = '0123456789';
-    const symbols = '@#$!%*?&';
-    
+    const lowercase = "abcdefghijklmnopqrstuvwxyz";
+    const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const numbers = "0123456789";
+    const symbols = "@#$!%*?&";
+
     const allChars = lowercase + uppercase + numbers + symbols;
-    
-    let password = '';
-    
+
+    let password = "";
+
     // Garantir pelo menos um caractere de cada tipo
     password += lowercase[crypto.randomInt(0, lowercase.length)];
     password += uppercase[crypto.randomInt(0, uppercase.length)];
     password += numbers[crypto.randomInt(0, numbers.length)];
     password += symbols[crypto.randomInt(0, symbols.length)];
-    
+
     // Preencher o restante aleatoriamente
     for (let i = 4; i < length; i++) {
       password += allChars[crypto.randomInt(0, allChars.length)];
     }
-    
+
     // Embaralhar a senha
     return password
-      .split('')
+      .split("")
       .sort(() => crypto.randomInt(0, 2) - 0.5)
-      .join('');
+      .join("");
   }
 
   /**
@@ -46,23 +46,23 @@ export class PasswordUtil {
     const errors: string[] = [];
 
     if (password.length < 8) {
-      errors.push('Senha deve ter pelo menos 8 caracteres');
+      errors.push("Senha deve ter pelo menos 8 caracteres");
     }
 
     if (!/[a-z]/.test(password)) {
-      errors.push('Senha deve conter pelo menos uma letra minúscula');
+      errors.push("Senha deve conter pelo menos uma letra minúscula");
     }
 
     if (!/[A-Z]/.test(password)) {
-      errors.push('Senha deve conter pelo menos uma letra maiúscula');
+      errors.push("Senha deve conter pelo menos uma letra maiúscula");
     }
 
     if (!/\d/.test(password)) {
-      errors.push('Senha deve conter pelo menos um número');
+      errors.push("Senha deve conter pelo menos um número");
     }
 
     if (!/[@$!%*?&]/.test(password)) {
-      errors.push('Senha deve conter pelo menos um símbolo (@$!%*?&)');
+      errors.push("Senha deve conter pelo menos um símbolo (@$!%*?&)");
     }
 
     return {

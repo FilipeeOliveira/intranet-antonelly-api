@@ -1,6 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { OrderType } from '@prisma/client';
-import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import { ApiProperty } from "@nestjs/swagger";
+import { OrderType } from "@prisma/client";
+import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength } from "class-validator";
 
 export class CreateOrderDto {
   @ApiProperty({ enum: OrderType, default: OrderType.PACKAGE })

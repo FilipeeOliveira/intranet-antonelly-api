@@ -1,14 +1,11 @@
-
-
-const customSiteTitle = "Intranet Antonelly";   
-
+const customSiteTitle = "Intranet Antonelly";
 
 const swaggerOptions = {
-    customSiteTitle,
-    swaggerOptions: {
-        persistAuthorization: true,
-    },
-}
+  customSiteTitle,
+  swaggerOptions: {
+    persistAuthorization: true,
+  },
+};
 
 const swaggerTitle = "Antonelly Construcoes e Servicos - Intranet API";
 
@@ -17,8 +14,4 @@ const swaggerDescription = `
   <p>Sistema completo para acesso interno a dados para empresa Antonelly Construcoes e servicos:</p>
 `;
 
-export {
-    swaggerOptions,
-    swaggerTitle,
-    swaggerDescription
-}
+export { swaggerOptions, swaggerTitle, swaggerDescription };

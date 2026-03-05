@@ -1,9 +1,9 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { AuthRepository } from '../../infrastructure/repositories/auth.repository';
-import { ForgotPasswordDto } from '../../domain/dto/forgot-password.dto';
-import { EmailService } from 'src/modules/email/application/services/email.service';
-import { envConfig } from 'src/config/config';
+import { Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
+import { AuthRepository } from "../../infrastructure/repositories/auth.repository";
+import { ForgotPasswordDto } from "../../domain/dto/forgot-password.dto";
+import { EmailService } from "src/modules/email/application/services/email.service";
+import { envConfig } from "src/config/config";
 
 @Injectable()
 export class ForgotPasswordUseCase {
@@ -19,23 +19,23 @@ export class ForgotPasswordUseCase {
     const user = await this.authRepository.findUserByEmail(forgotPasswordDto.email);
 
     if (!user) {
-      throw new NotFoundException('Email não encontrado no sistema');
+      throw new NotFoundException("Email não encontrado no sistema");
     }
 
     if (!user.isActive) {
-      throw new NotFoundException('Usuário inativo');
+      throw new NotFoundException("Usuário inativo");
     }
 
     // Gerar token de recuperação com expiração de 15 minutos
     const resetPayload = {
       sub: user.id,
       email: user.email,
-      type: 'password_reset',
+      type: "password_reset",
     };
 
     const resetToken = this.jwtService.sign(resetPayload, {
       expiresIn: envConfig.RESET_TOKEN_EXPIRES_IN,
-      secret: envConfig.JWT_SECRET + '_RESET', // Secret diferente para maior segurança
+      secret: envConfig.JWT_SECRET + "_RESET", // Secret diferente para maior segurança
     });
 
     // Montar link de recuperação
@@ -54,9 +54,9 @@ export class ForgotPasswordUseCase {
     }
 
     return {
-      message: 'Se o email existir no sistema, um link de recuperação será enviado.',
+      message: "Se o email existir no sistema, um link de recuperação será enviado.",
       // Retorna resetToken apenas em modo de desenvolvimento para facilitar testes
-      ...(envConfig.MODE === 'dev' && { resetToken }),
+      ...(envConfig.MODE === "dev" && { resetToken }),
     };
   }
 }

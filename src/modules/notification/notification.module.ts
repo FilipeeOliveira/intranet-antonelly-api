@@ -5,19 +5,9 @@ import { NotificationRepository } from "./infrastructure/repositories/notificati
 import { NotificationController } from "./presentation/notification.controller";
 
 @Module({
-    imports: [
-        PrismaModule
-    ],
-    controllers: [
-        NotificationController
-    ],
-    providers: [
-        NotificationService,
-        NotificationRepository
-    ],
-    exports: [
-        NotificationService,
-        NotificationRepository
-    ],
+  imports: [PrismaModule],
+  controllers: [NotificationController],
+  providers: [NotificationService, NotificationRepository],
+  exports: [NotificationService, NotificationRepository],
 })
-export class NotificationModule { }
+export class NotificationModule {}

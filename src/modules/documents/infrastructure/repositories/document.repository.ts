@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../../prisma/prisma.service';
-import { DocumentStatus } from '../../domain/dto/create-document.dto';
-import { DocumentQueryDto } from '../../domain/dto/document-query.dto';
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "../../../prisma/prisma.service";
+import { DocumentStatus } from "../../domain/dto/create-document.dto";
+import { DocumentQueryDto } from "../../domain/dto/document-query.dto";
 
 @Injectable()
 export class DocumentRepository {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async findAll(query: DocumentQueryDto) {
     const { page, limit, search, status, sector, sectorId, version, sortBy, sortOrder } = query;
@@ -17,8 +17,8 @@ export class DocumentRepository {
 
     if (search) {
       where.OR = [
-        { title: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } },
+        { title: { contains: search, mode: "insensitive" } },
+        { description: { contains: search, mode: "insensitive" } },
       ];
     }
 
@@ -33,18 +33,19 @@ export class DocumentRepository {
       // Caso contrário, filtra por nome do setor
       where.sector = {
         name: {
-          contains: sector, mode: 'insensitive',
-        }
+          contains: sector,
+          mode: "insensitive",
+        },
       };
     }
 
     if (version) {
-      where.version = { contains: version, mode: 'insensitive' };
+      where.version = { contains: version, mode: "insensitive" };
     }
 
     // Construir ordenação
     const orderBy: any = {};
-    orderBy[sortBy || 'title'] = sortOrder || 'asc';
+    orderBy[sortBy || "title"] = sortOrder || "asc";
 
     const [documents, total] = await Promise.all([
       this.prisma.document.findMany({
@@ -72,16 +73,11 @@ export class DocumentRepository {
     });
   }
 
-  async create(data: {
-    title: string;
-    description?: string;
-    sectorId: string;
-    filePath: string;
-  }) {
+  async create(data: { title: string; description?: string; sectorId: string; filePath: string }) {
     return this.prisma.document.create({
       data: {
         ...data,
-        version: '1.0',
+        version: "1.0",
         status: DocumentStatus.APPROVED,
       },
       include: { sector: true },
@@ -100,16 +96,19 @@ export class DocumentRepository {
     return this.prisma.documentHistory.create({ data });
   }
 
-  async update(id: string, data: Partial<{
-    title: string;
-    category: string;
-    description: string;
-    department: string;
-    status: DocumentStatus;
-    version: string;
-    versionNote: string;
-    filePath: string;
-  }>) {
+  async update(
+    id: string,
+    data: Partial<{
+      title: string;
+      category: string;
+      description: string;
+      department: string;
+      status: DocumentStatus;
+      version: string;
+      versionNote: string;
+      filePath: string;
+    }>,
+  ) {
     return this.prisma.document.update({
       where: { id },
       data: {

@@ -1,23 +1,23 @@
-import { Injectable } from '@nestjs/common';
-import { VisitHistory } from '@prisma/client';
-import moment from 'moment';
-import { PrismaService } from '../../../prisma/prisma.service';
-import { VisitHistoryQueryDto } from '../../domain/dto/visit-history-query.dto';
-import { VisitHistoryStatus, VisitHistoryStatusList } from '../../domain/enums/VisitHistoryStatus';
+import { Injectable } from "@nestjs/common";
+import { VisitHistory } from "@prisma/client";
+import moment from "moment";
+import { PrismaService } from "../../../prisma/prisma.service";
+import { VisitHistoryQueryDto } from "../../domain/dto/visit-history-query.dto";
+import { VisitHistoryStatus, VisitHistoryStatusList } from "../../domain/enums/VisitHistoryStatus";
 
 @Injectable()
 export class VisitHistoryRepository {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async findAll(query: VisitHistoryQueryDto) {
     const { page, limit, search, sortBy, sortOrder, status, date, time } = query;
     const skip = (page - 1) * limit;
 
-    let where: any = {};
+    const where: any = {};
     if (search) {
       where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { cpf: { contains: search, mode: 'insensitive' } },
+        { name: { contains: search, mode: "insensitive" } },
+        { cpf: { contains: search, mode: "insensitive" } },
       ];
     }
 
@@ -28,30 +28,27 @@ export class VisitHistoryRepository {
     // Filtro por data e/ou hora
     if (date && time) {
       // Caso Data + Hora
-      const start = moment(`${date} ${time}`, 'YYYY-MM-DD HH:mm').utc(true).startOf('hour');
-      const end = moment(start).utc(true).endOf('hour');
+      const start = moment(`${date} ${time}`, "YYYY-MM-DD HH:mm").utc(true).startOf("hour");
+      const end = moment(start).utc(true).endOf("hour");
 
       where.arrivedAt = {
         gte: start.toDate(),
         lte: end.toDate(),
       };
-    }
-
-    else if (date && !time) {
+    } else if (date && !time) {
       // Caso apenas a Data
-      const start = moment(date, 'YYYY-MM-DD').utc(true).startOf('day');
-      const end = moment(date, 'YYYY-MM-DD').utc(true).endOf('day');
+      const start = moment(date, "YYYY-MM-DD").utc(true).startOf("day");
+      const end = moment(date, "YYYY-MM-DD").utc(true).endOf("day");
 
       where.arrivedAt = {
         gte: start.toDate(),
         lte: end.toDate(),
       };
-    }
-    else if (!date && time) {
+    } else if (!date && time) {
       // Caso apenas a Hora (usa o dia atual)
-      const today = moment().format('YYYY-MM-DD');
-      const start = moment(`${today} ${time}`, 'YYYY-MM-DD HH:mm').utc(true).startOf('hour');
-      const end = moment(start).utc(true).endOf('hour');
+      const today = moment().format("YYYY-MM-DD");
+      const start = moment(`${today} ${time}`, "YYYY-MM-DD HH:mm").utc(true).startOf("hour");
+      const end = moment(start).utc(true).endOf("hour");
 
       where.arrivedAt = {
         gte: start.toDate(),
@@ -59,9 +56,7 @@ export class VisitHistoryRepository {
       };
     }
 
-    const orderBy: any = sortBy
-      ? { [sortBy]: sortOrder || 'desc' }
-      : { createdAt: 'desc' };
+    const orderBy: any = sortBy ? { [sortBy]: sortOrder || "desc" } : { createdAt: "desc" };
 
     const [histories, total] = await Promise.all([
       this.prisma.visitHistory.findMany({
@@ -72,13 +67,12 @@ export class VisitHistoryRepository {
         },
         take: limit,
         orderBy,
-
       }),
       this.prisma.visitHistory.count({ where }),
     ]);
 
     return {
-      data: histories.map(h => ({
+      data: histories.map((h) => ({
         ...h,
         statusLabel: VisitHistoryStatusList[h.status],
       })),
@@ -89,22 +83,14 @@ export class VisitHistoryRepository {
     };
   }
 
-  async count(args: {
-    status?: VisitHistoryStatus;
-
-  }): Promise<number> {
+  async count(args: { status?: VisitHistoryStatus }): Promise<number> {
     return this.prisma.visitHistory.count({ where: args });
   }
 
-  async findVisitorPresentByCpf(args: {
-    cpf: string;
-    startDate?: Date;
-    endDate?: Date;
-  }) {
-
+  async findVisitorPresentByCpf(args: { cpf: string; startDate?: Date; endDate?: Date }) {
     const { cpf } = args;
-    args.startDate = args.startDate || moment().startOf('day').toDate();
-    args.endDate = args.endDate || moment().endOf('day').toDate();
+    args.startDate = args.startDate || moment().startOf("day").toDate();
+    args.endDate = args.endDate || moment().endOf("day").toDate();
 
     return this.prisma.visitHistory.findFirst({
       where: {
@@ -119,14 +105,10 @@ export class VisitHistoryRepository {
     });
   }
 
-  async findVisitorScheduledByCpf(args: {
-    cpf: string;
-    startDate?: Date;
-    endDate?: Date;
-  }) {
+  async findVisitorScheduledByCpf(args: { cpf: string; startDate?: Date; endDate?: Date }) {
     const { cpf } = args;
-    args.startDate = args.startDate || moment().startOf('day').toDate();
-    args.endDate = args.endDate || moment().endOf('day').toDate();
+    args.startDate = args.startDate || moment().startOf("day").toDate();
+    args.endDate = args.endDate || moment().endOf("day").toDate();
 
     return this.prisma.visitHistory.findFirst({
       where: {
@@ -144,22 +126,20 @@ export class VisitHistoryRepository {
   async findLastVisitByCpf(cpf: string) {
     return this.prisma.visitHistory.findFirst({
       where: { cpf },
-      orderBy: { arrivedAt: 'desc' },
+      orderBy: { arrivedAt: "desc" },
     });
   }
-
 
   async findById(id: string) {
     return this.prisma.visitHistory.findUnique({
       where: { id },
       include: {
         companie: true,
-      }
+      },
     });
   }
 
   async create(data: Partial<VisitHistory>) {
-
     return await this.prisma.visitHistory.create({
       data: {
         description: data.description,
@@ -169,7 +149,7 @@ export class VisitHistoryRepository {
         companyId: data.companyId,
         status: data.status,
         isScheduled: data.isScheduled || false,
-        arrivedAt: data.arrivedAt
+        arrivedAt: data.arrivedAt,
       },
     });
   }

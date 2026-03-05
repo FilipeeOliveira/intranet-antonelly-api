@@ -1,13 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../../prisma/prisma.service';
-import { CreateUserDto } from '../../domain/dto/create-user.dto';
-import { UserQueryDto } from '../../domain/dto/user-query.dto';
-import { UserResponseDto } from '../../domain/dto/user-response.dto';
-import { RoleType } from '../../../auth/domain/entities/role.entity';
-
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "../../../prisma/prisma.service";
+import { CreateUserDto } from "../../domain/dto/create-user.dto";
+import { UserQueryDto } from "../../domain/dto/user-query.dto";
+import { UserResponseDto } from "../../domain/dto/user-response.dto";
 @Injectable()
 export class UsersRepository {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async findAll(query: UserQueryDto) {
     const { page, limit, search, role, sector, isActive, sortBy, sortOrder } = query;
@@ -19,8 +17,8 @@ export class UsersRepository {
 
     if (search) {
       where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { email: { contains: search, mode: 'insensitive' } },
+        { name: { contains: search, mode: "insensitive" } },
+        { email: { contains: search, mode: "insensitive" } },
       ];
     }
 
@@ -29,7 +27,7 @@ export class UsersRepository {
     }
 
     if (sector) {
-      where.sector = { name: { contains: sector, mode: 'insensitive' } };
+      where.sector = { name: { contains: sector, mode: "insensitive" } };
     }
 
     if (isActive !== undefined) {
@@ -38,7 +36,7 @@ export class UsersRepository {
 
     // Construir ordenação
     const orderBy: any = {};
-    if (sortBy === 'role') {
+    if (sortBy === "role") {
       orderBy.role = { key: sortOrder };
     } else {
       orderBy[sortBy] = sortOrder;
@@ -59,7 +57,7 @@ export class UsersRepository {
     ]);
 
     return {
-      data: users.map(user => ({
+      data: users.map((user) => ({
         id: user.id,
         name: user.name,
         email: user.email,
@@ -157,7 +155,6 @@ export class UsersRepository {
   async update(id: string, data: Partial<CreateUserDto>) {
     const updateData: any = { ...data };
 
-
     return this.prisma.user.update({
       where: { id },
       data: updateData,
@@ -185,7 +182,7 @@ export class UsersRepository {
     });
 
     if (!user) {
-      throw new Error('Usuário não encontrado');
+      throw new Error("Usuário não encontrado");
     }
 
     return this.prisma.user.update({

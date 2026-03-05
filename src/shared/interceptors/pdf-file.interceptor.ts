@@ -8,10 +8,8 @@ export const pdfFileInterceptor = (fieldName = "document") =>
     storage: diskStorage({
       destination: "./uploads/documents/current",
       filename: (req, file, callback) => {
-        const originalName = Buffer.from(file.originalname, 'latin1').toString('utf8');
-        const nameWithoutExt = originalName.replace(extname(originalName), '');
-
-        const uniqueSuffix = Date.now() + Math.round(Math.random() * 1e9);
+        const originalName = Buffer.from(file.originalname, "latin1").toString("utf8");
+        const nameWithoutExt = originalName.replace(extname(originalName), "");
 
         callback(null, `${nameWithoutExt}${extname(originalName)}`);
       },

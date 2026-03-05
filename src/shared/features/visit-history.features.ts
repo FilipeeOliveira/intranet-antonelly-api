@@ -1,6 +1,6 @@
 export const VisitHistoryGeneralFeatures = {
-    READ: 'VISIT_HISTORY_READ',
-    WRITE: 'VISIT_HISTORY_WRITE',
+  READ: "VISIT_HISTORY_READ",
+  WRITE: "VISIT_HISTORY_WRITE",
 };
 
 /* Old features that are no longer in use */

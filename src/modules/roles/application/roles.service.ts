@@ -1,8 +1,4 @@
-import {
-    Injectable,
-    ConflictException,
-    NotFoundException,
-} from "@nestjs/common";
+import { Injectable, ConflictException, NotFoundException } from "@nestjs/common";
 import { RolesRepository } from "../infrastructure/repositories/roles.repository";
 import { RoleQueryDto } from "../domain/dto/role-query.dto";
 import { CreateRoleDto } from "../domain/dto/create-role.dto";
@@ -10,57 +6,57 @@ import { UpdateRoleDto } from "../domain/dto/update-role.dto";
 
 @Injectable()
 export class RolesService {
-    constructor(private readonly rolesRepository: RolesRepository) { }
+  constructor(private readonly rolesRepository: RolesRepository) {}
 
-    async findAll(filters?: RoleQueryDto) {
-        return this.rolesRepository.findAll(filters);
+  async findAll(filters?: RoleQueryDto) {
+    return this.rolesRepository.findAll(filters);
+  }
+
+  async findById(id: string) {
+    const role = await this.rolesRepository.findById(id);
+
+    if (!role) {
+      throw new NotFoundException("Role não encontrada");
     }
 
-    async findById(id: string) {
-        const role = await this.rolesRepository.findById(id);
+    return role;
+  }
 
-        if (!role) {
-            throw new NotFoundException("Role não encontrada");
-        }
+  async create(dto: CreateRoleDto) {
+    const existingRole = await this.rolesRepository.findByKey(dto.key);
 
-        return role;
+    if (existingRole) {
+      throw new ConflictException("Já existe uma role com essa key");
     }
 
-    async create(dto: CreateRoleDto) {
-        const existingRole = await this.rolesRepository.findByKey(dto.key);
+    return this.rolesRepository.create(dto);
+  }
 
-        if (existingRole) {
-            throw new ConflictException("Já existe uma role com essa key");
-        }
+  async update(id: string, dto: UpdateRoleDto) {
+    const role = await this.rolesRepository.findById(id);
 
-        return this.rolesRepository.create(dto);
+    if (!role) {
+      throw new NotFoundException("Role não encontrada");
     }
 
-    async update(id: string, dto: UpdateRoleDto) {
-        const role = await this.rolesRepository.findById(id);
+    if (dto.key && dto.key !== role.key) {
+      const roleWithSameKey = await this.rolesRepository.findByKey(dto.key);
 
-        if (!role) {
-            throw new NotFoundException("Role não encontrada");
-        }
-
-        if (dto.key && dto.key !== role.key) {
-            const roleWithSameKey = await this.rolesRepository.findByKey(dto.key);
-
-            if (roleWithSameKey) {
-                throw new ConflictException("Já existe uma role com essa key");
-            }
-        }
-
-        return this.rolesRepository.update(id, dto);
+      if (roleWithSameKey) {
+        throw new ConflictException("Já existe uma role com essa key");
+      }
     }
 
-    async delete(id: string) {
-        const role = await this.rolesRepository.findById(id);
+    return this.rolesRepository.update(id, dto);
+  }
 
-        if (!role) {
-            throw new NotFoundException("Role não encontrada");
-        }
+  async delete(id: string) {
+    const role = await this.rolesRepository.findById(id);
 
-        return this.rolesRepository.delete(id);
+    if (!role) {
+      throw new NotFoundException("Role não encontrada");
     }
+
+    return this.rolesRepository.delete(id);
+  }
 }
