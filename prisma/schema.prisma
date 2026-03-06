@@ -56,7 +56,6 @@ model User {
   blacklistedTokens BlacklistedToken[]
   communiques       Communique[]
   createdConstructions   Construction[]       @relation("ConstructionCreator")
-  constructionMemberships ConstructionMember[]
 
   @@map("users")
 }
@@ -330,20 +329,5 @@ model Construction {
   imageUrl        String?              @map("image_url")
 
   creator         User                 @relation("ConstructionCreator", fields: [createdBy], references: [id])
-  members         ConstructionMember[]
-
   @@map("constructions")
-}
-
-model ConstructionMember {
-  id             String       @id @default(uuid())
-  constructionId String       @map("construction_id")
-  userId         String       @map("user_id")
-  createdAt      DateTime     @default(now()) @map("created_at")
-
-  construction   Construction @relation(fields: [constructionId], references: [id], onDelete: Cascade)
-  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([constructionId, userId])
-  @@map("construction_members")
 }

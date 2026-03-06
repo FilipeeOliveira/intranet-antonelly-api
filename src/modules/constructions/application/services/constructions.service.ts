@@ -1,5 +1,5 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
-import { Construction, ConstructionStatus } from "@prisma/client";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import { ConstructionStatus } from "@prisma/client";
 import { ConstructionsRepository } from "../../infrastructure/repositories/constructions.repository";
 import { CreateConstructionDto } from "../../domain/dto/create-construction.dto";
 import { UpdateConstructionDto } from "../../domain/dto/update-construction.dto";
@@ -11,8 +11,6 @@ interface UserPayload {
   name: string;
   role: string;
 }
-
-const ADMIN_ROLES = ["SUPERADMIN", "ADMIN"];
 
 const validTransitions: Record<ConstructionStatus, ConstructionStatus[]> = {
   planning: ["in_progress", "cancelled"],
@@ -26,16 +24,13 @@ const validTransitions: Record<ConstructionStatus, ConstructionStatus[]> = {
 export class ConstructionsService {
   constructor(private readonly constructionsRepository: ConstructionsRepository) {}
 
-  async findAll(filters: FilterConstructionDto, user: UserPayload) {
-    const isAdmin = ADMIN_ROLES.includes(user.role);
-    const userScope = isAdmin ? undefined : { userId: user.id };
-    return this.constructionsRepository.findMany(filters, userScope);
+  async findAll(filters: FilterConstructionDto) {
+    return this.constructionsRepository.findMany(filters);
   }
 
-  async findOne(id: string, user: UserPayload) {
+  async findOne(id: string) {
     const construction = await this.constructionsRepository.findOne(id);
     if (!construction) throw new NotFoundException("Obra não encontrada");
-    this.checkAccess(user, construction);
     return construction;
   }
 
@@ -58,10 +53,9 @@ export class ConstructionsService {
     });
   }
 
-  async update(id: string, dto: UpdateConstructionDto, user: UserPayload) {
+  async update(id: string, dto: UpdateConstructionDto) {
     const construction = await this.constructionsRepository.findOne(id);
     if (!construction) throw new NotFoundException("Obra não encontrada");
-    this.checkAccess(user, construction);
 
     const startDate = dto.startDate ? new Date(dto.startDate) : construction.startDate;
     const expectedEndDate = dto.expectedEndDate ? new Date(dto.expectedEndDate) : construction.expectedEndDate;
@@ -85,14 +79,12 @@ export class ConstructionsService {
   async remove(id: string) {
     const construction = await this.constructionsRepository.findOne(id);
     if (!construction) throw new NotFoundException("Obra não encontrada");
-
     return this.constructionsRepository.delete(id);
   }
 
-  async updateStatus(id: string, newStatus: ConstructionStatus, user: UserPayload) {
+  async updateStatus(id: string, newStatus: ConstructionStatus) {
     const construction = await this.constructionsRepository.findOne(id);
     if (!construction) throw new NotFoundException("Obra não encontrada");
-    this.checkAccess(user, construction);
 
     const allowed = validTransitions[construction.status];
     if (!allowed.includes(newStatus)) {
@@ -102,16 +94,12 @@ export class ConstructionsService {
     const extra: Record<string, unknown> = {};
     if (newStatus === "completed") extra.actualEndDate = new Date();
 
-    return this.constructionsRepository.update(id, {
-      status: newStatus,
-      ...extra,
-    });
+    return this.constructionsRepository.update(id, { status: newStatus, ...extra });
   }
 
-  async getProgress(id: string, user: UserPayload) {
+  async getProgress(id: string) {
     const construction = await this.constructionsRepository.findOne(id);
     if (!construction) throw new NotFoundException("Obra não encontrada");
-    this.checkAccess(user, construction);
 
     const today = new Date();
     const daysRemaining = Math.ceil((construction.expectedEndDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
@@ -125,26 +113,6 @@ export class ConstructionsService {
       daysRemaining: daysRemaining > 0 ? daysRemaining : 0,
       contractValue: construction.contractValue ? Number(construction.contractValue) : null,
     };
-  }
-
-  async addMember(id: string, userId: string, user: UserPayload) {
-    const construction = await this.constructionsRepository.findOne(id);
-    if (!construction) throw new NotFoundException("Obra não encontrada");
-    this.checkAccess(user, construction);
-    return this.constructionsRepository.addMember(id, userId);
-  }
-
-  async removeMember(id: string, userId: string, user: UserPayload) {
-    const construction = await this.constructionsRepository.findOne(id);
-    if (!construction) throw new NotFoundException("Obra não encontrada");
-    this.checkAccess(user, construction);
-    return this.constructionsRepository.removeMember(id, userId);
-  }
-
-  private checkAccess(user: UserPayload, construction: Construction & { members: { userId: string }[] }) {
-    if (ADMIN_ROLES.includes(user.role)) return;
-    const isMember = construction.members.some((m) => m.userId === user.id);
-    if (!isMember) throw new ForbiddenException("Sem acesso a esta obra");
   }
 
   private validateDates(startDate: Date, expectedEndDate: Date) {

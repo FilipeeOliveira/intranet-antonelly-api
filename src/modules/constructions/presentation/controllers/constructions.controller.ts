@@ -42,12 +42,9 @@ export class ConstructionsController {
   @Features(Permissions.CONSTRUCTIONS.READ)
   @Get()
   @ApiOperation({ summary: "Listar obras com filtros e paginação" })
-  @ApiResponse({
-    status: 200,
-    description: "Lista de obras retornada com sucesso.",
-  })
-  async findAll(@Query() filters: FilterConstructionDto, @CurrentUser() user: UserPayload) {
-    return this.constructionsService.findAll(filters, user);
+  @ApiResponse({ status: 200, description: "Lista de obras retornada com sucesso." })
+  async findAll(@Query() filters: FilterConstructionDto) {
+    return this.constructionsService.findAll(filters);
   }
 
   @Features(Permissions.CONSTRUCTIONS.READ)
@@ -56,8 +53,8 @@ export class ConstructionsController {
   @ApiParam({ name: "id", description: "UUID da obra" })
   @ApiResponse({ status: 200, description: "Obra retornada com sucesso." })
   @ApiResponse({ status: 404, description: "Obra não encontrada." })
-  async findOne(@Param("id", ParseUUIDPipe) id: string, @CurrentUser() user: UserPayload) {
-    return this.constructionsService.findOne(id, user);
+  async findOne(@Param("id", ParseUUIDPipe) id: string) {
+    return this.constructionsService.findOne(id);
   }
 
   @Features(Permissions.CONSTRUCTIONS.WRITE)
@@ -73,12 +70,8 @@ export class ConstructionsController {
   @ApiOperation({ summary: "Editar obra" })
   @ApiParam({ name: "id", description: "UUID da obra" })
   @ApiResponse({ status: 200, description: "Obra atualizada com sucesso." })
-  async update(
-    @Param("id", ParseUUIDPipe) id: string,
-    @Body() dto: UpdateConstructionDto,
-    @CurrentUser() user: UserPayload,
-  ) {
-    return this.constructionsService.update(id, dto, user);
+  async update(@Param("id", ParseUUIDPipe) id: string, @Body() dto: UpdateConstructionDto) {
+    return this.constructionsService.update(id, dto);
   }
 
   @Features(Permissions.CONSTRUCTIONS.DELETE)
@@ -95,51 +88,16 @@ export class ConstructionsController {
   @ApiOperation({ summary: "Alterar status da obra" })
   @ApiParam({ name: "id", description: "UUID da obra" })
   @ApiResponse({ status: 200, description: "Status alterado com sucesso." })
-  async updateStatus(
-    @Param("id", ParseUUIDPipe) id: string,
-    @Body() dto: UpdateConstructionStatusDto,
-    @CurrentUser() user: UserPayload,
-  ) {
-    return this.constructionsService.updateStatus(id, dto.status, user);
+  async updateStatus(@Param("id", ParseUUIDPipe) id: string, @Body() dto: UpdateConstructionStatusDto) {
+    return this.constructionsService.updateStatus(id, dto.status);
   }
 
   @Features(Permissions.CONSTRUCTIONS.READ)
   @Get(":id/progress")
   @ApiOperation({ summary: "Obter progresso calculado da obra" })
   @ApiParam({ name: "id", description: "UUID da obra" })
-  @ApiResponse({
-    status: 200,
-    description: "Dados de progresso retornados com sucesso.",
-  })
-  async getProgress(@Param("id", ParseUUIDPipe) id: string, @CurrentUser() user: UserPayload) {
-    return this.constructionsService.getProgress(id, user);
-  }
-
-  @Features(Permissions.CONSTRUCTIONS.WRITE)
-  @Post(":id/members/:userId")
-  @ApiOperation({ summary: "Adicionar membro à obra" })
-  @ApiParam({ name: "id", description: "UUID da obra" })
-  @ApiParam({ name: "userId", description: "UUID do usuário a adicionar" })
-  @ApiResponse({ status: 201, description: "Membro adicionado com sucesso." })
-  async addMember(
-    @Param("id", ParseUUIDPipe) id: string,
-    @Param("userId", ParseUUIDPipe) userId: string,
-    @CurrentUser() user: UserPayload,
-  ) {
-    return this.constructionsService.addMember(id, userId, user);
-  }
-
-  @Features(Permissions.CONSTRUCTIONS.WRITE)
-  @Delete(":id/members/:userId")
-  @ApiOperation({ summary: "Remover membro da obra" })
-  @ApiParam({ name: "id", description: "UUID da obra" })
-  @ApiParam({ name: "userId", description: "UUID do usuário a remover" })
-  @ApiResponse({ status: 200, description: "Membro removido com sucesso." })
-  async removeMember(
-    @Param("id", ParseUUIDPipe) id: string,
-    @Param("userId", ParseUUIDPipe) userId: string,
-    @CurrentUser() user: UserPayload,
-  ) {
-    return this.constructionsService.removeMember(id, userId, user);
+  @ApiResponse({ status: 200, description: "Dados de progresso retornados com sucesso." })
+  async getProgress(@Param("id", ParseUUIDPipe) id: string) {
+    return this.constructionsService.getProgress(id);
   }
 }

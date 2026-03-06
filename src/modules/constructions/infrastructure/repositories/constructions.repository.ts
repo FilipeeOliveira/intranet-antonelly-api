@@ -7,15 +7,11 @@ import { FilterConstructionDto } from "../../domain/dto/filter-construction.dto"
 export class ConstructionsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findMany(filters: FilterConstructionDto, userScope?: { userId: string }) {
+  async findMany(filters: FilterConstructionDto) {
     const { search, category, status, orderBy, page = 1, limit = 50 } = filters;
     const skip = (page - 1) * limit;
 
     const where: Prisma.ConstructionWhereInput = {};
-
-    if (userScope) {
-      where.members = { some: { userId: userScope.userId } };
-    }
 
     if (search) {
       where.OR = [
@@ -39,13 +35,6 @@ export class ConstructionsRepository {
         orderBy: sortMap[orderBy || "date"],
         skip,
         take: limit,
-        include: {
-          members: {
-            include: {
-              user: { select: { id: true, name: true, email: true } },
-            },
-          },
-        },
       }),
       this.prisma.construction.count({ where }),
     ]);
@@ -54,60 +43,18 @@ export class ConstructionsRepository {
   }
 
   async findOne(id: string) {
-    return this.prisma.construction.findUnique({
-      where: { id },
-      include: {
-        members: {
-          include: { user: { select: { id: true, name: true, email: true } } },
-        },
-      },
-    });
+    return this.prisma.construction.findUnique({ where: { id } });
   }
 
   async create(data: Prisma.ConstructionCreateInput) {
-    return this.prisma.construction.create({
-      data,
-      include: {
-        members: {
-          include: { user: { select: { id: true, name: true, email: true } } },
-        },
-      },
-    });
+    return this.prisma.construction.create({ data });
   }
 
   async update(id: string, data: Prisma.ConstructionUpdateInput) {
-    return this.prisma.construction.update({
-      where: { id },
-      data,
-      include: {
-        members: {
-          include: { user: { select: { id: true, name: true, email: true } } },
-        },
-      },
-    });
+    return this.prisma.construction.update({ where: { id }, data });
   }
 
   async delete(id: string) {
     return this.prisma.construction.delete({ where: { id } });
-  }
-
-  async countDependencies(id: string) {
-    return this.prisma.constructionMember.count({
-      where: { constructionId: id },
-    });
-  }
-
-  async addMember(constructionId: string, userId: string) {
-    return this.prisma.constructionMember.upsert({
-      where: { constructionId_userId: { constructionId, userId } },
-      create: { constructionId, userId },
-      update: {},
-    });
-  }
-
-  async removeMember(constructionId: string, userId: string) {
-    return this.prisma.constructionMember.delete({
-      where: { constructionId_userId: { constructionId, userId } },
-    });
   }
 }
