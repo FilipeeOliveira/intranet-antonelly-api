@@ -169,6 +169,9 @@ model VisitHistory {
   leftAt    DateTime?
   createdAt DateTime  @default(now())
 
+  signature String?   @db.Text
+  signedAt  DateTime? @db.Timestamptz
+
   companie Companie? @relation(fields: [companyId], references: [id])
 
   @@map("visit_history")
