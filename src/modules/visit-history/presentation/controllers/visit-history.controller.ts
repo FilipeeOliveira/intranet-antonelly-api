@@ -9,6 +9,7 @@ import { VisitHistoryService } from "../../application/services/visit-history.se
 import { CreateVisitHistoryDto } from "../../domain/dto/create-visit-history.dto";
 import { CreateVisitScheduleDto } from "../../domain/dto/create-visit-schedule.dto";
 import { EndVisitDto } from "../../domain/dto/end-visit.dto";
+import { SaveVisitorTermDto } from '../../domain/dto/save-visitor-term.dto';
 import { StartVisitDto } from "../../domain/dto/start-visit.dto";
 import { VisitHistoryQueryDto } from "../../domain/dto/visit-history-query.dto";
 
@@ -97,6 +98,14 @@ export class VisitHistoryController {
   async getTotalVisitCount() {
     return this.visitHistoryService.getTotalCount();
   }
+
+    @Features(Permissions.VISIT_HISTORY_GENERAL.WRITE)
+    @Patch(':id/term')
+    @ApiOperation({ summary: 'Salvar o termo assinado de um visitante' })
+    @ApiResponse({ status: 200, description: 'Termo salvo com sucesso.' })
+    async saveTerm(@Param('id') id: string, @Body() dto: SaveVisitorTermDto) {
+        return this.visitHistoryService.saveTermSignature(id, dto);
+    }
 
   @Features(Permissions.VISIT_HISTORY_GENERAL.READ)
   @Get(":id")
