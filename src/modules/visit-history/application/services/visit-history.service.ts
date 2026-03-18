@@ -6,6 +6,7 @@ import { getCurrentUtcDate } from 'src/shared/utils/getCurrentUtcDate';
 import { getLocalDateToUtcDate } from 'src/shared/utils/getLocalDateToUtcDate';
 import { CreateVisitHistoryDto } from '../../domain/dto/create-visit-history.dto';
 import { CreateVisitScheduleDto } from '../../domain/dto/create-visit-schedule.dto';
+import { SaveVisitorTermDto } from '../../domain/dto/save-visitor-term.dto';
 import { UpdateVisitHistoryDto } from '../../domain/dto/update-visit-history.dto';
 import { VisitHistoryQueryDto } from '../../domain/dto/visit-history-query.dto';
 import { VisitHistoryStatus } from '../../domain/enums/VisitHistoryStatus';
@@ -154,10 +155,14 @@ export class VisitHistoryService {
     return await this.visitHistoryRepository.findAll(query);
   }
 
-  async findById(id: string): Promise<VisitHistory> {
+  async findById(id: string) {
     const history = await this.visitHistoryRepository.findById(id);
     if (!history) throw new NotFoundException('Histórico não encontrado.');
-    return history;
+
+    return {
+      ...history,
+      signature: history.signature ? `data:image/png;base64,${history.signature}` : null,
+    };
   }
 
   async update(id: string, dto: UpdateVisitHistoryDto): Promise<VisitHistory> {
@@ -194,6 +199,39 @@ export class VisitHistoryService {
     await this.visitHistoryRepository.delete(id);
 
     return { message: 'Visita cancelada e removida com sucesso.' };
+  }
+
+  async saveTermSignature(visitId: string, dto: SaveVisitorTermDto): Promise<{ id: string; signedAt: Date; hasSignature: boolean }> {
+    const visit = await this.visitHistoryRepository.findById(visitId);
+
+    if (!visit) throw new NotFoundException('Registro de visita não encontrado');
+
+    if (visit.status !== VisitHistoryStatus.PRESENT) {
+      throw new BadRequestException('A visita não está em andamento para assinatura');
+    }
+
+    if (!dto.signature?.startsWith('data:image/png;base64,')) {
+      throw new BadRequestException('Assinatura inválida ou ausente');
+    }
+
+    if (dto.signature.length > 500_000) {
+      throw new BadRequestException('Assinatura excede o tamanho permitido');
+    }
+
+    const signedAt = new Date(dto.signedAt);
+
+    if (isNaN(signedAt.getTime())) {
+      throw new BadRequestException('Data de assinatura inválida');
+    }
+
+    const base64 = dto.signature.replace('data:image/png;base64,', '');
+
+    await this.visitHistoryRepository.update(visitId, {
+      signature: base64,
+      signedAt,
+    });
+
+    return { id: visit.id, signedAt, hasSignature: true };
   }
 
   async delete(id: string): Promise<VisitHistory> {
