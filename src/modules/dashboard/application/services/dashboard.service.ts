@@ -1,17 +1,17 @@
-import { Injectable } from '@nestjs/common';
-import moment from 'moment';
-import { PrismaService } from 'src/modules/prisma/prisma.service';
+import { Injectable } from "@nestjs/common";
+import moment from "moment";
+import { PrismaService } from "src/modules/prisma/prisma.service";
 
 @Injectable()
 export class DashboardService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getSummary() {
-    const todayStart = moment.utc().startOf('day').toDate();
-    const todayEnd = moment.utc().endOf('day').toDate();
-    const yesterdayStart = moment.utc().subtract(1, 'day').startOf('day').toDate();
-    const yesterdayEnd = moment.utc().subtract(1, 'day').endOf('day').toDate();
-    const last7DaysStart = moment.utc().subtract(7, 'days').startOf('day').toDate();
+    const todayStart = moment.utc().startOf("day").toDate();
+    const todayEnd = moment.utc().endOf("day").toDate();
+    const yesterdayStart = moment.utc().subtract(1, "day").startOf("day").toDate();
+    const yesterdayEnd = moment.utc().subtract(1, "day").endOf("day").toDate();
+    const last7DaysStart = moment.utc().subtract(7, "days").startOf("day").toDate();
 
     const [
       communiquesToday,

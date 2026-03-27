@@ -12,27 +12,15 @@ import { NotificationModule } from "../notification/notification.module";
 import { SendNotificationAboutCommunique } from "./application/use-cases/send-notification-about-communique";
 
 @Module({
-    imports: [
-        EmailModule,
-        PrismaModule,
-        SectorsModule,
-        UsersModule,
-        NotificationModule
-    ],
-    controllers: [
-        CommuniqueController
-    ],
-    providers: [
-        CommuniqueService,
-        CommuniqueRepository,
-        CommuniquesGateway,
-        SendEmailCommuniqueBySector,
-        SendNotificationAboutCommunique
-    ],
-    exports: [
-        CommuniqueService,
-        SendEmailCommuniqueBySector,
-        SendNotificationAboutCommunique
-    ],
+  imports: [EmailModule, PrismaModule, SectorsModule, UsersModule, NotificationModule],
+  controllers: [CommuniqueController],
+  providers: [
+    CommuniqueService,
+    CommuniqueRepository,
+    CommuniquesGateway,
+    SendEmailCommuniqueBySector,
+    SendNotificationAboutCommunique,
+  ],
+  exports: [CommuniqueService, SendEmailCommuniqueBySector, SendNotificationAboutCommunique],
 })
-export class CommuniqueModule { }
+export class CommuniqueModule {}

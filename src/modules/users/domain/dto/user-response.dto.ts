@@ -1,52 +1,51 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { RoleType } from '../../../auth/domain/entities/role.entity';
-import { Role, Sector } from '@prisma/client';
+import { ApiProperty } from "@nestjs/swagger";
+import { Role, Sector } from "@prisma/client";
 
 export class UserResponseDto {
-  @ApiProperty({ description: 'ID do usuário' })
+  @ApiProperty({ description: "ID do usuário" })
   id: string;
 
-  @ApiProperty({ description: 'Nome completo do usuário' })
+  @ApiProperty({ description: "Nome completo do usuário" })
   name: string;
 
-  @ApiProperty({ description: 'Email do usuário' })
+  @ApiProperty({ description: "Email do usuário" })
   email: string;
 
-  @ApiProperty({ description: 'Username do usuário', required: false })
+  @ApiProperty({ description: "Username do usuário", required: false })
   username?: string;
 
-  @ApiProperty({ description: 'Setor do usuário', required: false })
+  @ApiProperty({ description: "Setor do usuário", required: false })
   sector?: Sector;
 
-  @ApiProperty({ description: 'Perfil do usuário', required: false })
+  @ApiProperty({ description: "Perfil do usuário", required: false })
   role: Role;
 
-  @ApiProperty({ description: 'Status de ativação do usuário' })
+  @ApiProperty({ description: "Status de ativação do usuário" })
   isActive: boolean;
 
-  @ApiProperty({ description: 'Indica se tem senha temporária' })
+  @ApiProperty({ description: "Indica se tem senha temporária" })
   isTemporaryPassword: boolean;
 
-  @ApiProperty({ description: 'Data de criação' })
+  @ApiProperty({ description: "Data de criação" })
   createdAt: Date;
 
-  @ApiProperty({ description: 'Data de atualização' })
+  @ApiProperty({ description: "Data de atualização" })
   updatedAt: Date;
 }
 
 export class PaginatedUsersResponseDto {
-  @ApiProperty({ type: [UserResponseDto], description: 'Lista de usuários' })
+  @ApiProperty({ type: [UserResponseDto], description: "Lista de usuários" })
   data: UserResponseDto[];
 
-  @ApiProperty({ description: 'Total de registros' })
+  @ApiProperty({ description: "Total de registros" })
   total: number;
 
-  @ApiProperty({ description: 'Página atual' })
+  @ApiProperty({ description: "Página atual" })
   page: number;
 
-  @ApiProperty({ description: 'Limite por página' })
+  @ApiProperty({ description: "Limite por página" })
   limit: number;
 
-  @ApiProperty({ description: 'Total de páginas' })
+  @ApiProperty({ description: "Total de páginas" })
   totalPages: number;
 }

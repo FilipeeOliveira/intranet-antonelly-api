@@ -4,26 +4,28 @@ import { PrismaService } from "src/modules/prisma/prisma.service";
 
 @Injectable()
 export class SendEmailCommuniqueBySector {
-    constructor(
-        private readonly emailService: EmailService,
-        private readonly prisma: PrismaService,
-    ) { }
+  constructor(
+    private readonly emailService: EmailService,
+    private readonly prisma: PrismaService,
+  ) {}
 
-    private readonly logger = new Logger(SendEmailCommuniqueBySector.name);
+  private readonly logger = new Logger(SendEmailCommuniqueBySector.name);
 
-    async execute(_sectorId: string, context: CommuniqueEmailContext) {
-        const users = await this.prisma.user.findMany({
-            where: { isActive: true },
-            select: { email: true },
-        });
+  async execute(_sectorId: string, context: CommuniqueEmailContext) {
+    const users = await this.prisma.user.findMany({
+      where: { isActive: true },
+      select: { email: true },
+    });
 
-        if (users.length === 0) {
-            this.logger.warn('Nenhum usuário ativo encontrado. Email não enviado.');
-            return;
-        }
-
-        const to = users.map(user => user.email);
-        this.logger.log(`Enviando comunicado para ${to.length} usuários ativos`);
-        this.emailService.sendCommunicationEmail(to, context).catch(err => this.logger.error(`Falha ao enviar email de comunicado: ${err?.message}`));
+    if (users.length === 0) {
+      this.logger.warn("Nenhum usuário ativo encontrado. Email não enviado.");
+      return;
     }
+
+    const to = users.map((user) => user.email);
+    this.logger.log(`Enviando comunicado para ${to.length} usuários ativos`);
+    this.emailService
+      .sendCommunicationEmail(to, context)
+      .catch((err) => this.logger.error(`Falha ao enviar email de comunicado: ${err?.message}`));
+  }
 }

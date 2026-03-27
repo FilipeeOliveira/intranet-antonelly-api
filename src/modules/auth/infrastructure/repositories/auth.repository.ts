@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/modules/prisma/prisma.service';
-import { IAuthRepository } from '../../domain/repositories/auth.repository.interface';
-import { User } from '../../domain/entities/user.entity';
-import { Role, RoleType } from '../../domain/entities/role.entity';
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "src/modules/prisma/prisma.service";
+import { IAuthRepository } from "../../domain/repositories/auth.repository.interface";
+import { User } from "../../domain/entities/user.entity";
+import { Role, RoleType } from "../../domain/entities/role.entity";
 
 @Injectable()
 export class AuthRepository implements IAuthRepository {
@@ -55,8 +55,8 @@ export class AuthRepository implements IAuthRepository {
         role: true,
         permissions: {
           include: {
-            feature: true
-          }
+            feature: true,
+          },
         },
       },
     });

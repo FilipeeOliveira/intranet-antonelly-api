@@ -227,6 +227,33 @@ export async function createPagesSeed() {
         }
     });
 
+    const constructionsPage = await prisma.page.upsert({
+        where: { name: 'OBRAS' },
+        update: {},
+        create: {
+            name: 'OBRAS',
+            features: {
+                create: [
+                    {
+                        key: Permissions.CONSTRUCTIONS.READ,
+                        prettyName: 'Visualizar Obras',
+                        description: 'Permite visualizar todas as informações desta página, incluindo listagem de obras, detalhes individuais, membros e progresso.'
+                    },
+                    {
+                        key: Permissions.CONSTRUCTIONS.WRITE,
+                        prettyName: 'Ações de escrita de Obras',
+                        description: 'Permite criar e editar obras, alterar status, gerenciar membros e atualizar informações.'
+                    },
+                    {
+                        key: Permissions.CONSTRUCTIONS.DELETE,
+                        prettyName: 'Excluir Obras',
+                        description: 'Permite excluir obras do sistema. Restrito a perfis com alto nível de acesso.',
+                    },
+                ]
+            }
+        }
+    });
+
 
     // Marcar features que existem no back-end mas não devem aparecer no modal de permissões
     const hiddenFeatureKeys = [
@@ -236,6 +263,7 @@ export async function createPagesSeed() {
         Permissions.SECTORS.WRITE,
         Permissions.ROOMS.READ,
         Permissions.ROOMS.WRITE,
+        Permissions.CONSTRUCTIONS.DELETE,
     ];
     for (const key of hiddenFeatureKeys) {
         await prisma.$executeRaw`UPDATE features SET hidden = true WHERE key = ${key}`;
@@ -253,6 +281,7 @@ export async function createPagesSeed() {
     console.log(`🏢 Salas -> ${roomsPage.id}`);
     console.log(`🔐 Permissões -> ${permissionsPage.id}`);
     console.log(`📦 Orders -> ${ordersPage.id}`);
+    console.log(`🏗️ Obras -> ${constructionsPage.id}`);
 
     return [
         usersPage,
@@ -264,6 +293,7 @@ export async function createPagesSeed() {
         permissionsPage,
         visitorHistoryPage,
         procedimentosPage,
-        ordersPage
+        ordersPage,
+        constructionsPage,
     ];
 }

@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../../prisma/prisma.service';
-import { CompaniesQueryDto } from '../../domain/dto/companies-query.dto';
-import { CreateCompanyDto } from '../../domain/dto/create-company.dto';
-import { UpdateCompanyDto } from '../../domain/dto/update-companie.dto';
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "../../../prisma/prisma.service";
+import { CompaniesQueryDto } from "../../domain/dto/companies-query.dto";
+import { CreateCompanyDto } from "../../domain/dto/create-company.dto";
+import { UpdateCompanyDto } from "../../domain/dto/update-companie.dto";
 
 @Injectable()
 export class CompanyRepository {
@@ -14,11 +14,11 @@ export class CompanyRepository {
 
     const where: any = {};
     if (search) {
-      where.name = { contains: search, mode: 'insensitive' };
+      where.name = { contains: search, mode: "insensitive" };
     }
 
     const orderBy: any = {};
-    orderBy[sortBy || 'name'] = sortOrder || 'asc';
+    orderBy[sortBy || "name"] = sortOrder || "asc";
 
     const [companies, total] = await Promise.all([
       this.prisma.companie.findMany({

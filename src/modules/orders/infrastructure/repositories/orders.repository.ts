@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import { Order, Prisma } from '@prisma/client';
-import { PrismaService } from '../../../prisma/prisma.service';
-import { ListOrdersDto } from '../../domain/dto/list-orders.dto';
+import { Injectable } from "@nestjs/common";
+import { Order, Prisma } from "@prisma/client";
+import { PrismaService } from "../../../prisma/prisma.service";
+import { ListOrdersDto } from "../../domain/dto/list-orders.dto";
 
 @Injectable()
 export class OrdersRepository {
@@ -22,21 +22,21 @@ export class OrdersRepository {
     }
 
     if (recipientEmail) {
-      where.recipientEmail = { equals: recipientEmail, mode: 'insensitive' };
+      where.recipientEmail = { equals: recipientEmail, mode: "insensitive" };
     }
 
     if (search) {
       where.OR = [
-        { sender: { contains: search, mode: 'insensitive' } },
-        { recipientName: { contains: search, mode: 'insensitive' } },
-        { trackingCode: { contains: search, mode: 'insensitive' } },
-        { protocolNumber: { contains: search, mode: 'insensitive' } },
+        { sender: { contains: search, mode: "insensitive" } },
+        { recipientName: { contains: search, mode: "insensitive" } },
+        { trackingCode: { contains: search, mode: "insensitive" } },
+        { protocolNumber: { contains: search, mode: "insensitive" } },
       ];
     }
 
     const orderBy: Prisma.OrderOrderByWithRelationInput = sortBy
-      ? { [sortBy]: sortOrder ?? 'desc' }
-      : { createdAt: 'desc' };
+      ? { [sortBy]: sortOrder ?? "desc" }
+      : { createdAt: "desc" };
 
     const [data, total] = await Promise.all([
       this.prisma.order.findMany({ where, skip, take: limit, orderBy }),

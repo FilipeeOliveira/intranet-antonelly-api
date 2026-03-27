@@ -1,48 +1,48 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString, IsOptional, IsEnum } from 'class-validator';
-import { RoleType } from '../../../auth/domain/entities/role.entity';
+import { ApiProperty } from "@nestjs/swagger";
+import { IsEmail, IsNotEmpty, IsString, IsOptional, IsEnum } from "class-validator";
+import { RoleType } from "../../../auth/domain/entities/role.entity";
 
 export class CreateUserDto {
   @ApiProperty({
-    description: 'Nome completo do usuário',
-    example: 'João Silva',
+    description: "Nome completo do usuário",
+    example: "João Silva",
   })
-  @IsString({ message: 'Nome deve ser uma string' })
-  @IsNotEmpty({ message: 'Nome é obrigatório' })
+  @IsString({ message: "Nome deve ser uma string" })
+  @IsNotEmpty({ message: "Nome é obrigatório" })
   name: string;
 
   @ApiProperty({
-    description: 'Email do usuário',
-    example: 'joao.silva@empresa.com',
+    description: "Email do usuário",
+    example: "joao.silva@empresa.com",
   })
-  @IsEmail({}, { message: 'Email deve ter um formato válido' })
-  @IsNotEmpty({ message: 'Email é obrigatório' })
+  @IsEmail({}, { message: "Email deve ter um formato válido" })
+  @IsNotEmpty({ message: "Email é obrigatório" })
   email: string;
 
   @ApiProperty({
-    description: 'Username do usuário (opcional)',
-    example: 'joao.silva',
+    description: "Username do usuário (opcional)",
+    example: "joao.silva",
     required: false,
   })
   @IsOptional()
-  @IsString({ message: 'Username deve ser uma string' })
+  @IsString({ message: "Username deve ser uma string" })
   username?: string;
 
   @ApiProperty({
-    description: 'Setor do usuário',
-    example: 'uuid-do-setor',
+    description: "Setor do usuário",
+    example: "uuid-do-setor",
     required: true,
   })
   @IsOptional()
-  @IsString({ message: 'Setor ID deve ser uma string' })
+  @IsString({ message: "Setor ID deve ser uma string" })
   sectorId?: string;
 
   @ApiProperty({
-    description: 'Perfil do usuário',
+    description: "Perfil do usuário",
     enum: RoleType,
     example: RoleType.FUNCIONARIO,
   })
-  @IsEnum(RoleType, { message: 'Perfil deve ser um dos valores válidos' })
-  @IsNotEmpty({ message: 'Perfil é obrigatório' })
+  @IsEnum(RoleType, { message: "Perfil deve ser um dos valores válidos" })
+  @IsNotEmpty({ message: "Perfil é obrigatório" })
   role: RoleType;
 }

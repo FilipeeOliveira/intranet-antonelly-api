@@ -5,19 +5,9 @@ import { RolesRepository } from "./infrastructure/repositories/roles.repository"
 import { RolesController } from "./presentation/roles.controller";
 
 @Module({
-    imports: [
-        PrismaModule
-    ],
-    controllers: [
-        RolesController
-    ],
-    providers: [
-        RolesRepository,
-        RolesService
-    ],
-    exports: [
-        RolesRepository,
-        RolesService
-    ],
+  imports: [PrismaModule],
+  controllers: [RolesController],
+  providers: [RolesRepository, RolesService],
+  exports: [RolesRepository, RolesService],
 })
-export class RolesModule { }
+export class RolesModule {}

@@ -1,9 +1,9 @@
-import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
-import { AuthRepository } from '../../infrastructure/repositories/auth.repository';
-import { ResetPasswordDto } from '../../domain/dto/reset-password.dto';
-import { envConfig } from 'src/config/config';
+import { Injectable, BadRequestException, UnauthorizedException } from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
+import * as bcrypt from "bcrypt";
+import { AuthRepository } from "../../infrastructure/repositories/auth.repository";
+import { ResetPasswordDto } from "../../domain/dto/reset-password.dto";
+import { envConfig } from "src/config/config";
 
 @Injectable()
 export class ResetPasswordUseCase {
@@ -17,28 +17,28 @@ export class ResetPasswordUseCase {
 
     // Verificar se as senhas coincidem
     if (newPassword !== confirmPassword) {
-      throw new BadRequestException('Nova senha e confirmação não coincidem');
+      throw new BadRequestException("Nova senha e confirmação não coincidem");
     }
 
     // Verificar e decodificar o token
     let payload: any;
     try {
       payload = this.jwtService.verify(token, {
-        secret: envConfig.JWT_SECRET + '_RESET',
+        secret: envConfig.JWT_SECRET + "_RESET",
       });
     } catch (error) {
-      throw new UnauthorizedException('Token de recuperação inválido ou expirado');
+      throw new UnauthorizedException("Token de recuperação inválido ou expirado");
     }
 
     // Verificar se é um token de reset
-    if (payload.type !== 'password_reset') {
-      throw new UnauthorizedException('Token inválido');
+    if (payload.type !== "password_reset") {
+      throw new UnauthorizedException("Token inválido");
     }
 
     // Buscar o usuário
     const user = await this.authRepository.findUserById(payload.sub);
     if (!user || !user.isActive) {
-      throw new UnauthorizedException('Usuário não encontrado ou inativo');
+      throw new UnauthorizedException("Usuário não encontrado ou inativo");
     }
 
     // Hash da nova senha com salt rounds 12
@@ -51,7 +51,7 @@ export class ResetPasswordUseCase {
     await this.authRepository.invalidateAllUserTokens(user.id);
 
     return {
-      message: 'Senha alterada com sucesso. Faça login com sua nova senha.',
+      message: "Senha alterada com sucesso. Faça login com sua nova senha.",
     };
   }
 }

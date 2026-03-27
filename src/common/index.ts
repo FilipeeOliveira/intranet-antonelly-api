@@ -1,1 +1,1 @@
-export * from './swagger/swagger.config';
+export * from "./swagger/swagger.config";

@@ -1,32 +1,29 @@
-import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
-import { AuthRepository } from '../../infrastructure/repositories/auth.repository';
-import { ChangeTemporaryPasswordDto } from '../../domain/dto/change-temporary-password.dto';
+import { Injectable, BadRequestException, UnauthorizedException } from "@nestjs/common";
+import * as bcrypt from "bcrypt";
+import { AuthRepository } from "../../infrastructure/repositories/auth.repository";
+import { ChangeTemporaryPasswordDto } from "../../domain/dto/change-temporary-password.dto";
 
 @Injectable()
 export class ChangeTemporaryPasswordUseCase {
   constructor(private readonly authRepository: AuthRepository) {}
 
-  async execute(
-    userId: string,
-    changePasswordDto: ChangeTemporaryPasswordDto,
-  ): Promise<{ message: string }> {
+  async execute(userId: string, changePasswordDto: ChangeTemporaryPasswordDto): Promise<{ message: string }> {
     const { newPassword, confirmPassword } = changePasswordDto;
 
     // Verificar se as senhas coincidem
     if (newPassword !== confirmPassword) {
-      throw new BadRequestException('Nova senha e confirmação não coincidem');
+      throw new BadRequestException("Nova senha e confirmação não coincidem");
     }
 
     // Buscar o usuário
     const user = await this.authRepository.findUserById(userId);
     if (!user || !user.isActive) {
-      throw new UnauthorizedException('Usuário não encontrado ou inativo');
+      throw new UnauthorizedException("Usuário não encontrado ou inativo");
     }
 
     // Verificar se realmente tem senha temporária
     if (!user.isTemporaryPassword) {
-      throw new BadRequestException('Usuário não possui senha temporária');
+      throw new BadRequestException("Usuário não possui senha temporária");
     }
 
     // Hash da nova senha com salt rounds 12
@@ -37,7 +34,7 @@ export class ChangeTemporaryPasswordUseCase {
     await this.authRepository.updateTemporaryPasswordFlag(user.id, false);
 
     return {
-      message: 'Senha alterada com sucesso. Agora você pode usar sua nova senha.',
+      message: "Senha alterada com sucesso. Agora você pode usar sua nova senha.",
     };
   }
 }

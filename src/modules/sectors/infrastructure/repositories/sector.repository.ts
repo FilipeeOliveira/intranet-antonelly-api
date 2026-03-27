@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../../prisma/prisma.service';
-import { SectorQueryDto } from '../../domain/dto/sector-query.dto';
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "../../../prisma/prisma.service";
+import { SectorQueryDto } from "../../domain/dto/sector-query.dto";
 
 @Injectable()
 export class SectorRepository {
@@ -12,11 +12,11 @@ export class SectorRepository {
 
     const where: any = {};
     if (search) {
-      where.name = { contains: search, mode: 'insensitive' };
+      where.name = { contains: search, mode: "insensitive" };
     }
 
     const orderBy: any = {};
-    orderBy[sortBy || 'name'] = sortOrder || 'asc';
+    orderBy[sortBy || "name"] = sortOrder || "asc";
 
     const [sectors, total] = await Promise.all([
       this.prisma.sector.findMany({

@@ -1,20 +1,20 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { IsEnum, IsOptional, IsString, Max, Min } from 'class-validator';
-import { DocumentStatus } from './create-document.dto';
+import { ApiProperty } from "@nestjs/swagger";
+import { Type } from "class-transformer";
+import { IsEnum, IsOptional, IsString, Max, Min } from "class-validator";
+import { DocumentStatus } from "./create-document.dto";
 
 export class DocumentQueryDto {
   @ApiProperty({
-    description: 'Busca por título, descrição ou categoria',
+    description: "Busca por título, descrição ou categoria",
     required: false,
-    example: 'Manual de Segurança',
+    example: "Manual de Segurança",
   })
   @IsOptional()
   @IsString()
   search?: string;
 
   @ApiProperty({
-    description: 'Filtro por status do documento',
+    description: "Filtro por status do documento",
     enum: DocumentStatus,
     required: false,
   })
@@ -23,34 +23,34 @@ export class DocumentQueryDto {
   status?: DocumentStatus;
 
   @ApiProperty({
-    description: 'Filtro por nome do setor',
+    description: "Filtro por nome do setor",
     required: false,
-    example: 'RH',
+    example: "RH",
   })
   @IsOptional()
   @IsString()
   sector?: string;
 
   @ApiProperty({
-    description: 'Filtro por ID do setor (UUID)',
+    description: "Filtro por ID do setor (UUID)",
     required: false,
-    example: '0801b5e5-6aa4-4ec3-9742-5a48419a4104',
+    example: "0801b5e5-6aa4-4ec3-9742-5a48419a4104",
   })
   @IsOptional()
   @IsString()
   sectorId?: string;
 
   @ApiProperty({
-    description: 'Filtro por versão',
+    description: "Filtro por versão",
     required: false,
-    example: '1.0',
+    example: "1.0",
   })
   @IsOptional()
   @IsString()
   version?: string;
 
   @ApiProperty({
-    description: 'Número da página',
+    description: "Número da página",
     minimum: 1,
     default: 1,
     required: false,
@@ -61,7 +61,7 @@ export class DocumentQueryDto {
   page?: number = 1;
 
   @ApiProperty({
-    description: 'Limite de registros por página',
+    description: "Limite de registros por página",
     minimum: 1,
     maximum: 100,
     default: 10,
@@ -74,22 +74,22 @@ export class DocumentQueryDto {
   limit?: number = 10;
 
   @ApiProperty({
-    description: 'Campo para ordenação',
-    enum: ['title', 'category', 'department', 'status', 'version', 'createdAt'],
-    default: 'title',
+    description: "Campo para ordenação",
+    enum: ["title", "category", "department", "status", "version", "createdAt"],
+    default: "title",
     required: false,
   })
   @IsOptional()
-  @IsEnum(['title', 'category', 'department', 'status', 'version', 'createdAt'])
-  sortBy?: string = 'title';
+  @IsEnum(["title", "category", "department", "status", "version", "createdAt"])
+  sortBy?: string = "title";
 
   @ApiProperty({
-    description: 'Direção da ordenação',
-    enum: ['asc', 'desc'],
-    default: 'asc',
+    description: "Direção da ordenação",
+    enum: ["asc", "desc"],
+    default: "asc",
     required: false,
   })
   @IsOptional()
-  @IsEnum(['asc', 'desc'])
-  sortOrder?: 'asc' | 'desc' = 'asc';
+  @IsEnum(["asc", "desc"])
+  sortOrder?: "asc" | "desc" = "asc";
 }

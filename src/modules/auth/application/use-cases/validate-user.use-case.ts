@@ -1,15 +1,13 @@
-import {Injectable } from '@nestjs/common';
-import { AuthRepository } from '../../infrastructure/repositories/auth.repository';
+import { Injectable } from "@nestjs/common";
+import { AuthRepository } from "../../infrastructure/repositories/auth.repository";
 
 @Injectable()
 export class ValidateUserUseCase {
-  constructor(
-    private readonly authRepository: AuthRepository,
-  ) {}
+  constructor(private readonly authRepository: AuthRepository) {}
 
   async execute(payload: any) {
     const user = await this.authRepository.findUserById(payload.sub);
-    
+
     if (!user || !user.isActive) {
       return null;
     }

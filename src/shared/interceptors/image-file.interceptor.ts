@@ -10,7 +10,6 @@ export const imageFileInterceptor = (fieldName = "image") =>
       filename: (req, file, callback) => {
         // Corrige caracteres especiais
         const originalName = Buffer.from(file.originalname.trim(), "latin1").toString("utf8");
-        const nameWithoutExt = originalName.replace(extname(originalName), "");
 
         const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
         const extension = extname(originalName);
@@ -24,12 +23,7 @@ export const imageFileInterceptor = (fieldName = "image") =>
       if (allowedMimeTypes.includes(file.mimetype)) {
         callback(null, true);
       } else {
-        callback(
-          new BadRequestException(
-            "Somente imagens PNG, JPG, JPEG ou WEBP são permitidas!"
-          ),
-          false
-        );
+        callback(new BadRequestException("Somente imagens PNG, JPG, JPEG ou WEBP são permitidas!"), false);
       }
     },
     limits: {

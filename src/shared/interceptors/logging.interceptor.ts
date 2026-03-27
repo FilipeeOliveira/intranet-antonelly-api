@@ -1,24 +1,18 @@
-import {
-  Injectable,
-  NestInterceptor,
-  ExecutionContext,
-  CallHandler,
-  Logger,
-} from '@nestjs/common';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler, Logger } from "@nestjs/common";
+import { Observable } from "rxjs";
+import { tap } from "rxjs/operators";
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
-  private readonly logger = new Logger('HTTP');
+  private readonly logger = new Logger("HTTP");
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
     const response = context.switchToHttp().getResponse();
 
     const { method, url, headers, body, query, params } = request;
-    const userAgent = headers['user-agent'] || '';
-    const clientIP = headers['x-forwarded-for'] || request.connection.remoteAddress;
+    const userAgent = headers["user-agent"] || "";
+    const clientIP = headers["x-forwarded-for"] || request.connection.remoteAddress;
 
     const startTime = Date.now();
 
@@ -26,11 +20,11 @@ export class LoggingInterceptor implements NestInterceptor {
     this.logger.log(`
 [REQUEST] ${method} ${url}
 IP: ${clientIP}
-User-Agent: ${userAgent.substring(0, 100)}${userAgent.length > 100 ? '...' : ''}
-${query && Object.keys(query).length ? `Query: ${JSON.stringify(query)}` : ''}
-${params && Object.keys(params).length ? `Params: ${JSON.stringify(params)}` : ''}
-${body && Object.keys(body).length && !this.isSensitiveRoute(url) ? `Body: ${JSON.stringify(body, null, 2)}` : ''}
-${this.isSensitiveRoute(url) ? 'Body: [SENSITIVE DATA HIDDEN]' : ''}
+User-Agent: ${userAgent.substring(0, 100)}${userAgent.length > 100 ? "..." : ""}
+${query && Object.keys(query).length ? `Query: ${JSON.stringify(query)}` : ""}
+${params && Object.keys(params).length ? `Params: ${JSON.stringify(params)}` : ""}
+${body && Object.keys(body).length && !this.isSensitiveRoute(url) ? `Body: ${JSON.stringify(body, null, 2)}` : ""}
+${this.isSensitiveRoute(url) ? "Body: [SENSITIVE DATA HIDDEN]" : ""}
 Started at: ${new Date().toISOString()}
     `);
 
@@ -64,7 +58,7 @@ Completed at: ${new Date().toISOString()}
 [ERROR] ${method} ${url} - ${statusCode}
 Duration: ${duration}ms
 Error: ${error.message}
-Stack: ${error.stack?.split('\n')[0] || 'N/A'}
+Stack: ${error.stack?.split("\n")[0] || "N/A"}
 Failed at: ${new Date().toISOString()}
           `);
         },
@@ -73,13 +67,8 @@ Failed at: ${new Date().toISOString()}
   }
 
   private isSensitiveRoute(url: string): boolean {
-    const sensitiveRoutes = [
-      '/auth/login',
-      '/auth/reset-password',
-      '/auth/change-temporary-password',
-      '/users'
-    ];
+    const sensitiveRoutes = ["/auth/login", "/auth/reset-password", "/auth/change-temporary-password", "/users"];
 
-    return sensitiveRoutes.some(route => url.includes(route));
+    return sensitiveRoutes.some((route) => url.includes(route));
   }
 }
