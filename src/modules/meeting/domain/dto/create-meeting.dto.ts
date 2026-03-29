@@ -1,12 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsDateString, IsEnum, IsNotEmpty, IsOptional, IsString } from "class-validator";
-import { MeetingStatus } from "../../infrastructure/repositories/meeting.repository";
+import { IsDateString, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class CreateMeetingDto {
-  @ApiProperty({
-    description: "Assunto da reunião",
-    example: "Revisão do Sprint",
-  })
+  @ApiProperty({ description: "Assunto da reunião", example: "Revisão do Sprint" })
   @IsNotEmpty()
   @IsString()
   subject: string;
@@ -16,67 +12,33 @@ export class CreateMeetingDto {
   @IsString()
   description?: string;
 
-  @ApiProperty({
-    description: "Data da reunião (YYYY-MM-DD)",
-    example: "2025-10-01",
-    required: true,
-  })
+  @ApiProperty({ description: "Setor responsável pela reunião", example: "TI", required: false })
+  @IsOptional()
+  @IsString()
+  sector?: string;
+
+  @ApiProperty({ description: "Nome do responsável pela reunião", example: "Filipe Oliveira", required: false })
+  @IsOptional()
+  @IsString()
+  responsible?: string;
+
+  @ApiProperty({ description: "Data da reunião (YYYY-MM-DD)", example: "2026-03-27" })
   @IsNotEmpty()
   @IsDateString()
   date: string;
 
-  @ApiProperty({
-    description: "Horário da reunião (HH:MM)",
-    example: "14:30",
-    required: true,
-  })
+  @ApiProperty({ description: "Horário de início (HH:MM)", example: "10:00" })
   @IsNotEmpty()
   @IsString()
   startTime: string;
 
-  @ApiProperty({
-    description: "Fim da reunião (HH:MM)",
-    example: "15:30",
-    required: true,
-  })
+  @ApiProperty({ description: "Horário de término (HH:MM)", example: "11:00" })
   @IsNotEmpty()
   @IsString()
   endTime: string;
 
-  @ApiProperty({
-    description: "ID Sala da reunião",
-    example: "uuid-da-sala",
-    required: true,
-  })
+  @ApiProperty({ description: "ID da sala", example: "uuid-da-sala" })
   @IsNotEmpty()
   @IsString()
   roomId: string;
-
-  @ApiProperty({
-    description: "ID do Setor da reunião",
-    example: "uuid-do-setor",
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  sectorId?: string;
-
-  @ApiProperty({
-    description: "ID do Usuário responsável pela reunião",
-    example: "uuid-do-usuario",
-    required: true,
-  })
-  @IsNotEmpty()
-  @IsString()
-  responsibleId: string;
-
-  @ApiProperty({
-    description: "Status da reunião",
-    example: MeetingStatus.SCHEDULED,
-    enum: MeetingStatus,
-    required: false,
-  })
-  @IsEnum(MeetingStatus)
-  @IsOptional()
-  status?: MeetingStatus;
 }

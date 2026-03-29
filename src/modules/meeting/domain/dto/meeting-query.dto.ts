@@ -67,4 +67,13 @@ export class MeetingQueryDto {
   @IsOptional()
   @IsString()
   startDate?: string;
+
+  @ApiProperty({
+    description: "Aba de visualização: scheduled (agendadas), in_progress (em andamento), history (concluídas e canceladas). Sobrescreve o filtro 'status' quando informado.",
+    enum: ["scheduled", "in_progress", "history"],
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  tab?: "scheduled" | "in_progress" | "history";
 }
