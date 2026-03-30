@@ -1,5 +1,5 @@
 import { Injectable, BadRequestException, UnauthorizedException } from "@nestjs/common";
-import * as bcrypt from "bcrypt";
+import * as bcrypt from "bcryptjs";
 import { AuthRepository } from "../../infrastructure/repositories/auth.repository";
 import { ChangeTemporaryPasswordDto } from "../../domain/dto/change-temporary-password.dto";
 

@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import * as bcrypt from "bcrypt";
+import * as bcrypt from "bcryptjs";
 import { AuthRepository } from "../../infrastructure/repositories/auth.repository";
 import { ResetPasswordDto } from "../../domain/dto/reset-password.dto";
 import { envConfig } from "src/config/config";
