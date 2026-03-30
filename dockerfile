@@ -1,4 +1,4 @@
-FROM node:22.11.0-alpine AS development
+FROM node:22.11-alpine AS development
 
 RUN apk update && apk add --no-cache git bash curl tzdata
 

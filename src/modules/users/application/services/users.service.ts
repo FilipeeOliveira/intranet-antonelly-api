@@ -1,5 +1,5 @@
 import { ConflictException, ForbiddenException, Injectable, Logger, NotFoundException } from "@nestjs/common";
-import * as bcrypt from "bcrypt";
+import * as bcrypt from "bcryptjs";
 import { AuthRepository } from "src/modules/auth/infrastructure/repositories/auth.repository";
 import { EmailService } from "src/modules/email/application/services/email.service";
 import { PermissionsService } from "src/modules/permissions/application/services/permissions.service";
