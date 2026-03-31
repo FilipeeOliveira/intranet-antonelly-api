@@ -1,13 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../../../prisma/prisma.service";
 import { MeetingQueryDto } from "../../domain/dto/meeting-query.dto";
+import { MeetingStatus } from "../../domain/enums/MeetingStatus";
 import moment from "moment";
 
-export enum MeetingStatus {
-  SCHEDULED = 1, // agendada
-  IN_PROGRESS = 2, // em andamento
-  COMPLETED = 3, // concluída
-}
+export { MeetingStatus };
 
 @Injectable()
 export class MeetingRepository {
@@ -19,6 +16,7 @@ export class MeetingRepository {
         date,
         roomId,
         id: excludeId ? { not: excludeId } : undefined,
+        status: { notIn: [MeetingStatus.CANCELED, MeetingStatus.COMPLETED] },
         AND: [
           {
             startTime: { lt: endTime },
@@ -30,14 +28,16 @@ export class MeetingRepository {
   }
 
   async findAll(query: MeetingQueryDto) {
-    const { page = 1, limit = 10, search, sortBy, sortOrder, roomId, status, startDate } = query;
+    const { page = 1, limit = 10, search, sortBy, sortOrder, roomId, status, startDate, tab } = query;
     const skip = (page - 1) * limit;
 
     const where: any = {};
+
     if (search) {
       where.OR = [
         { subject: { contains: search, mode: "insensitive" } },
-        { Sector: { name: { contains: search, mode: "insensitive" } } },
+        { sector: { contains: search, mode: "insensitive" } },
+        { responsible: { contains: search, mode: "insensitive" } },
         { description: { contains: search, mode: "insensitive" } },
       ];
     }
@@ -46,12 +46,23 @@ export class MeetingRepository {
       where.roomId = roomId;
     }
 
-    if (status) {
+    if (tab) {
+      switch (tab) {
+        case "scheduled":
+          where.status = MeetingStatus.SCHEDULED;
+          break;
+        case "in_progress":
+          where.status = MeetingStatus.IN_PROGRESS;
+          break;
+        case "history":
+          where.status = { in: [MeetingStatus.COMPLETED, MeetingStatus.CANCELED] };
+          break;
+      }
+    } else if (status) {
       where.status = status;
     }
 
     if (startDate) {
-      // Usa UTC para consistência com a forma como as datas são armazenadas
       const startOfDay = moment.utc(startDate).startOf("day").toDate();
       const endOfDay = moment.utc(startDate).endOf("day").toDate();
       where.date = { gte: startOfDay, lte: endOfDay };
@@ -59,7 +70,7 @@ export class MeetingRepository {
 
     const orderBy: any = [
       { [sortBy || "createdAt"]: sortOrder || "desc" },
-      { id: "desc" }, // torna a ordenação estável
+      { id: "desc" },
     ];
 
     const [meetings, total] = await Promise.all([
@@ -68,31 +79,7 @@ export class MeetingRepository {
         skip,
         take: limit,
         orderBy,
-        include: {
-          Sector: true,
-          Room: true,
-          Responsible: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              sector: {
-                select: {
-                  id: true,
-                  name: true,
-                  description: true,
-                },
-              },
-              role: {
-                select: {
-                  id: true,
-                  key: true,
-                  description: true,
-                },
-              },
-            },
-          },
-        },
+        include: { Room: true },
       }),
       this.prisma.meetingSchedule.count({ where }),
     ]);
@@ -106,66 +93,41 @@ export class MeetingRepository {
     };
   }
 
-  async findMeetingsByStatus(args: { date: Date; hour: string; status: MeetingStatus }) {
-    const { date, hour, status } = args;
-    const initialDate = moment(date).utc(true).startOf("day").toDate();
-    const finalDate = moment(date).utc(true).endOf("day").toDate();
+  async findInProgressPastEndTime(date: Date, currentTime: string) {
+    const startOfDay = moment(date).utc(true).startOf("day").toDate();
+    const endOfDay = moment(date).utc(true).endOf("day").toDate();
 
-    const where: any = {
-      date: {
-        gte: initialDate,
-        lte: finalDate,
+    return this.prisma.meetingSchedule.findMany({
+      where: {
+        date: { gte: startOfDay, lte: endOfDay },
+        status: MeetingStatus.IN_PROGRESS,
+        endTime: { lte: currentTime },
       },
-      status,
-    };
+    });
+  }
 
-    switch (status) {
-      case MeetingStatus.SCHEDULED:
-        // Busca reuniões agendadas que já deveriam ter começado (startTime <= hora atual)
-        Object.assign(where, {
-          startTime: { lte: hour },
-        });
-        break;
+  async findScheduledPastEndTime(date: Date, currentTime: string) {
+    const startOfDay = moment(date).utc(true).startOf("day").toDate();
+    const endOfDay = moment(date).utc(true).endOf("day").toDate();
 
-      case MeetingStatus.IN_PROGRESS:
-        // Busca reuniões em andamento que já deveriam ter terminado (endTime <= hora atual)
-        Object.assign(where, {
-          endTime: { lte: hour },
-        });
-        break;
-    }
-
-    return this.prisma.meetingSchedule.findMany({ where });
+    return this.prisma.meetingSchedule.findMany({
+      where: {
+        date: { gte: startOfDay, lte: endOfDay },
+        status: MeetingStatus.SCHEDULED,
+        endTime: { lte: currentTime },
+      },
+    });
   }
 
   async findById(id: string) {
     return this.prisma.meetingSchedule.findUnique({
       where: { id },
-      include: {
-        Sector: true,
-        Room: true,
-        Responsible: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            role: {
-              select: {
-                id: true,
-                key: true,
-                description: true,
-              },
-            },
-          },
-        },
-      },
+      include: { Room: true },
     });
   }
 
   async create(data: any) {
-    return this.prisma.meetingSchedule.create({
-      data,
-    });
+    return this.prisma.meetingSchedule.create({ data });
   }
 
   async update(id: string, data: any) {
@@ -175,26 +137,23 @@ export class MeetingRepository {
     });
   }
 
-  async delete(id: string) {
-    return this.prisma.meetingSchedule.delete({
+  async cancel(id: string) {
+    return this.prisma.meetingSchedule.update({
       where: { id },
+      data: { status: MeetingStatus.CANCELED },
     });
   }
 
   async findToday() {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const startOfDay = moment().utc(true).startOf("day").toDate();
+    const endOfDay = moment().utc(true).endOf("day").toDate();
 
     return this.prisma.meetingSchedule.findMany({
       where: {
-        date: today,
+        date: { gte: startOfDay, lte: endOfDay },
       },
       orderBy: { startTime: "asc" },
-      include: {
-        Sector: true,
-        Room: true,
-        Responsible: true,
-      },
+      include: { Room: true },
     });
   }
 }

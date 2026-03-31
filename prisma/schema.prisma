@@ -28,10 +28,9 @@ model Sector {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  documents       Document[]
-  users           User[]
-  MeetingSchedule MeetingSchedule[]
-  communiques     Communique[]
+  documents   Document[]
+  users       User[]
+  communiques Communique[]
 
   @@map("sectors")
 }
@@ -49,10 +48,9 @@ model User {
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
-  sector            Sector               @relation(fields: [sectorId], references: [id])
-  role              Role                 @relation(fields: [roleId], references: [id])
-  meetings          MeetingSchedule[]
-  permissions       UserPermission[]
+  sector      Sector           @relation(fields: [sectorId], references: [id])
+  role        Role             @relation(fields: [roleId], references: [id])
+  permissions UserPermission[]
   blacklistedTokens BlacklistedToken[]
   communiques       Communique[]
   createdConstructions   Construction[]       @relation("ConstructionCreator")
@@ -192,22 +190,22 @@ model Room {
 }
 
 model MeetingSchedule {
-  id            String   @id @default(uuid())
+  id            String    @id @default(uuid())
   subject       String
   description   String?
-  date          DateTime // Somente data
-  startTime     String // Somente horário em HH:MM
-  endTime       String // HH:MM calculado
-  sectorId      String?
+  sector        String?   // Setor digitado livremente (texto simples)
+  responsible   String?   // Responsável digitado livremente (texto simples)
+  date          DateTime  // Somente data
+  startTime     String    // Horário agendado HH:MM
+  endTime       String    // Horário agendado HH:MM
+  actualStartAt DateTime? // Horário real de início (preenchido no start manual)
+  actualEndAt   DateTime? // Horário real de fim (preenchido no finish manual ou cron)
   roomId        String
-  responsibleId String?
-  status        Int      @default(1) // 1 = agendada, 2 = em andamento, 3 = concluida, 4 = cancelada
+  status        Int       @default(1) // 1 = agendada, 2 = em andamento, 3 = concluida, 4 = cancelada
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  Sector      Sector?  @relation(fields: [sectorId], references: [id])
-  Room        Room     @relation(fields: [roomId], references: [id])
-  Responsible User?    @relation(fields: [responsibleId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Room      Room     @relation(fields: [roomId], references: [id])
 
   @@map("meeting_schedule")
 }
