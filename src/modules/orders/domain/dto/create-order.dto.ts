@@ -43,11 +43,11 @@ export class CreateOrderDto {
   @MaxLength(255)
   recipientDepartment?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
+  @IsOptional()
   @IsEmail()
-  @IsNotEmpty()
   @MaxLength(255)
-  recipientEmail: string;
+  recipientEmail?: string;
 
   @ApiProperty()
   @IsString()
