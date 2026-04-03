@@ -279,7 +279,7 @@ model Order {
   description         String?     @db.Text
   recipientName       String      @db.VarChar(255)
   recipientDepartment String?     @db.VarChar(255)
-  recipientEmail      String      @db.VarChar(255)
+  recipientEmail      String?      @db.VarChar(255)
   receivedAt          DateTime
   receivedBy          String      @db.VarChar(255)
   status              OrderStatus @default(AWAITING_PICKUP)
