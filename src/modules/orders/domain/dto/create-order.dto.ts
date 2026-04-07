@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { OrderType } from "@prisma/client";
+import { Transform } from "class-transformer";
 import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength } from "class-validator";
 
 export class CreateOrderDto {
@@ -45,6 +46,7 @@ export class CreateOrderDto {
 
   @ApiProperty({ required: false })
   @IsOptional()
+  @Transform(({ value }) => value === "" ? undefined : value)
   @IsEmail()
   @MaxLength(255)
   recipientEmail?: string;
